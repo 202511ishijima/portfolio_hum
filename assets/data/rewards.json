@@ -1,0 +1,5 @@
+[
+  { "id": "reward-01", "name": "Limited Tote Bag", "points": 300, "description": "Natural tote bag with logo art." },
+  { "id": "reward-02", "name": "Soft Plush Toy", "points": 500, "description": "Limited plush inspired by a golden hamster." },
+  { "id": "reward-03", "name": "Acrylic Keyholder", "points": 180, "description": "Mini charm popular for social posts." }
+]

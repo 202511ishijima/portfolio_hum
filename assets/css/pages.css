@@ -1,0 +1,78 @@
+.hero {
+  padding-top: 36px;
+}
+
+.hero-card__label {
+  margin-bottom: 10px;
+  font-family: "Quicksand", sans-serif;
+  color: var(--color-main-deep);
+  font-weight: 700;
+}
+
+.page-hero {
+  margin-top: 24px;
+}
+
+.page-hero h1 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+.detail-layout,
+.cart-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.detail-card__media {
+  margin-bottom: 0;
+}
+
+.menu-section {
+  display: grid;
+  gap: 16px;
+}
+
+.news-card,
+.faq-item {
+  display: grid;
+  gap: 8px;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.stats-row {
+  display: grid;
+  gap: 12px;
+}
+
+.stats-card {
+  padding: 18px;
+  border-radius: 20px;
+  background: #fff7f0;
+  border: 1px solid var(--color-border);
+}
+
+.stats-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.4rem;
+}
+
+@media (min-width: 900px) {
+  .detail-layout {
+    grid-template-columns: 0.9fr 1.1fr;
+    align-items: start;
+  }
+
+  .cart-layout {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: start;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

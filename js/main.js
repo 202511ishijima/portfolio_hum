@@ -1,14 +1,11 @@
-//  プロジェクトアーカイブ 共通JS
+// Shared scripts for the project archive pages.
 
-// ナビゲーション生成関数
 function generateNavigation() {
   const sidebar = document.querySelector('.sidebar');
   if (!sidebar) return;
 
-  // data-nav-level属性でパス階層を判定（root, docs, design, prompts）
   const navLevel = sidebar.dataset.navLevel || 'root';
 
-  // パスプレフィックスを設定
   let rootPath = './';
   let docsPath = './docs/';
   let designPath = './design/';
@@ -31,10 +28,10 @@ function generateNavigation() {
     promptsPath = './';
   }
 
-  const navHTML = `
+  sidebar.innerHTML = `
     <div class="sidebar-header">
       <div class="logo">PROJECT ARCHIVE</div>
-      <div class="project-name"><br>プロジェクトアーカイブ</div>
+      <div class="project-name">ポートフォリオ制作<br>プロジェクトアーカイブ</div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-group">
@@ -62,30 +59,26 @@ function generateNavigation() {
         <a href="${docsPath}08-db-design.html"><span class="nav-number">08</span> DB設計書</a>
         <a href="${docsPath}09-test-report.html"><span class="nav-number">09</span> テスト報告書</a>
         <a href="${designPath}system-flow.html"><span class="material-symbols-outlined icon-sm">account_tree</span> システムフロー図</a>
-        <a href="${designPath}class-diagram.html"><span class="material-symbols-outlined icon-sm">lan</span> クラス構成図</a>
+        <a href="${designPath}class-diagram.html"><span class="material-symbols-outlined icon-sm">lan</span> クラス図</a>
         <a href="${designPath}method-list.html"><span class="material-symbols-outlined icon-sm">list_alt</span> メソッド一覧</a>
         <a href="${designPath}logic-explanation.html"><span class="material-symbols-outlined icon-sm">search</span> ロジック解説</a>
       </div>
       <div class="nav-group">
         <div class="nav-group-title">プロンプト</div>
         <a href="${promptsPath}prompt-step.html"><span class="material-symbols-outlined icon-sm">format_list_numbered</span> ステップ別プロンプト</a>
-        <a href="${promptsPath}prompt-function.html"><span class="material-symbols-outlined icon-sm">extension</span> 機能追加別プロンプト</a>
-        <a href="${promptsPath}prompt-log.html"><span class="material-symbols-outlined icon-sm">history</span> 実行ログ</a>
+        <a href="${promptsPath}prompt-function.html"><span class="material-symbols-outlined icon-sm">extension</span> 機能追加プロンプト</a>
+        <a href="${promptsPath}prompt-log.html"><span class="material-symbols-outlined icon-sm">history</span> 作業ログ</a>
       </div>
     </nav>
     <div class="sidebar-footer">
       &copy; Project Archive 2026
     </div>
   `;
-
-  sidebar.innerHTML = navHTML;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ナビゲーションを生成
   generateNavigation();
 
-  // Sidebar toggle for mobile
   const hamburger = document.querySelector('.hamburger');
   const sidebar = document.querySelector('.sidebar');
 
@@ -94,17 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
       sidebar.classList.toggle('open');
     });
 
-    // Close sidebar when clicking outside
-    document.addEventListener('click', (e) => {
-      if (sidebar.classList.contains('open') &&
-          !sidebar.contains(e.target) &&
-          !hamburger.contains(e.target)) {
+    document.addEventListener('click', (event) => {
+      if (
+        sidebar.classList.contains('open') &&
+        !sidebar.contains(event.target) &&
+        !hamburger.contains(event.target)
+      ) {
         sidebar.classList.remove('open');
       }
     });
 
-    // Close sidebar when clicking a nav link (mobile)
-    sidebar.querySelectorAll('a').forEach(link => {
+    sidebar.querySelectorAll('a').forEach((link) => {
       link.addEventListener('click', () => {
         if (window.innerWidth <= 768) {
           sidebar.classList.remove('open');
@@ -113,46 +106,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Set active nav item based on current page
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.sidebar-nav a').forEach(link => {
+  document.querySelectorAll('.sidebar-nav a').forEach((link) => {
     const href = link.getAttribute('href');
     if (href && (href.endsWith(currentPage) || (currentPage === 'index.html' && href === './index.html'))) {
       link.classList.add('active');
     }
   });
 
-  // Copy prompt text functionality
-  document.querySelectorAll('.prompt-box').forEach(box => {
+  document.querySelectorAll('.prompt-box').forEach((box) => {
     const promptText = box.querySelector('.prompt-text');
-    if (promptText) {
-      promptText.style.cursor = 'pointer';
-      promptText.title = 'クリックしてコピー';
+    if (!promptText) return;
 
-      promptText.addEventListener('click', () => {
-        const text = promptText.textContent;
-        navigator.clipboard.writeText(text).then(() => {
-          const originalBg = promptText.style.background;
-          promptText.style.background = '#d1fae5';
-          promptText.style.transition = 'background 0.3s';
-          setTimeout(() => {
-            promptText.style.background = originalBg || '#fff';
-          }, 500);
-        });
+    promptText.style.cursor = 'pointer';
+    promptText.title = 'クリックしてコピー';
+
+    promptText.addEventListener('click', () => {
+      const text = promptText.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const originalBg = promptText.style.background;
+        promptText.style.background = '#d1fae5';
+        promptText.style.transition = 'background 0.3s';
+        setTimeout(() => {
+          promptText.style.background = originalBg || '#fff';
+        }, 500);
       });
-    }
+    });
   });
 
-  // Smooth scroll for TOC links
-  document.querySelectorAll('.toc-list a').forEach(link => {
-    link.addEventListener('click', (e) => {
+  document.querySelectorAll('.toc-list a').forEach((link) => {
+    link.addEventListener('click', (event) => {
       const href = link.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+      if (!href || !href.startsWith('#')) return;
+
+      event.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   });

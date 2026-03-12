@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン | はむのくらし</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+<body data-base-path="../" data-page="login">
+  <div id="site-header"></div>
+  <main class="container">
+    <section class="section">
+      <article class="form-card">
+        <p class="eyebrow">LOGIN</p>
+        <h1>ログイン</h1>
+        <form id="login-form" class="form-grid">
+          <label class="form-row">メールアドレス<input name="email" type="email" required></label>
+          <label class="form-row">パスワード<input name="password" type="password" required></label>
+          <button class="button" type="submit">ログインする</button>
+        </form>
+      </article>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../assets/js/common.js"></script>
+  <script src="../assets/js/router.js"></script>
+  <script src="../assets/js/membership.js"></script>
+</body>
+</html>

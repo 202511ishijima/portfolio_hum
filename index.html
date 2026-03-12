@@ -1,171 +1,152 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>プロジェクトアーカイブ - プロジェクトアーカイブ</title>
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
-  <link rel="stylesheet" href="css/style.css">
+  <title>はむのくらし | ハムスターカフェ・お迎え・用品EC</title>
+  <meta name="description" content="はむのくらしは、ハムスターカフェ・生体のお迎え相談・飼育用品のお買い物を一つにつないだ静的Webサイトです。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
 </head>
-
-<body>
-  <button class="hamburger" aria-label="メニュー">
-    <span></span><span></span><span></span>
-  </button>
-
-  <div class="page-wrapper">
-    <aside class="sidebar" data-nav-level="root"></aside>
-
-    <main class="main-content">
-      <header class="doc-header">
-        <div class="doc-category">PROJECT ARCHIVE TOP</div>
-        <h1 class="doc-title">プロジェクトアーカイブ</h1>
-        <div class="doc-meta">
-          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 作成日：2026-XX-XX</span>
-          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者：（氏名を入力）</span>
-          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+<body data-base-path="./" data-page="home">
+  <div id="site-header"></div>
+  <main>
+    <section class="hero section">
+      <div class="container hero__grid">
+        <div>
+          <p class="eyebrow">HAMU NO KURASHI</p>
+          <h1>ハムスターの幸せが、<br>いちばんの幸せ。</h1>
+          <p class="hero__lead">カフェでふれあい、お迎えを考え、暮らしに必要な用品までそろう。はむのくらしは、やさしい時間と安心の出会いをつなぐハムスター専門サイトです。</p>
+          <div class="button-row">
+            <a class="button" href="pages/cafe.html">カフェを見る</a>
+            <a class="button button--secondary" href="hamsters/index.html">お迎えを考える</a>
+          </div>
+          <ul class="hero__badges">
+            <li>駅近カフェ</li>
+            <li>対面説明で安心</li>
+            <li>ポイント会員あり</li>
+          </ul>
         </div>
-      </header>
-
-      <div class="doc-body">
-
-        <section class="section">
-          <h2 class="section-title"><span class="section-icon"><span
-                class="material-symbols-outlined">person</span></span> プロフィール</h2>
-
-          <div class="fill-block">
-            <div class="fill-label">氏名 <span class="required">必須</span></div>
-            <div class="fill-content">
-              <p>（氏名を入力）</p>
-            </div>
+        <div class="hero-card">
+          <div class="hero-card__inner">
+            <p class="hero-card__label">Brand Story</p>
+            <p>小さな体で、一生懸命生きているハムスター。その小さなぬくもりは、忙しい毎日にそっとやさしさをくれます。はむのくらしは、ただ販売する場所ではなく、ハムスターと人が安心して一緒に暮らせる未来をつくる場所です。</p>
           </div>
-
-          <div class="fill-block">
-            <div class="fill-label">キャッチコピー <span class="required">必須</span></div>
-            <div class="fill-hint">自分を一言で表現するフレーズ（例：「ユーザー体験を設計するフルスタック開発者」）</div>
-            <div class="fill-content">
-              <p>（キャッチコピーを入力）</p>
-            </div>
-          </div>
-
-          <div class="fill-block">
-            <div class="fill-label">自己紹介文 <span class="required">必須</span></div>
-            <div class="fill-hint">3〜5文で自分の強み・学んだこと・目指す方向性を紹介</div>
-            <div class="fill-content">
-              <p>（自己紹介文を入力）</p>
-            </div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title"><span class="section-icon"><span
-                class="material-symbols-outlined">work</span></span> 制作物</h2>
-
-          <div class="card-grid">
-            <div class="card">
-              <div class="card-title">Webサイト</div>
-              <div class="card-text">
-                （制作したWebサイトの名前・概要を入力）<br>
-                <a href="#">→ サイトを見る</a>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title">Webアプリケーション</div>
-              <div class="card-text">
-                （制作したWebアプリの名前・概要を入力）<br>
-                <a href="#">→ アプリを見る</a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title"><span class="section-icon"><span
-                class="material-symbols-outlined">description</span></span> 制作ドキュメント</h2>
-          <div class="card-grid">
-            <div class="card"><a href="./docs/01-proposal.html">
-                <div class="card-title">01 企画提案書</div>
-              </a></div>
-            <div class="card"><a href="./docs/02-market-research.html">
-                <div class="card-title">02 マーケットリサーチ</div>
-              </a></div>
-            <div class="card"><a href="./docs/03-persona.html">
-                <div class="card-title">03 ペルソナシート</div>
-              </a></div>
-            <div class="card"><a href="./docs/04-sitemap.html">
-                <div class="card-title">04 サイトマップ</div>
-              </a></div>
-            <div class="card"><a href="./docs/05-wireframe.html">
-                <div class="card-title">05 ワイヤーフレーム</div>
-              </a></div>
-            <div class="card"><a href="./docs/06-design-guide.html">
-                <div class="card-title">06 デザインガイドライン</div>
-              </a></div>
-            <div class="card"><a href="./docs/10-retrospective.html">
-                <div class="card-title">10 振り返り・技術記事</div>
-              </a></div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title"><span class="section-icon"><span
-                class="material-symbols-outlined">engineering</span></span> 設計資料</h2>
-          <div class="card-grid">
-            <div class="card"><a href="./docs/07-specification.html">
-                <div class="card-title">07 仕様書</div>
-              </a></div>
-            <div class="card"><a href="./docs/08-db-design.html">
-                <div class="card-title">08 DB設計書</div>
-              </a></div>
-            <div class="card"><a href="./docs/09-test-report.html">
-                <div class="card-title">09 テスト報告書</div>
-              </a></div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title"><span class="section-icon"><span
-                class="material-symbols-outlined">bolt</span></span> スキル</h2>
-
-          <div class="fill-block">
-            <div class="fill-label">技術スキル一覧 <span class="required">必須</span></div>
-            <div class="fill-content">
-              <p><strong>フロントエンド：</strong>HTML / CSS / JavaScript / Tailwind CSS</p>
-              <p><strong>バックエンド：</strong>Java / Spring Boot / MyBatis</p>
-              <p><strong>データベース：</strong>MySQL（またはH2）</p>
-              <p><strong>デザイン：</strong>Figma / UI/UXデザイン</p>
-              <p><strong>ツール：</strong>Git / GitHub / VS Code / ChatGPT</p>
-              <p>（上記を自分の実際のスキルに合わせて編集してください）</p>
-            </div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title"><span class="section-icon"><span
-                class="material-symbols-outlined">link</span></span> リンク</h2>
-
-          <div class="fill-block">
-            <div class="fill-label">GitHub <span class="required">必須</span></div>
-            <div class="fill-content">
-              <p>https://github.com/（ユーザー名）</p>
-            </div>
-          </div>
-
-          <div class="fill-block">
-            <div class="fill-label">連絡先 <span class="optional">任意</span></div>
-            <div class="fill-content">
-              <p>（メールアドレスなど）</p>
-            </div>
-          </div>
-        </section>
-
+        </div>
       </div>
-    </main>
-  </div>
+    </section>
 
-  <script src="js/main.js"></script>
+    <section class="section section--soft">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">CONCEPT</p>
+          <h2>体験からお迎え、その先の暮らしまで。</h2>
+          <p>カフェ体験を入口に、安心できる説明と継続的なサポートで長く寄り添う導線を設計しています。</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card"><h3>1. カフェで出会う</h3><p>自然光のような明るい空間で、かわいいしぐさや食事の姿を近くで感じられます。</p></article>
+          <article class="feature-card"><h3>2. お迎えを考える</h3><p>性格や飼いやすさを比較しながら、対面説明で一匹ずつ丁寧にご案内します。</p></article>
+          <article class="feature-card"><h3>3. 暮らしを続ける</h3><p>スターターセットや用品EC、限定景品のある会員制度で継続利用につなげます。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container split-section">
+        <div>
+          <p class="eyebrow">CAFE</p>
+          <h2>約1000円で、軽食つきのやさしいカフェ時間。</h2>
+          <p>ドリンク8種、フード8種、体験用えさ3種を用意。店内にはSNSに投稿したくなるフォトスポットもあり、親子でも、おひとりでも、ゆったりと過ごせます。</p>
+          <div class="button-row">
+            <a class="button" href="pages/cafe.html">メニューを見る</a>
+            <a class="button button--ghost" href="pages/news.html">最新のお知らせ</a>
+          </div>
+        </div>
+        <div class="spotlight-card">
+          <h3>店内フォトスポット</h3>
+          <p>木目の壁とアイボリーの丸窓、やわらかい照明で、ハムスターの表情がかわいく写る撮影スペースを用意。</p>
+          <ul class="check-list">
+            <li>自然光風の明るいトーン</li>
+            <li>小さなお子さまでも撮影しやすい高さ</li>
+            <li>季節限定の小物ディスプレイ</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--soft">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">HAMSTERS</p>
+          <h2>性格や飼いやすさが見える、お迎え候補たち。</h2>
+          <p>はじめての方でも比較しやすいように、種類ごとの特徴と個性が伝わる一覧を用意しています。</p>
+        </div>
+        <div id="featured-hamsters" class="card-grid"></div>
+        <div class="center-button"><a class="button button--secondary" href="hamsters/index.html">生体一覧へ</a></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">STARTER SET</p>
+          <h2>はじめてのお迎えに、迷いにくいセット。</h2>
+          <p>ケージ、回し車、給水器、床材などをバランスよくまとめたスターターセットを用意しています。</p>
+        </div>
+        <div id="starter-products" class="card-grid"></div>
+      </div>
+    </section>
+
+    <section class="section section--soft">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">POPULAR ITEMS</p>
+          <h2>人気商品</h2>
+          <p>毎日の飼育に使いやすい用品を、カテゴリをまたいでピックアップしています。</p>
+        </div>
+        <div id="popular-products" class="card-grid"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container split-section">
+        <div class="membership-card">
+          <p class="eyebrow">MEMBERSHIP</p>
+          <h2>ポイントは限定グッズ交換に。</h2>
+          <p>ポイントはお買い物の値引きではなく、トートバッグやぬいぐるみなど限定景品と交換できます。再来店・再購入のきっかけになる、やさしい会員制度です。</p>
+          <a class="button" href="pages/membership.html">会員制度を見る</a>
+        </div>
+        <div>
+          <p class="eyebrow">SNS</p>
+          <h2>投稿したくなる、やさしい毎日。</h2>
+          <p>#はむのくらし の投稿で、お気に入りの一枚やお迎え準備の記録を共有。</p>
+          <div class="sns-links">
+            <a href="pages/contact.html">Instagram風ギャラリーを見る</a>
+            <a href="pages/news.html">季節イベントを見る</a>
+            <a href="pages/faq.html">はじめての疑問を解決</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--soft">
+      <div class="container">
+        <div class="section-heading"><p class="eyebrow">NEWS</p><h2>お知らせ</h2></div>
+        <div id="home-news" class="news-list"></div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/router.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/hamsters.js"></script>
+  <script src="assets/js/membership.js"></script>
 </body>
-
 </html>

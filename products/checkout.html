@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ダミー購入 | はむのくらし</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+<body data-base-path="../" data-page="cart" data-complete-path="complete.html">
+  <div id="site-header"></div>
+  <main class="container">
+    <section class="section cart-layout">
+      <form id="checkout-form" class="form-card form-grid">
+        <h1>ダミー購入手続き</h1>
+        <label class="form-row">お名前<input type="text" required></label>
+        <label class="form-row">住所<input type="text" required></label>
+        <label class="form-row">電話番号<input type="tel" required></label>
+        <label class="form-row">お支払い方法
+          <select>
+            <option>クレジットカード（ダミー）</option>
+            <option>店頭支払い（ダミー）</option>
+          </select>
+        </label>
+        <button class="button" type="submit">注文を確定する</button>
+      </form>
+      <div id="checkout-summary"></div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../assets/js/common.js"></script>
+  <script src="../assets/js/router.js"></script>
+  <script src="../assets/js/cart.js"></script>
+</body>
+</html>
