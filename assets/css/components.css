@@ -53,7 +53,11 @@
 .cart-card,
 .summary-card,
 .form-card,
-.policy-card {
+.policy-card,
+.visual-card,
+.quote-card,
+.flow-card,
+.media-panel {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -67,7 +71,11 @@
 .detail-card,
 .form-card,
 .summary-card,
-.cart-card {
+.cart-card,
+.visual-card,
+.quote-card,
+.flow-card,
+.media-panel {
   padding: 24px;
 }
 
@@ -91,7 +99,8 @@
 .hero__badges,
 .chip-list,
 .check-list,
-.footer-list {
+.footer-list,
+.plain-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -119,7 +128,8 @@
   font-weight: 700;
 }
 
-.check-list {
+.check-list,
+.plain-list {
   display: grid;
   gap: 10px;
 }
@@ -130,17 +140,19 @@
 }
 
 .check-list li::before {
-  content: "●";
+  content: "*";
   position: absolute;
   left: 0;
   top: 0;
   color: var(--color-accent);
+  font-weight: 700;
 }
 
 .product-card__media,
 .hamster-card__media,
 .menu-card__media,
-.detail-card__media {
+.detail-card__media,
+.media-placeholder {
   aspect-ratio: 4 / 3;
   border-radius: 22px;
   margin-bottom: 18px;
@@ -152,12 +164,30 @@
 .product-card__media::after,
 .hamster-card__media::after,
 .menu-card__media::after,
-.detail-card__media::after {
+.detail-card__media::after,
+.media-placeholder::after {
   content: "";
   position: absolute;
   inset: 18px;
   border-radius: 20px;
   border: 1px dashed rgba(255, 255, 255, 0.55);
+}
+
+.media-placeholder::before {
+  content: attr(data-label);
+  position: absolute;
+  inset: auto 16px 16px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 253, 249, 0.92);
+  color: var(--color-main-deep);
+  font-size: 0.85rem;
+  font-weight: 700;
+  z-index: 1;
 }
 
 .product-card__meta,
@@ -175,7 +205,8 @@
   color: var(--color-main-deep);
 }
 
-.grid-two {
+.grid-two,
+.grid-three {
   display: grid;
   gap: 18px;
 }
@@ -283,7 +314,8 @@
 
 .tab-row,
 .filter-row,
-.sns-links {
+.sns-links,
+.link-row {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -291,7 +323,8 @@
 
 .tab-row a,
 .filter-row button,
-.sns-links a {
+.sns-links a,
+.link-row a {
   display: inline-flex;
   align-items: center;
   min-height: 40px;
@@ -306,8 +339,22 @@
   color: var(--color-white);
 }
 
+.info-pair {
+  display: grid;
+  gap: 12px;
+}
+
+.info-pair strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
 @media (min-width: 768px) {
   .grid-two {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-three {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

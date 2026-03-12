@@ -12,19 +12,45 @@
   <link rel="stylesheet" href="../assets/css/components.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
 </head>
-<body data-base-path="../" data-page="login">
+<body data-base-path="../" data-page="register">
   <div id="site-header"></div>
   <main class="container">
-    <section class="section">
+    <section class="section auth-layout">
+      <article class="section-stack">
+        <div class="panel visual-card">
+          <p class="eyebrow">REGISTER</p>
+          <h1>会員登録</h1>
+          <p>100 円ごとに 1 ポイントがたまり、限定グッズ交換につながる会員制度の入口です。特に 500 ポイントで交換できるぬいぐるみを主役に見せます。</p>
+          <div class="media-placeholder media-placeholder-tall">ぬいぐるみ訴求イメージ</div>
+        </div>
+        <div class="grid-three">
+          <article class="info-card">
+            <h3>50pt</h3>
+            <p>小さな遊び道具と交換</p>
+          </article>
+          <article class="info-card">
+            <h3>100pt</h3>
+            <p>限定キーホルダーと交換</p>
+          </article>
+          <article class="info-card">
+            <h3>500pt</h3>
+            <p>限定ぬいぐるみと交換</p>
+          </article>
+        </div>
+      </article>
+
       <article class="form-card">
-        <p class="eyebrow">REGISTER</p>
-        <h1>会員登録</h1>
+        <h2>会員情報を登録</h2>
         <form id="register-form" class="form-grid">
           <label class="form-row">お名前<input name="name" type="text" required></label>
           <label class="form-row">メールアドレス<input name="email" type="email" required></label>
           <label class="form-row">パスワード<input name="password" type="password" required></label>
           <button class="button" type="submit">登録する</button>
         </form>
+        <div class="link-row">
+          <a class="button button-secondary" href="./login.html">ログインへ</a>
+          <a class="button button-ghost" href="./rewards.html">景品一覧を見る</a>
+        </div>
       </article>
     </section>
   </main>

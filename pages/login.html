@@ -15,15 +15,35 @@
 <body data-base-path="../" data-page="login">
   <div id="site-header"></div>
   <main class="container">
-    <section class="section">
+    <section class="section auth-layout">
+      <article class="section-stack">
+        <div class="panel visual-card">
+          <p class="eyebrow">LOGIN</p>
+          <h1>ログイン</h1>
+          <p>ポイント確認や景品交換ページの利用に進むためのダミーログイン画面です。提出用の静的サイトとして、気軽に確認できる構成にしています。</p>
+          <div class="media-placeholder media-placeholder-tall">会員イメージ画像</div>
+        </div>
+        <div class="panel">
+          <h2>ログイン後にできること</h2>
+          <ul class="check-list">
+            <li>現在ポイントの確認</li>
+            <li>限定ぬいぐるみの交換導線確認</li>
+            <li>会員特典ページと景品一覧の閲覧</li>
+          </ul>
+        </div>
+      </article>
+
       <article class="form-card">
-        <p class="eyebrow">LOGIN</p>
-        <h1>ログイン</h1>
+        <h2>会員情報を入力</h2>
         <form id="login-form" class="form-grid">
           <label class="form-row">メールアドレス<input name="email" type="email" required></label>
           <label class="form-row">パスワード<input name="password" type="password" required></label>
           <button class="button" type="submit">ログインする</button>
         </form>
+        <div class="link-row">
+          <a class="button button-secondary" href="./register.html">新規会員登録</a>
+          <a class="button button-ghost" href="./membership.html">制度を見る</a>
+        </div>
       </article>
     </section>
   </main>
