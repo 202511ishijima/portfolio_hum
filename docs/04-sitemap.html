@@ -3,48 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>サイトマップ -  プロジェクトアーカイブ</title>
+  <title>サイトマップ - プロジェクトアーカイブ</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <button class="hamburger" aria-label="メニュー">
+  <button class="hamburger" aria-label="メニューを開く">
     <span></span><span></span><span></span>
   </button>
 
   <div class="page-wrapper">
-  <aside class="sidebar" data-nav-level="docs"></aside>
+    <aside class="sidebar" data-nav-level="docs"></aside>
 
     <main class="main-content">
       <header class="doc-header">
         <div class="doc-category">DOCUMENT 04</div>
         <h1 class="doc-title">サイトマップ</h1>
         <div class="doc-meta">
-          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 作成日：2026-XX-XX</span>
-          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者：（氏名を入力）</span>
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 更新日: 2026-03-12</span>
+          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者: はむのくらし企画案</span>
           <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
         </div>
       </header>
 
       <div class="doc-body">
-
-        <div class="external-link-box">
-          <div class="external-link-box-title">
-            <span class="material-symbols-outlined">link</span>
-            詳細ドキュメント（Google スプレッドシート）
-          </div>
-          <div class="external-link-box-desc">
-            このページは概要のみを記載しています。詳細なサイトマップは以下のリンクからご確認ください。
-          </div>
-          <div class="external-link-input">
-            <input type="text" placeholder="https://docs.google.com/spreadsheets/d/xxxxx" id="external-link-04">
-            <a href="#" class="link-btn" onclick="window.open(document.getElementById('external-link-04').value || 'https://docs.google.com', '_blank'); return false;">
-              <span class="material-symbols-outlined">open_in_new</span>
-              開く
-            </a>
-          </div>
-        </div>
-
         <div class="toc">
           <div class="toc-title">目次</div>
           <ol class="toc-list">
@@ -58,97 +40,215 @@
         <section class="section" id="sec1">
           <h2 class="section-title"><span class="section-icon">1</span> サイト構造図</h2>
 
-        <div class="fill-block">
-          <div class="fill-label">Webサイト構造図 <span class="required">必須</span></div>
-          <div class="fill-hint">トップページから下層ページまでの階層構造をツリー形式で記載</div>
-          <div class="fill-content">
-            <p>（ツリー形式のサイト構造図を記載）</p>
+          <div class="fill-block completed">
+            <div class="fill-label">Webサイト構造図 <span class="required">必須</span></div>
+            <div class="fill-hint">トップページから下層ページまでの階層構造をツリー形式で整理する。</div>
+            <div class="fill-content ascii-diagram">
+              <pre>TOP
+├ はむのくらしについて
+├ カフェ
+├ ハムスターお迎え
+│  ├ 生体一覧
+│  └ 生体詳細
+├ 商品
+│  ├ 商品一覧
+│  ├ 商品詳細
+│  ├ カート
+│  ├ 購入手続き
+│  └ 購入完了
+├ はじめての方へ
+├ 会員制度
+│  ├ ログイン
+│  ├ 会員登録
+│  ├ マイページ
+│  └ 景品交換
+├ お知らせ
+├ FAQ
+└ お問い合わせ</pre>
+            </div>
           </div>
-        </div>
-        <div class="fill-block">
-          <div class="fill-label">Webアプリケーション構造図 <span class="required">必須</span></div>
-          <div class="fill-hint">Spring Bootアプリケーションの画面構造をツリー形式で記載</div>
-          <div class="fill-content">
-            <p>（ツリー形式のアプリ構造図を記載）</p>
-          </div>
-        </div>
 
+          <div class="fill-block completed">
+            <div class="fill-label">Webアプリケーション構造図 <span class="required">必須</span></div>
+            <div class="fill-hint">疑似ECアプリとしての画面構造をツリー形式で整理する。</div>
+            <div class="fill-content ascii-diagram">
+              <pre>ECアプリ
+├ ログイン
+├ 会員登録
+├ 商品一覧
+├ 商品詳細
+├ カート
+├ 購入手続き
+├ 購入完了
+├ マイページ
+└ 景品交換</pre>
+            </div>
+          </div>
         </section>
 
         <section class="section" id="sec2">
           <h2 class="section-title"><span class="section-icon">2</span> ページ一覧</h2>
 
-          <div class="fill-block">
-            <div class="fill-label">Webサイト ページ一覧 <span class="required">必須</span></div>
-        <table class="doc-table">
-          <thead><tr><th>No.</th><th>ページ名</th><th>ページの目的</th><th>主要コンテンツ</th></tr></thead>
-          <tbody>
-          <tr class="template-row"><td>1</td><td>（トップページ）</td><td>（サービスの魅力を伝え、各ページへ誘導）</td><td>（ヒーロー、サービス紹介、CTA等）</td></tr>
-          <tr class="template-row"><td>2</td><td>（ページ名）</td><td>（目的を記載）</td><td>（コンテンツを記載）</td></tr>
-          <tr class="template-row"><td>3</td><td>（ページ名）</td><td>（目的を記載）</td><td>（コンテンツを記載）</td></tr>
-          <tr class="template-row"><td>…</td><td>…</td><td>…</td><td>…</td></tr>
-          </tbody>
-        </table>
-
+          <div class="fill-block completed">
+            <div class="fill-label">Webサイトページ一覧 <span class="required">必須</span></div>
+            <table class="doc-table">
+              <thead>
+                <tr><th>No</th><th>ページ名</th><th>ページの目的</th><th>主要コンテンツ</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>トップページ</td><td>サービス全体の魅力を伝え、各導線へ案内する</td><td>ヒーロー、ブランド紹介、カフェ紹介、生体紹介、人気商品、CTA</td></tr>
+                <tr><td>2</td><td>はむのくらしについて</td><td>ブランドの想いと世界観を伝える</td><td>ブランドメッセージ、ストーリー、方針</td></tr>
+                <tr><td>3</td><td>カフェ</td><td>来店意欲を高める</td><td>店内紹介、利用案内、メニュー、フォトスポット</td></tr>
+                <tr><td>4</td><td>ハムスターお迎え</td><td>お迎えの考え方と流れを伝える</td><td>販売ポリシー、お迎え手順、相談導線</td></tr>
+                <tr><td>5</td><td>生体一覧</td><td>種類や個体情報を比較できるようにする</td><td>種類、性格、飼いやすさ、価格</td></tr>
+                <tr><td>6</td><td>生体詳細</td><td>各個体の特徴を詳しく伝える</td><td>説明文、性格、価格、問い合わせ導線</td></tr>
+                <tr><td>7</td><td>商品トップ</td><td>商品カテゴリへの入口を作る</td><td>カテゴリ紹介、おすすめ導線</td></tr>
+                <tr><td>8</td><td>商品一覧</td><td>商品を比較・選択しやすくする</td><td>カテゴリ導線、商品カード、カート追加</td></tr>
+                <tr><td>9</td><td>商品詳細</td><td>商品の購入判断を支援する</td><td>商品説明、価格、特徴、購入ボタン</td></tr>
+                <tr><td>10</td><td>カート</td><td>購入内容を確認する</td><td>商品一覧、数量変更、合計金額</td></tr>
+                <tr><td>11</td><td>購入手続き</td><td>ダミー購入を行う</td><td>フォーム、購入確認、注文確定</td></tr>
+                <tr><td>12</td><td>購入完了</td><td>購入完了を知らせる</td><td>完了メッセージ、次の導線</td></tr>
+                <tr><td>13</td><td>はじめての方へ</td><td>初心者の不安を減らす</td><td>飼育の基本、準備物、導線案内</td></tr>
+                <tr><td>14</td><td>会員制度</td><td>会員メリットを伝える</td><td>ポイント説明、景品紹介、登録導線</td></tr>
+                <tr><td>15</td><td>ログイン</td><td>会員機能への入口を作る</td><td>ログインフォーム</td></tr>
+                <tr><td>16</td><td>会員登録</td><td>新規会員を獲得する</td><td>登録フォーム、登録特典案内</td></tr>
+                <tr><td>17</td><td>マイページ</td><td>会員情報を確認させる</td><td>ポイント表示、景品交換導線</td></tr>
+                <tr><td>18</td><td>景品交換</td><td>会員制度の魅力を高める</td><td>景品一覧、必要ポイント</td></tr>
+                <tr><td>19</td><td>お知らせ</td><td>新着情報を発信する</td><td>新メニュー、イベント、営業情報</td></tr>
+                <tr><td>20</td><td>FAQ</td><td>よくある疑問を解消する</td><td>飼育、販売、会員制度に関するQ&amp;A</td></tr>
+                <tr><td>21</td><td>お問い合わせ</td><td>相談や連絡を受け付ける</td><td>問い合わせフォーム、案内情報</td></tr>
+              </tbody>
+            </table>
           </div>
 
-          <div class="fill-block">
-            <div class="fill-label">Webアプリ 画面一覧 <span class="required">必須</span></div>
-        <table class="doc-table">
-          <thead><tr><th>No.</th><th>画面名</th><th>画面の目的</th><th>主要機能</th></tr></thead>
-          <tbody>
-          <tr class="template-row"><td>1</td><td>（ログイン画面）</td><td>（ユーザー認証）</td><td>（メールアドレス/パスワード入力）</td></tr>
-          <tr class="template-row"><td>2</td><td>（一覧画面）</td><td>（データの一覧表示）</td><td>（検索・ソート・ページネーション）</td></tr>
-          <tr class="template-row"><td>3</td><td>（登録画面）</td><td>（新規データ登録）</td><td>（入力フォーム・バリデーション）</td></tr>
-          <tr class="template-row"><td>…</td><td>…</td><td>…</td><td>…</td></tr>
-          </tbody>
-        </table>
-
+          <div class="fill-block completed">
+            <div class="fill-label">Webアプリ画面一覧 <span class="required">必須</span></div>
+            <table class="doc-table">
+              <thead>
+                <tr><th>No</th><th>画面名</th><th>画面の目的</th><th>主要機能</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>ログイン画面</td><td>会員状態でサイトを利用できる入口にする</td><td>メールアドレス入力、パスワード入力</td></tr>
+                <tr><td>2</td><td>会員登録画面</td><td>新規ユーザーを会員化する</td><td>登録フォーム、登録完了導線</td></tr>
+                <tr><td>3</td><td>商品一覧画面</td><td>商品を比較・選択させる</td><td>カテゴリフィルタ、商品表示、カート追加</td></tr>
+                <tr><td>4</td><td>商品詳細画面</td><td>購入判断を促す</td><td>詳細説明、価格表示、カート追加</td></tr>
+                <tr><td>5</td><td>カート画面</td><td>購入内容を整理する</td><td>数量変更、削除、合計表示</td></tr>
+                <tr><td>6</td><td>購入手続き画面</td><td>ダミー購入を完了させる</td><td>住所入力、支払方法選択、注文確定</td></tr>
+                <tr><td>7</td><td>購入完了画面</td><td>処理結果を伝える</td><td>完了メッセージ、トップへの導線</td></tr>
+                <tr><td>8</td><td>マイページ</td><td>会員情報を見せる</td><td>ポイント表示、景品交換リンク</td></tr>
+                <tr><td>9</td><td>景品交換画面</td><td>ポイント制度の利用価値を見せる</td><td>景品一覧、必要ポイント表示</td></tr>
+              </tbody>
+            </table>
           </div>
         </section>
 
         <section class="section" id="sec3">
           <h2 class="section-title"><span class="section-icon">3</span> ユーザーフロー</h2>
 
-        <div class="fill-block">
-          <div class="fill-label">メインシナリオ <span class="required">必須</span></div>
-          <div class="fill-hint">ペルソナがサイトに訪問してから目的を達成するまでの動線（メインの行動パターン）</div>
-          <div class="fill-content">
-            <p>（メインのユーザーフローを記載）</p>
+          <div class="fill-block completed">
+            <div class="fill-label">メインシナリオ <span class="required">必須</span></div>
+            <div class="fill-content ascii-diagram">
+              <pre>サイト訪問
+↓
+トップページ閲覧
+↓
+カフェ紹介を見る
+↓
+ハムスターに興味を持つ
+↓
+ハムスターお迎えページを見る
+↓
+生体一覧・詳細を見る
+↓
+スターターセットや用品を見る
+↓
+商品をカートに入れる
+↓
+購入手続き
+↓
+購入完了
+↓
+会員制度を知り、再来店・再購入につながる</pre>
+            </div>
           </div>
-        </div>
-        <div class="fill-block">
-          <div class="fill-label">サブシナリオ <span class="optional">任意</span></div>
-          <div class="fill-hint">その他の行動パターン（1〜2パターン）</div>
-          <div class="fill-content">
-            <p>（サブシナリオを記載）</p>
-          </div>
-        </div>
 
+          <div class="fill-block completed">
+            <div class="fill-label">サブシナリオ 1 <span class="required">必須</span></div>
+            <div class="fill-content ascii-diagram">
+              <pre>Instagram投稿を見る
+↓
+サイト訪問
+↓
+カフェページを見る
+↓
+フォトスポットやメニューに興味を持つ
+↓
+来店を検討する
+↓
+会員制度を見る</pre>
+            </div>
+          </div>
+
+          <div class="fill-block completed">
+            <div class="fill-label">サブシナリオ 2 <span class="required">必須</span></div>
+            <div class="fill-content ascii-diagram">
+              <pre>飼育用品を探して検索流入
+↓
+商品一覧ページを見る
+↓
+商品詳細を比較する
+↓
+はじめての方へページで不安を解消する
+↓
+カート追加
+↓
+購入手続き
+↓
+会員登録を検討する</pre>
+            </div>
+          </div>
         </section>
 
         <section class="section" id="sec4">
           <h2 class="section-title"><span class="section-icon">4</span> URL設計</h2>
 
-          <div class="fill-block">
+          <div class="fill-block completed">
             <div class="fill-label">URL一覧 <span class="required">必須</span></div>
-        <table class="doc-table">
-          <thead><tr><th>URL</th><th>HTTPメソッド</th><th>画面/機能</th><th>説明</th></tr></thead>
-          <tbody>
-          <tr class="template-row"><td>/</td><td>GET</td><td>トップページ</td><td>Webサイトのトップ</td></tr>
-          <tr class="template-row"><td>/about</td><td>GET</td><td>概要ページ</td><td>サービスの概要</td></tr>
-          <tr class="template-row"><td>/app/login</td><td>GET</td><td>ログイン画面</td><td>ログインフォーム表示</td></tr>
-          <tr class="template-row"><td>/app/login</td><td>POST</td><td>ログイン処理</td><td>認証処理</td></tr>
-          <tr class="template-row"><td>/app/items</td><td>GET</td><td>一覧画面</td><td>データ一覧表示</td></tr>
-          <tr class="template-row"><td>/app/items/new</td><td>GET</td><td>新規登録画面</td><td>登録フォーム表示</td></tr>
-          <tr class="template-row"><td>/app/items</td><td>POST</td><td>新規登録処理</td><td>データ保存</td></tr>
-          <tr class="template-row"><td>…</td><td>…</td><td>…</td><td>…</td></tr>
-          </tbody>
-        </table>
-
+            <table class="doc-table">
+              <thead>
+                <tr><th>URL</th><th>HTTPメソッド</th><th>画面 / 機能</th><th>説明</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>/</td><td>GET</td><td>トップページ</td><td>サイトトップ表示</td></tr>
+                <tr><td>/about</td><td>GET</td><td>はむのくらしについて</td><td>ブランド紹介表示</td></tr>
+                <tr><td>/cafe</td><td>GET</td><td>カフェ</td><td>カフェ紹介・メニュー表示</td></tr>
+                <tr><td>/receive</td><td>GET</td><td>ハムスターお迎え</td><td>お迎え案内表示</td></tr>
+                <tr><td>/hamsters</td><td>GET</td><td>生体一覧</td><td>生体一覧表示</td></tr>
+                <tr><td>/hamsters/{id}</td><td>GET</td><td>生体詳細</td><td>生体詳細表示</td></tr>
+                <tr><td>/products</td><td>GET</td><td>商品トップ</td><td>商品カテゴリ導線表示</td></tr>
+                <tr><td>/products/list</td><td>GET</td><td>商品一覧</td><td>商品一覧表示</td></tr>
+                <tr><td>/products/{id}</td><td>GET</td><td>商品詳細</td><td>商品詳細表示</td></tr>
+                <tr><td>/cart</td><td>GET</td><td>カート</td><td>カート内容表示</td></tr>
+                <tr><td>/cart</td><td>POST</td><td>カート追加</td><td>商品をカートへ追加する疑似処理</td></tr>
+                <tr><td>/checkout</td><td>GET</td><td>購入手続き</td><td>購入フォーム表示</td></tr>
+                <tr><td>/checkout</td><td>POST</td><td>購入処理</td><td>ダミー注文確定処理</td></tr>
+                <tr><td>/complete</td><td>GET</td><td>購入完了</td><td>購入完了画面表示</td></tr>
+                <tr><td>/beginner</td><td>GET</td><td>はじめての方へ</td><td>初心者向け情報表示</td></tr>
+                <tr><td>/membership</td><td>GET</td><td>会員制度</td><td>会員制度説明表示</td></tr>
+                <tr><td>/login</td><td>GET</td><td>ログイン画面</td><td>ログインフォーム表示</td></tr>
+                <tr><td>/login</td><td>POST</td><td>ログイン処理</td><td>ダミー認証処理</td></tr>
+                <tr><td>/register</td><td>GET</td><td>会員登録画面</td><td>登録フォーム表示</td></tr>
+                <tr><td>/register</td><td>POST</td><td>会員登録処理</td><td>ダミー会員登録処理</td></tr>
+                <tr><td>/mypage</td><td>GET</td><td>マイページ</td><td>ポイント情報表示</td></tr>
+                <tr><td>/rewards</td><td>GET</td><td>景品交換</td><td>景品一覧表示</td></tr>
+                <tr><td>/news</td><td>GET</td><td>お知らせ</td><td>新着情報表示</td></tr>
+                <tr><td>/faq</td><td>GET</td><td>FAQ</td><td>よくある質問表示</td></tr>
+                <tr><td>/contact</td><td>GET</td><td>お問い合わせ</td><td>問い合わせフォーム表示</td></tr>
+                <tr><td>/contact</td><td>POST</td><td>問い合わせ送信</td><td>ダミー送信処理</td></tr>
+              </tbody>
+            </table>
           </div>
         </section>
-
       </div>
     </main>
   </div>
