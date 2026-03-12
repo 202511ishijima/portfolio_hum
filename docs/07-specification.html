@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>仕様書（機能仕様書） -  プロジェクトアーカイブ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <button class="hamburger" aria-label="メニュー">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="page-wrapper">
+  <aside class="sidebar" data-nav-level="docs"></aside>
+
+    <main class="main-content">
+      <header class="doc-header">
+        <div class="doc-category">DOCUMENT 07</div>
+        <h1 class="doc-title">仕様書（機能仕様書）</h1>
+        <div class="doc-meta">
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 作成日：2026-XX-XX</span>
+          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者：（氏名を入力）</span>
+          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+        </div>
+      </header>
+
+      <div class="doc-body">
+
+        <div class="external-link-box">
+          <div class="external-link-box-title">
+            <span class="material-symbols-outlined">link</span>
+            詳細ドキュメント（Google スプレッドシート）
+          </div>
+          <div class="external-link-box-desc">
+            このページは概要のみを記載しています。詳細な仕様書は以下のリンクからご確認ください。
+          </div>
+          <div class="external-link-input">
+            <input type="text" placeholder="https://docs.google.com/spreadsheets/d/xxxxx" id="external-link-07">
+            <a href="#" class="link-btn" onclick="window.open(document.getElementById('external-link-07').value || 'https://docs.google.com', '_blank'); return false;">
+              <span class="material-symbols-outlined">open_in_new</span>
+              開く
+            </a>
+          </div>
+        </div>
+
+        <div class="toc">
+          <div class="toc-title">目次</div>
+          <ol class="toc-list">
+            <li><a href="#sec1">システム概要</a></li>
+            <li><a href="#sec2">機能一覧</a></li>
+            <li><a href="#sec3">画面遷移図</a></li>
+            <li><a href="#sec4">機能詳細仕様</a></li>
+            <li><a href="#sec5">非機能要件</a></li>
+          </ol>
+        </div>
+
+        <section class="section" id="sec1">
+          <h2 class="section-title"><span class="section-icon">1</span> システム概要</h2>
+
+        <div class="fill-block">
+          <div class="fill-label">システムの目的 <span class="required">必須</span></div>
+          <div class="fill-hint">このシステムが解決する課題と提供する価値</div>
+          <div class="fill-content">
+            <p>（システムの目的を記載）</p>
+          </div>
+        </div>
+        <div class="fill-block">
+          <div class="fill-label">システム構成図 <span class="required">必須</span></div>
+          <div class="fill-hint">フロントエンド ↔ バックエンド ↔ データベースの関係を図示</div>
+          <div class="fill-content">
+            <p>（システム構成図を記載）</p>
+          </div>
+        </div>
+
+        </section>
+
+        <section class="section" id="sec2">
+          <h2 class="section-title"><span class="section-icon">2</span> 機能一覧</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">機能一覧表 <span class="required">必須</span></div>
+        <table class="doc-table">
+          <thead><tr><th>No.</th><th>機能名</th><th>概要</th><th>対応画面</th><th>優先度</th></tr></thead>
+          <tbody>
+          <tr class="template-row"><td>F-001</td><td>（ログイン）</td><td>（メール/パスワードで認証）</td><td>（ログイン画面）</td><td><span class="badge badge-must">Must</span></td></tr>
+          <tr class="template-row"><td>F-002</td><td>（一覧表示）</td><td>（データの一覧表示・ページネーション）</td><td>（一覧画面）</td><td><span class="badge badge-must">Must</span></td></tr>
+          <tr class="template-row"><td>F-003</td><td>（新規登録）</td><td>（フォームから新規データ登録）</td><td>（登録画面）</td><td><span class="badge badge-must">Must</span></td></tr>
+          <tr class="template-row"><td>F-004</td><td>（詳細表示）</td><td>（データの詳細情報表示）</td><td>（詳細画面）</td><td><span class="badge badge-must">Must</span></td></tr>
+          <tr class="template-row"><td>F-005</td><td>（編集）</td><td>（既存データの更新）</td><td>（編集画面）</td><td><span class="badge badge-must">Must</span></td></tr>
+          <tr class="template-row"><td>F-006</td><td>（削除）</td><td>（データの削除・確認ダイアログ）</td><td>（一覧画面）</td><td><span class="badge badge-must">Must</span></td></tr>
+          <tr class="template-row"><td>F-007</td><td>（検索）</td><td>（キーワード・条件検索）</td><td>（一覧画面）</td><td><span class="badge badge-should">Should</span></td></tr>
+          <tr class="template-row"><td>F-008</td><td>（ソート）</td><td>（カラムクリックでの並び替え）</td><td>（一覧画面）</td><td><span class="badge badge-should">Should</span></td></tr>
+          <tr class="template-row"><td>F-009</td><td>（CSV出力）</td><td>（データのCSVエクスポート）</td><td>（一覧画面）</td><td><span class="badge badge-could">Could</span></td></tr>
+          <tr class="template-row"><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+          </tbody>
+        </table>
+
+          </div>
+        </section>
+
+        <section class="section" id="sec3">
+          <h2 class="section-title"><span class="section-icon">3</span> 画面遷移図</h2>
+
+        <div class="fill-block">
+          <div class="fill-label">画面遷移図 <span class="required">必須</span></div>
+          <div class="fill-hint">各画面間の遷移関係を図示</div>
+          <div class="fill-content">
+            <p>（画面遷移図を記載）</p>
+          </div>
+        </div>
+
+        </section>
+
+        <section class="section" id="sec4">
+          <h2 class="section-title"><span class="section-icon">4</span> 機能詳細仕様</h2>
+
+
+          <div class="subsection">
+            <h3 class="subsection-title">機能仕様テンプレート（コピーして使用）</h3>
+
+        <div class="fill-block">
+          <div class="fill-label">機能名：（機能名を入力） <span class="required">必須</span></div>
+          <div class="fill-hint">機能ID：F-XXX</div>
+          <div class="fill-content">
+            <p>（機能の詳細仕様を記載）</p>
+          </div>
+        </div>
+
+            <div class="fill-block">
+              <div class="fill-label">入力項目一覧 <span class="required">必須</span></div>
+        <table class="doc-table">
+          <thead><tr><th>項目名</th><th>データ型</th><th>必須</th><th>バリデーション</th><th>備考</th></tr></thead>
+          <tbody>
+          <tr class="template-row"><td>（項目名）</td><td>（String / Integer / Date 等）</td><td>（○ / —）</td><td>（必須チェック / 文字数制限 等）</td><td>（備考）</td></tr>
+          <tr class="template-row"><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+          </tbody>
+        </table>
+
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec5">
+          <h2 class="section-title"><span class="section-icon">5</span> 非機能要件</h2>
+
+        <div class="fill-block">
+          <div class="fill-label">セキュリティ要件 <span class="required">必須</span></div>
+          <div class="fill-hint">認証・認可・データ保護に関する要件</div>
+          <div class="fill-content">
+            <p>（セキュリティ要件を記載）</p>
+          </div>
+        </div>
+        <div class="fill-block">
+          <div class="fill-label">対応環境 <span class="required">必須</span></div>
+          <div class="fill-hint">対応ブラウザ・デバイス</div>
+          <div class="fill-content">
+            <p>・対応ブラウザ：Chrome（最新版）/ Firefox（最新版）/ Edge（最新版）
+・対応デバイス：PC / タブレット / スマートフォン
+（自分の実際の対応範囲に合わせて編集してください）</p>
+          </div>
+        </div>
+
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

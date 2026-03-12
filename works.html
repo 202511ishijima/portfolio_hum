@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>制作物一覧 -  プロジェクトアーカイブ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <button class="hamburger" aria-label="メニュー">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="page-wrapper">
+  <aside class="sidebar" data-nav-level="root"></aside>
+
+    <main class="main-content">
+      <header class="doc-header">
+        <div class="doc-category">WORKS</div>
+        <h1 class="doc-title">制作物一覧</h1>
+        <div class="doc-meta">
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 作成日：2026-XX-XX</span>
+          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者：（氏名を入力）</span>
+          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+        </div>
+      </header>
+
+      <div class="doc-body">
+
+
+        <section class="section">
+          <h2 class="section-title"><span class="section-icon"><span class="material-symbols-outlined">star</span></span> メイン制作物</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">作品名 <span class="required">必須</span></div>
+            <div class="fill-content"><p>（作品名を入力）</p></div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">作品概要 <span class="required">必須</span></div>
+            <div class="fill-hint">どんなサービス・サイトか、ターゲットユーザーは誰か</div>
+            <div class="fill-content"><p>（作品概要を入力）</p></div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">使用技術 <span class="required">必須</span></div>
+            <div class="fill-content">
+              <p><strong>フロントエンド：</strong>HTML / CSS / JavaScript</p>
+              <p><strong>バックエンド：</strong>Java / Spring Boot / MyBatis</p>
+              <p><strong>データベース：</strong>MySQL</p>
+              <p><strong>その他：</strong>Git / Figma</p>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">担当範囲 <span class="required">必須</span></div>
+            <div class="fill-hint">企画・デザイン・フロントエンド・バックエンドなど</div>
+            <div class="fill-content"><p>（担当範囲を入力）</p></div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">工夫した点・アピールポイント <span class="required">必須</span></div>
+            <div class="fill-content"><p>（工夫した点を入力）</p></div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">スクリーンショット <span class="required">必須</span></div>
+            <div class="fill-hint">作品のスクリーンショットを貼り付け</div>
+            <div class="fill-content">
+              <p>（スクリーンショットを挿入）</p>
+              <p class="text-muted">※ 画像は images/ フォルダに保存し、&lt;img&gt;タグで挿入してください</p>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">リンク <span class="optional">任意</span></div>
+            <div class="fill-content">
+              <p><strong>デモサイト：</strong>（URLを入力）</p>
+              <p><strong>GitHubリポジトリ：</strong>https://github.com/（ユーザー名）/（リポジトリ名）</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title"><span class="section-icon"><span class="material-symbols-outlined">web</span></span> その他の制作物</h2>
+
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-title">制作物2</div>
+              <div class="card-text">
+                <p>（作品名・概要を入力）</p>
+                <p><strong>使用技術：</strong>HTML / CSS / JavaScript</p>
+                <p><a href="#">→ 詳細を見る</a></p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">制作物3</div>
+              <div class="card-text">
+                <p>（作品名・概要を入力）</p>
+                <p><strong>使用技術：</strong>HTML / CSS</p>
+                <p><a href="#">→ 詳細を見る</a></p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">制作物4</div>
+              <div class="card-text">
+                <p>（作品名・概要を入力）</p>
+                <p><strong>使用技術：</strong>（技術を入力）</p>
+                <p><a href="#">→ 詳細を見る</a></p>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <section class="section">
+          <h2 class="section-title"><span class="section-icon"><span class="material-symbols-outlined">school</span></span> 授業課題・練習作品</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">課題・練習作品リスト <span class="optional">任意</span></div>
+            <div class="fill-hint">授業で制作した課題や個人での練習作品</div>
+            <div class="fill-content">
+              <p>・（課題名1）：（簡単な説明）</p>
+              <p>・（課題名2）：（簡単な説明）</p>
+              <p>・（課題名3）：（簡単な説明）</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

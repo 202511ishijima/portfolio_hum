@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ロジック解説 - プロジェクトアーカイブ</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+  <button class="hamburger" aria-label="メニュー">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="page-wrapper">
+    <aside class="sidebar" data-nav-level="design"></aside>
+
+    <main class="main-content">
+      <header class="doc-header">
+        <div class="doc-category">DESIGN DOCUMENT</div>
+        <h1 class="doc-title">ロジック解説</h1>
+        <div class="doc-meta">
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 作成日：2026-XX-XX</span>
+          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者：（氏名を入力）</span>
+          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+        </div>
+      </header>
+
+      <div class="doc-body">
+
+        <div class="toc">
+          <div class="toc-title">目次</div>
+          <ol class="toc-list">
+            <li><a href="#sec1">ログイン処理のロジック</a></li>
+            <li><a href="#sec2">バリデーション処理のロジック</a></li>
+            <li><a href="#sec3">検索処理のロジック</a></li>
+            <li><a href="#sec4">権限チェックのロジック</a></li>
+            <li><a href="#sec5">ステータス遷移のロジック</a></li>
+          </ol>
+        </div>
+
+        <section class="section" id="sec1">
+          <h2 class="section-title"><span class="section-icon">1</span> ログイン処理のロジック</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">フローチャート <span class="required">必須</span></div>
+            <div class="fill-hint">ログイン処理の判定フロー</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+                    ┌─────────────────┐
+                    │  ログイン画面表示 │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ メール/パスワード │
+                    │     入力        │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  入力値チェック   │
+                    └────────┬────────┘
+                             │
+                    ┌────────┴────────┐
+                    ▼                  ▼
+               入力エラー          入力OK
+                    │                  │
+                    ▼                  ▼
+            ┌───────────┐     ┌─────────────────┐
+            │エラー表示  │     │  ユーザー検索    │
+            │ログイン画面│     │ (DBからメールで) │
+            └───────────┘     └────────┬────────┘
+                                       │
+                              ┌────────┴────────┐
+                              ▼                  ▼
+                         ユーザー無し        ユーザー有り
+                              │                  │
+                              ▼                  ▼
+                      ┌───────────┐     ┌─────────────────┐
+                      │認証エラー  │     │ パスワード照合   │
+                      │ログイン画面│     │(BCrypt.matches) │
+                      └───────────┘     └────────┬────────┘
+                                                 │
+                                        ┌────────┴────────┐
+                                        ▼                  ▼
+                                   不一致             一致
+                                        │                  │
+                                        ▼                  ▼
+                                ┌───────────┐     ┌─────────────────┐
+                                │認証エラー  │     │  認証成功        │
+                                │ログイン画面│     │ SecurityContext │
+                                └───────────┘     │   に保存        │
+                                                  └────────┬────────┘
+                                                           │
+                                                           ▼
+                                                  ┌─────────────────┐
+                                                  │ /tasks へ       │
+                                                  │ リダイレクト     │
+                                                  └─────────────────┘
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">疑似コード <span class="required">必須</span></div>
+            <div class="fill-hint">IF-THEN-ELSE形式でロジックを記述</div>
+            <div class="fill-content">
+              <div class="code-block">
+                <pre>
+<span class="comment">// ログイン処理の疑似コード</span>
+
+<span class="keyword">FUNCTION</span> login(email, password)
+
+  <span class="comment">// 入力値チェック</span>
+  <span class="keyword">IF</span> email が空 <span class="keyword">THEN</span>
+    エラー「メールアドレスを入力してください」を追加
+  <span class="keyword">END IF</span>
+
+  <span class="keyword">IF</span> password が空 <span class="keyword">THEN</span>
+    エラー「パスワードを入力してください」を追加
+  <span class="keyword">END IF</span>
+
+  <span class="keyword">IF</span> エラーリストが空でない <span class="keyword">THEN</span>
+    <span class="keyword">RETURN</span> ログイン画面（エラー表示）
+  <span class="keyword">END IF</span>
+
+  <span class="comment">// ユーザー検索</span>
+  user = userMapper.selectByEmail(email)
+
+  <span class="keyword">IF</span> user が null <span class="keyword">THEN</span>
+    エラー「メールアドレスまたはパスワードが正しくありません」を追加
+    <span class="keyword">RETURN</span> ログイン画面（エラー表示）
+  <span class="keyword">END IF</span>
+
+  <span class="comment">// パスワード照合</span>
+  <span class="keyword">IF</span> BCrypt.matches(password, user.password) が false <span class="keyword">THEN</span>
+    エラー「メールアドレスまたはパスワードが正しくありません」を追加
+    <span class="keyword">RETURN</span> ログイン画面（エラー表示）
+  <span class="keyword">END IF</span>
+
+  <span class="comment">// 認証成功</span>
+  SecurityContext に user 情報を保存
+  <span class="keyword">RETURN</span> リダイレクト("/tasks")
+
+<span class="keyword">END FUNCTION</span>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec2">
+          <h2 class="section-title"><span class="section-icon">2</span> バリデーション処理のロジック</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">バリデーションの判定フロー <span class="required">必須</span></div>
+            <div class="fill-hint">タスク登録時のバリデーション処理</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+                    ┌─────────────────┐
+                    │  フォーム送信    │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ @Valid による    │
+                    │ 自動バリデーション│
+                    └────────┬────────┘
+                             │
+                    ┌────────┴────────┐
+                    ▼                  ▼
+            BindingResult に      エラーなし
+             エラーあり                │
+                    │                  │
+                    ▼                  ▼
+            ┌───────────────┐  ┌─────────────────┐
+            │ 入力画面に戻る │  │  追加バリデーション │
+            │ エラー表示     │  │  （業務ロジック）   │
+            └───────────────┘  └────────┬────────┘
+                                        │
+                               ┌────────┴────────┐
+                               ▼                  ▼
+                         業務エラー          エラーなし
+                               │                  │
+                               ▼                  ▼
+                       ┌───────────────┐  ┌─────────────────┐
+                       │ 入力画面に戻る │  │  登録処理実行    │
+                       │ エラー表示     │  │  リダイレクト    │
+                       └───────────────┘  └─────────────────┘
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">疑似コード <span class="required">必須</span></div>
+            <div class="fill-hint">バリデーション処理のロジック</div>
+            <div class="fill-content">
+              <div class="code-block">
+                <pre>
+<span class="comment">// タスク登録のバリデーション処理</span>
+
+<span class="keyword">FUNCTION</span> createTask(taskForm, bindingResult)
+
+  <span class="comment">// Bean Validationのエラーチェック</span>
+  <span class="keyword">IF</span> bindingResult.hasErrors() <span class="keyword">THEN</span>
+    <span class="keyword">RETURN</span> 入力画面（フォーム + エラーメッセージ）
+  <span class="keyword">END IF</span>
+
+  <span class="comment">// 業務ロジックバリデーション</span>
+
+  <span class="comment">// 期限の妥当性チェック</span>
+  <span class="keyword">IF</span> taskForm.dueDate が過去の日付 <span class="keyword">THEN</span>
+    bindingResult.rejectValue("dueDate", "error.dueDate",
+                              "期限は今日以降の日付を指定してください")
+  <span class="keyword">END IF</span>
+
+  <span class="comment">// タイトルの重複チェック（同一ユーザー内）</span>
+  existingTask = taskMapper.selectByTitleAndUserId(taskForm.title, userId)
+  <span class="keyword">IF</span> existingTask が存在する <span class="keyword">THEN</span>
+    bindingResult.rejectValue("title", "error.title",
+                              "同じタイトルのタスクが既に存在します")
+  <span class="keyword">END IF</span>
+
+  <span class="comment">// エラーがあれば入力画面に戻る</span>
+  <span class="keyword">IF</span> bindingResult.hasErrors() <span class="keyword">THEN</span>
+    <span class="keyword">RETURN</span> 入力画面（フォーム + エラーメッセージ）
+  <span class="keyword">END IF</span>
+
+  <span class="comment">// 登録処理</span>
+  task = FormからEntityに変換(taskForm)
+  task.userId = ログインユーザーID
+  task.createdAt = 現在日時
+  taskMapper.insert(task)
+
+  <span class="keyword">RETURN</span> リダイレクト("/tasks")（成功メッセージ付き）
+
+<span class="keyword">END FUNCTION</span>
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">エラーメッセージの表示ロジック <span class="optional">任意</span></div>
+            <div class="fill-hint">Thymeleafでのエラー表示</div>
+            <div class="fill-content">
+              <div class="code-block">
+                <pre>
+<span class="comment">&lt;!-- Thymeleafでのエラー表示 --&gt;</span>
+
+<span class="comment">&lt;!-- フィールドエラー（特定フィールド） --&gt;</span>
+&lt;div th:if="${#fields.hasErrors('title')}" class="error-message"&gt;
+  &lt;p th:each="err : ${#fields.errors('title')}" th:text="${err}"&gt;&lt;/p&gt;
+&lt;/div&gt;
+
+<span class="comment">&lt;!-- グローバルエラー（フィールドに紐づかないエラー） --&gt;</span>
+&lt;div th:if="${#fields.hasGlobalErrors()}" class="global-error"&gt;
+  &lt;p th:each="err : ${#fields.globalErrors()}" th:text="${err}"&gt;&lt;/p&gt;
+&lt;/div&gt;
+
+<span class="comment">&lt;!-- 入力フィールドのエラークラス付与 --&gt;</span>
+&lt;input type="text" th:field="*{title}"
+       th:classappend="${#fields.hasErrors('title')} ? 'error' : ''"&gt;
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec3">
+          <h2 class="section-title"><span class="section-icon">3</span> 検索処理のロジック</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">動的SQLの条件分岐 <span class="required">必須</span></div>
+            <div class="fill-hint">複合検索時のSQL生成ロジック</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+                    ┌─────────────────┐
+                    │  検索条件入力    │
+                    │ ・キーワード     │
+                    │ ・カテゴリ      │
+                    │ ・ステータス    │
+                    │ ・期間          │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  WHERE句の組立  │
+                    │  (動的SQL)      │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            ▼                ▼                ▼
+    ┌───────────────┐ ┌───────────────┐ ┌───────────────┐
+    │キーワードあり  │ │カテゴリあり   │ │ステータスあり │
+    │ title LIKE    │ │ category_id = │ │ status =      │
+    │ OR content    │ │ #{categoryId} │ │ #{status}     │
+    │ LIKE '%xxx%'  │ │               │ │               │
+    └───────────────┘ └───────────────┘ └───────────────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  AND で連結     │
+                    │  ORDER BY 追加  │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  SQL実行        │
+                    │  結果返却       │
+                    └─────────────────┘
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">複合検索のロジック <span class="required">必須</span></div>
+            <div class="fill-hint">疑似コードでの検索条件組立</div>
+            <div class="fill-content">
+              <div class="code-block">
+                <pre>
+<span class="comment">// 複合検索のロジック（MyBatis XML形式）</span>
+
+&lt;select id="search" resultType="Task"&gt;
+  SELECT * FROM tasks
+  WHERE user_id = #{userId}
+
+  <span class="comment">&lt;!-- キーワード検索 --&gt;</span>
+  &lt;if test="keyword != null and keyword != ''"&gt;
+    AND (title LIKE CONCAT('%', #{keyword}, '%')
+         OR content LIKE CONCAT('%', #{keyword}, '%'))
+  &lt;/if&gt;
+
+  <span class="comment">&lt;!-- カテゴリ絞り込み --&gt;</span>
+  &lt;if test="categoryId != null"&gt;
+    AND category_id = #{categoryId}
+  &lt;/if&gt;
+
+  <span class="comment">&lt;!-- ステータス絞り込み --&gt;</span>
+  &lt;if test="status != null and status != ''"&gt;
+    AND status = #{status}
+  &lt;/if&gt;
+
+  <span class="comment">&lt;!-- 期間絞り込み --&gt;</span>
+  &lt;if test="startDate != null"&gt;
+    AND due_date &gt;= #{startDate}
+  &lt;/if&gt;
+  &lt;if test="endDate != null"&gt;
+    AND due_date &lt;= #{endDate}
+  &lt;/if&gt;
+
+  <span class="comment">&lt;!-- ソート --&gt;</span>
+  ORDER BY
+  &lt;choose&gt;
+    &lt;when test="sortBy == 'dueDate'"&gt;due_date&lt;/when&gt;
+    &lt;when test="sortBy == 'priority'"&gt;priority DESC&lt;/when&gt;
+    &lt;otherwise&gt;created_at DESC&lt;/otherwise&gt;
+  &lt;/choose&gt;
+&lt;/select&gt;
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec4">
+          <h2 class="section-title"><span class="section-icon">4</span> 権限チェックのロジック</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">ロール判定のフロー <span class="required">必須</span></div>
+            <div class="fill-hint">管理者/一般ユーザーの権限チェック</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+                    ┌─────────────────┐
+                    │  リクエスト受信  │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  認証状態確認   │
+                    │(SecurityContext)│
+                    └────────┬────────┘
+                             │
+                    ┌────────┴────────┐
+                    ▼                  ▼
+              未認証              認証済み
+                    │                  │
+                    ▼                  ▼
+            ┌───────────┐     ┌─────────────────┐
+            │/login へ   │     │  ロール取得      │
+            │リダイレクト │     │ user.getRole()  │
+            └───────────┘     └────────┬────────┘
+                                       │
+                              ┌────────┴────────┐
+                              ▼                  ▼
+                           ADMIN              USER
+                              │                  │
+                              ▼                  ▼
+                    ┌─────────────────┐  ┌─────────────────┐
+                    │ 管理者機能      │  │ 一般ユーザー機能│
+                    │ ・ユーザー管理  │  │ ・自分のタスク  │
+                    │ ・全タスク閲覧  │  │   のみアクセス  │
+                    │ ・システム設定  │  │                 │
+                    └─────────────────┘  └─────────────────┘
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">データアクセス制御のロジック <span class="required">必須</span></div>
+            <div class="fill-hint">自分のタスクのみ操作可能にする制御</div>
+            <div class="fill-content">
+              <div class="code-block">
+                <pre>
+<span class="comment">// データアクセス制御のロジック</span>
+
+<span class="keyword">FUNCTION</span> updateTask(taskId, taskForm, loginUser)
+
+  <span class="comment">// タスクを取得</span>
+  task = taskMapper.selectById(taskId)
+
+  <span class="comment">// 存在チェック</span>
+  <span class="keyword">IF</span> task が null <span class="keyword">THEN</span>
+    <span class="keyword">THROW</span> NotFoundException("タスクが見つかりません")
+  <span class="keyword">END IF</span>
+
+  <span class="comment">// 権限チェック</span>
+  <span class="keyword">IF</span> loginUser.role が "ADMIN" でない
+     AND task.userId ≠ loginUser.id <span class="keyword">THEN</span>
+    <span class="keyword">THROW</span> AccessDeniedException("このタスクを編集する権限がありません")
+  <span class="keyword">END IF</span>
+
+  <span class="comment">// 更新処理（権限OK）</span>
+  task = FormからEntityに変換(taskForm)
+  task.updatedAt = 現在日時
+  taskMapper.update(task)
+
+  <span class="keyword">RETURN</span> 成功
+
+<span class="keyword">END FUNCTION</span>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec5">
+          <h2 class="section-title"><span class="section-icon">5</span> ステータス遷移のロジック</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">状態遷移図 <span class="required">必須</span></div>
+            <div class="fill-hint">タスクのステータス変化の流れ</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+                    ┌─────────────────────────────────────────┐
+                    │           タスクステータス遷移図          │
+                    └─────────────────────────────────────────┘
+
+                              ┌───────────┐
+                              │   TODO    │ ← 新規作成
+                              │  (未着手) │
+                              └─────┬─────┘
+                                    │
+                                    │ 着手
+                                    ▼
+                              ┌───────────┐
+                     ┌────────│   DOING   │────────┐
+                     │        │  (作業中) │        │
+                     │        └─────┬─────┘        │
+                     │              │              │
+                     │ 保留         │ 完了         │ 中止
+                     ▼              ▼              ▼
+               ┌───────────┐  ┌───────────┐  ┌───────────┐
+               │   HOLD    │  │   DONE    │  │ CANCELLED │
+               │   (保留)  │  │   (完了)  │  │  (中止)   │
+               └─────┬─────┘  └───────────┘  └───────────┘
+                     │              ▲
+                     │ 再開         │ 完了
+                     └──────────────┘
+
+          ※ DONEとCANCELLEDは最終状態（遷移不可）
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">遷移可否の判定ロジック <span class="required">必須</span></div>
+            <div class="fill-hint">状態遷移が許可されるかの判定処理</div>
+            <div class="fill-content">
+              <div class="code-block">
+                <pre>
+<span class="comment">// ステータス遷移の判定ロジック</span>
+
+<span class="keyword">FUNCTION</span> canTransition(currentStatus, newStatus)
+
+  <span class="comment">// 遷移ルールの定義</span>
+  allowedTransitions = {
+    "TODO"      → ["DOING", "CANCELLED"],
+    "DOING"     → ["TODO", "HOLD", "DONE", "CANCELLED"],
+    "HOLD"      → ["DOING", "CANCELLED"],
+    "DONE"      → [],  <span class="comment">// 遷移不可</span>
+    "CANCELLED" → []   <span class="comment">// 遷移不可</span>
+  }
+
+  <span class="comment">// 現在のステータスから遷移可能なステータスを取得</span>
+  allowed = allowedTransitions[currentStatus]
+
+  <span class="comment">// 遷移可否を判定</span>
+  <span class="keyword">IF</span> newStatus が allowed に含まれる <span class="keyword">THEN</span>
+    <span class="keyword">RETURN</span> true
+  <span class="keyword">ELSE</span>
+    <span class="keyword">RETURN</span> false
+  <span class="keyword">END IF</span>
+
+<span class="keyword">END FUNCTION</span>
+
+
+<span class="comment">// ステータス変更処理</span>
+
+<span class="keyword">FUNCTION</span> changeStatus(taskId, newStatus)
+
+  task = taskMapper.selectById(taskId)
+
+  <span class="keyword">IF</span> NOT canTransition(task.status, newStatus) <span class="keyword">THEN</span>
+    <span class="keyword">THROW</span> IllegalStateException(
+      "「" + task.status + "」から「" + newStatus + "」への遷移はできません"
+    )
+  <span class="keyword">END IF</span>
+
+  task.status = newStatus
+  task.updatedAt = 現在日時
+
+  <span class="comment">// 完了時は完了日時を記録</span>
+  <span class="keyword">IF</span> newStatus == "DONE" <span class="keyword">THEN</span>
+    task.completedAt = 現在日時
+  <span class="keyword">END IF</span>
+
+  taskMapper.updateStatus(task)
+
+<span class="keyword">END FUNCTION</span>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+
+</html>

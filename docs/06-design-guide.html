@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>デザインガイドライン -  プロジェクトアーカイブ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <button class="hamburger" aria-label="メニュー">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="page-wrapper">
+  <aside class="sidebar" data-nav-level="docs"></aside>
+
+    <main class="main-content">
+      <header class="doc-header">
+        <div class="doc-category">DOCUMENT 06</div>
+        <h1 class="doc-title">デザインガイドライン</h1>
+        <div class="doc-meta">
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 作成日：2026-XX-XX</span>
+          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者：（氏名を入力）</span>
+          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+        </div>
+      </header>
+
+      <div class="doc-body">
+
+        <div class="external-link-box">
+          <div class="external-link-box-title">
+            <span class="material-symbols-outlined">link</span>
+            詳細ドキュメント（Google スプレッドシート）
+          </div>
+          <div class="external-link-box-desc">
+            このページは概要のみを記載しています。詳細なデザインガイドラインは以下のリンクからご確認ください。
+          </div>
+          <div class="external-link-input">
+            <input type="text" placeholder="https://docs.google.com/spreadsheets/d/xxxxx" id="external-link-06">
+            <a href="#" class="link-btn" onclick="window.open(document.getElementById('external-link-06').value || 'https://docs.google.com', '_blank'); return false;">
+              <span class="material-symbols-outlined">open_in_new</span>
+              開く
+            </a>
+          </div>
+        </div>
+
+        <div class="toc">
+          <div class="toc-title">目次</div>
+          <ol class="toc-list">
+            <li><a href="#sec1">デザインコンセプト</a></li>
+            <li><a href="#sec2">カラーパレット</a></li>
+            <li><a href="#sec3">タイポグラフィ</a></li>
+            <li><a href="#sec4">UIコンポーネント</a></li>
+            <li><a href="#sec5">レイアウトルール</a></li>
+          </ol>
+        </div>
+
+        <section class="section" id="sec1">
+          <h2 class="section-title"><span class="section-icon">1</span> デザインコンセプト</h2>
+
+        <div class="fill-block">
+          <div class="fill-label">デザインキーワード <span class="required">必須</span></div>
+          <div class="fill-hint">デザインの方向性を表すキーワード3つとその説明</div>
+          <div class="fill-content">
+            <p>（デザインキーワード3つとその説明を記載）</p>
+          </div>
+        </div>
+
+        </section>
+
+        <section class="section" id="sec2">
+          <h2 class="section-title"><span class="section-icon">2</span> カラーパレット</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">カラーパレット <span class="required">必須</span></div>
+            <div class="fill-hint">各色のHEXコード・使用場面を記載し、実際の色見本も表示してください</div>
+
+        <table class="doc-table">
+          <thead><tr><th>色の種類</th><th>カラーコード</th><th>色見本</th><th>使用場面</th></tr></thead>
+          <tbody>
+          <tr class="template-row"><td>メインカラー</td><td>#（コードを入力）</td><td>（CSSで色見本を表示）</td><td>ヘッダー、ボタン、見出し</td></tr>
+          <tr class="template-row"><td>サブカラー</td><td>#（コードを入力）</td><td>（CSSで色見本を表示）</td><td>背景、カード、セクション区切り</td></tr>
+          <tr class="template-row"><td>アクセントカラー</td><td>#（コードを入力）</td><td>（CSSで色見本を表示）</td><td>CTA、リンク、強調</td></tr>
+          <tr class="template-row"><td>背景色</td><td>#（コードを入力）</td><td>（CSSで色見本を表示）</td><td>ページ背景</td></tr>
+          <tr class="template-row"><td>テキスト色</td><td>#（コードを入力）</td><td>（CSSで色見本を表示）</td><td>本文テキスト</td></tr>
+          <tr class="template-row"><td>テキスト色（薄）</td><td>#（コードを入力）</td><td>（CSSで色見本を表示）</td><td>補助テキスト、注釈</td></tr>
+          </tbody>
+        </table>
+
+          </div>
+        </section>
+
+        <section class="section" id="sec3">
+          <h2 class="section-title"><span class="section-icon">3</span> タイポグラフィ</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">フォント設定 <span class="required">必須</span></div>
+        <table class="doc-table">
+          <thead><tr><th>要素</th><th>フォント名</th><th>サイズ</th><th>太さ</th><th>行間</th><th>用途</th></tr></thead>
+          <tbody>
+          <tr class="template-row"><td>h1（大見出し）</td><td>（フォント名）</td><td>（px）</td><td>（bold等）</td><td>（倍率）</td><td>ページタイトル</td></tr>
+          <tr class="template-row"><td>h2（中見出し）</td><td>（フォント名）</td><td>（px）</td><td>（bold等）</td><td>（倍率）</td><td>セクション見出し</td></tr>
+          <tr class="template-row"><td>h3（小見出し）</td><td>（フォント名）</td><td>（px）</td><td>（bold等）</td><td>（倍率）</td><td>サブセクション</td></tr>
+          <tr class="template-row"><td>本文</td><td>（フォント名）</td><td>（px）</td><td>（regular等）</td><td>（倍率）</td><td>通常テキスト</td></tr>
+          <tr class="template-row"><td>キャプション</td><td>（フォント名）</td><td>（px）</td><td>（regular等）</td><td>（倍率）</td><td>画像の説明等</td></tr>
+          <tr class="template-row"><td>ボタン</td><td>（フォント名）</td><td>（px）</td><td>（bold等）</td><td>—</td><td>ボタンテキスト</td></tr>
+          </tbody>
+        </table>
+
+          </div>
+        </section>
+
+        <section class="section" id="sec4">
+          <h2 class="section-title"><span class="section-icon">4</span> UIコンポーネント</h2>
+
+
+        <div class="fill-block">
+          <div class="fill-label">ボタン <span class="required">必須</span></div>
+          <div class="fill-hint">プライマリ・セカンダリ・デンジャーの3種類のボタンスタイル（実物のHTMLサンプル付き）</div>
+          <div class="fill-content">
+            <p>（ここにボタンの実物サンプルとCSSコードを記載）</p>
+          </div>
+        </div>
+        <div class="fill-block">
+          <div class="fill-label">フォーム要素 <span class="required">必須</span></div>
+          <div class="fill-hint">テキスト入力・セレクト・テキストエリア・チェックボックス・ラジオボタン（実物のHTMLサンプル付き）</div>
+          <div class="fill-content">
+            <p>（ここにフォーム要素の実物サンプルとCSSコードを記載）</p>
+          </div>
+        </div>
+        <div class="fill-block">
+          <div class="fill-label">カード・テーブル・その他 <span class="required">必須</span></div>
+          <div class="fill-hint">カードコンポーネント・テーブルスタイル・アラート等（実物のHTMLサンプル付き）</div>
+          <div class="fill-content">
+            <p>（ここにコンポーネントの実物サンプルとCSSコードを記載）</p>
+          </div>
+        </div>
+
+        </section>
+
+        <section class="section" id="sec5">
+          <h2 class="section-title"><span class="section-icon">5</span> レイアウトルール</h2>
+
+        <div class="fill-block">
+          <div class="fill-label">レイアウト基本ルール <span class="required">必須</span></div>
+          <div class="fill-hint">グリッド・余白・角丸・シャドウ等の数値ルール</div>
+          <div class="fill-content">
+            <p>（レイアウトルールを記載）</p>
+          </div>
+        </div>
+
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

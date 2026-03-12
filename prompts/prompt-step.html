@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ステップ別プロンプト -  プロジェクトアーカイブ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <button class="hamburger" aria-label="メニュー">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="page-wrapper">
+  <aside class="sidebar" data-nav-level="prompts"></aside>
+
+    <main class="main-content">
+      <header class="doc-header">
+        <div class="doc-category">PROMPT COLLECTION</div>
+        <h1 class="doc-title">ステップ別プロンプト</h1>
+        <div class="doc-meta">
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 作成日：2026-XX-XX</span>
+          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者：（氏名を入力）</span>
+          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+        </div>
+      </header>
+
+      <div class="doc-body">
+
+
+        <div class="toc">
+          <div class="toc-title">目次</div>
+          <ol class="toc-list">
+            <li><a href="#step01">STEP 01: プロジェクト作成</a></li>
+            <li><a href="#step02">STEP 02: Entity作成</a></li>
+            <li><a href="#step03">STEP 03: Repository作成</a></li>
+            <li><a href="#step04">STEP 04: Service作成</a></li>
+            <li><a href="#step05">STEP 05: Controller作成</a></li>
+            <li><a href="#step06">STEP 06: View作成（一覧画面）</a></li>
+            <li><a href="#step07">STEP 07: View作成（登録・編集画面）</a></li>
+            <li><a href="#step08">STEP 08: 認証機能</a></li>
+            <li><a href="#step09">STEP 09: 画面デザイン適用</a></li>
+          </ol>
+        </div>
+
+        <!-- STEP 01 -->
+        <section class="section" id="step01">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">01</div>
+              <div>
+                <div class="step-title">プロジェクト作成</div>
+                <div class="step-desc">Spring Initializrでプロジェクトを作成し、基本設定を行う</div>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <h3 class="subsection-title">前提条件</h3>
+              <ul style="font-size: 14px; color: var(--text-light); margin-left: 20px;">
+                <li>Java 17以上がインストールされていること</li>
+                <li>Maven または Gradle が使用可能なこと</li>
+                <li>IDE（Eclipse、IntelliJ IDEA、VS Code等）が設定済みであること</li>
+              </ul>
+            </div>
+
+
+            <div class="subsection" style="margin-top: 20px;">
+              <h3 class="subsection-title">期待される出力</h3>
+              <ul style="font-size: 14px; color: var(--text-light); margin-left: 20px;">
+                <li>pom.xml（依存関係設定済み）</li>
+                <li>src/main/resources/application.properties</li>
+                <li>メインクラス（TaskAppApplication.java）</li>
+              </ul>
+            </div>
+
+            <div class="subsection">
+              <h3 class="subsection-title">確認ポイント</h3>
+              <ul style="font-size: 14px; color: var(--text-light); margin-left: 20px;">
+                <li>アプリケーションが正常に起動するか</li>
+                <li>http://localhost:8080 にアクセスできるか（エラーページでもOK）</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 02 -->
+        <section class="section" id="step02">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">02</div>
+              <div>
+                <div class="step-title">Entity作成</div>
+                <div class="step-desc">DB設計書を元にEntityクラスを作成する</div>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <h3 class="subsection-title">前提条件</h3>
+              <ul style="font-size: 14px; color: var(--text-light); margin-left: 20px;">
+                <li>DB設計書が完成していること</li>
+                <li>MySQLにデータベースとテーブルが作成済みであること</li>
+              </ul>
+            </div>
+
+
+            <div class="subsection" style="margin-top: 20px;">
+              <h3 class="subsection-title">確認ポイント</h3>
+              <ul style="font-size: 14px; color: var(--text-light); margin-left: 20px;">
+                <li>フィールドの型が適切か（Long, String, LocalDate等）</li>
+                <li>Lombokアノテーションが正しく設定されているか</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 03 -->
+        <section class="section" id="step03">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">03</div>
+              <div>
+                <div class="step-title">Repository作成</div>
+                <div class="step-desc">MyBatis Mapperインターフェースを作成する</div>
+              </div>
+            </div>
+
+
+            <div class="subsection" style="margin-top: 20px;">
+              <h3 class="subsection-title">確認ポイント</h3>
+              <ul style="font-size: 14px; color: var(--text-light); margin-left: 20px;">
+                <li>@Mapperアノテーションが付与されているか</li>
+                <li>SQLの構文が正しいか</li>
+                <li>カラム名とフィールド名のマッピングが正しいか</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 04 -->
+        <section class="section" id="step04">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">04</div>
+              <div>
+                <div class="step-title">Service作成</div>
+                <div class="step-desc">ビジネスロジック層のServiceクラスを作成する</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- STEP 05 -->
+        <section class="section" id="step05">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">05</div>
+              <div>
+                <div class="step-title">Controller作成</div>
+                <div class="step-desc">HTTPリクエストを処理するControllerを作成する</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- STEP 06 -->
+        <section class="section" id="step06">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">06</div>
+              <div>
+                <div class="step-title">View作成（一覧画面）</div>
+                <div class="step-desc">Thymeleafテンプレートで一覧・詳細画面を作成する</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- STEP 07 -->
+        <section class="section" id="step07">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">07</div>
+              <div>
+                <div class="step-title">View作成（登録・編集画面）</div>
+                <div class="step-desc">フォーム入力画面を作成する</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- STEP 08 -->
+        <section class="section" id="step08">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">08</div>
+              <div>
+                <div class="step-title">認証機能</div>
+                <div class="step-desc">Spring Securityでログイン機能を実装する</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- STEP 09 -->
+        <section class="section" id="step09">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">09</div>
+              <div>
+                <div class="step-title">画面デザイン適用</div>
+                <div class="step-desc">CSSを適用してUIを整える</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

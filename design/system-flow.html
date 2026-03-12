@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>システムフロー図 - プロジェクトアーカイブ</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+  <button class="hamburger" aria-label="メニュー">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="page-wrapper">
+    <aside class="sidebar" data-nav-level="design"></aside>
+
+    <main class="main-content">
+      <header class="doc-header">
+        <div class="doc-category">DESIGN DOCUMENT</div>
+        <h1 class="doc-title">システムフロー図</h1>
+        <div class="doc-meta">
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 作成日：2026-XX-XX</span>
+          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者：（氏名を入力）</span>
+          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+        </div>
+      </header>
+
+      <div class="doc-body">
+
+        <div class="toc">
+          <div class="toc-title">目次</div>
+          <ol class="toc-list">
+            <li><a href="#sec1">システム全体構成</a></li>
+            <li><a href="#sec2">リクエスト処理フロー</a></li>
+            <li><a href="#sec3">画面遷移フロー</a></li>
+            <li><a href="#sec4">データフロー</a></li>
+            <li><a href="#sec5">認証・認可フロー</a></li>
+          </ol>
+        </div>
+
+        <section class="section" id="sec1">
+          <h2 class="section-title"><span class="section-icon">1</span> システム全体構成</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">システム構成図 <span class="required">必須</span></div>
+            <div class="fill-hint">Controller → Service → Repository → DB の流れをASCII図で表現＠ASCII図でなくてもよいです。</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+┌─────────────────────────────────────────────────────────────────────┐
+│                         Spring Boot Application                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    │
+│   │  Client  │───▶│Controller│───▶│  Service │───▶│Repository│    │
+│   │ (Browser)│◀───│          │◀───│          │◀───│ (Mapper) │    │
+│   └──────────┘    └──────────┘    └──────────┘    └──────────┘    │
+│        │               │               │               │            │
+│        │               │               │               ▼            │
+│        │               │               │          ┌──────────┐      │
+│        │               │               │          │ Database │      │
+│        │               │               │          │ (MySQL)  │      │
+│        │               │               │          └──────────┘      │
+│        │               │               │                            │
+│        │          ┌────┴────┐          │                            │
+│        │          │Thymeleaf│          │                            │
+│        │          │  View   │          │                            │
+│        │          └─────────┘          │                            │
+│        │                               │                            │
+└────────┼───────────────────────────────┼────────────────────────────┘
+         │                               │
+         │     HTML/CSS/JavaScript       │
+         └───────────────────────────────┘
+
+（上記を参考に、自分のプロジェクトに合わせて編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">レイヤー構成の説明 <span class="required">必須</span></div>
+            <div class="fill-hint">各レイヤーの役割を表形式で説明</div>
+            <div class="fill-content">
+              <table class="doc-table">
+                <thead>
+                  <tr>
+                    <th>レイヤー</th>
+                    <th>役割</th>
+                    <th>主なクラス</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="template-row">
+                    <td>Controller</td>
+                    <td>HTTPリクエストの受付、レスポンス返却</td>
+                    <td>TaskController, UserController</td>
+                  </tr>
+                  <tr class="template-row">
+                    <td>Service</td>
+                    <td>ビジネスロジックの実装</td>
+                    <td>TaskService, UserService</td>
+                  </tr>
+                  <tr class="template-row">
+                    <td>Repository</td>
+                    <td>データベースアクセス</td>
+                    <td>TaskMapper, UserMapper</td>
+                  </tr>
+                  <tr class="template-row">
+                    <td>Entity</td>
+                    <td>データモデル</td>
+                    <td>Task, User, Category</td>
+                  </tr>
+                  <tr class="template-row">
+                    <td>Form</td>
+                    <td>画面入力データ</td>
+                    <td>TaskForm, LoginForm</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec2">
+          <h2 class="section-title"><span class="section-icon">2</span> リクエスト処理フロー</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">一覧表示の処理フロー <span class="required">必須</span></div>
+            <div class="fill-hint">GET /tasks リクエストの処理の流れ＠ASCII図でなくてもよいです。</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+┌────────┐ ┌──────────────┐ ┌───────────┐ ┌──────────┐ ┌────────┐
+│ Client │────▶│TaskController│────▶│TaskService│────▶│TaskMapper│────▶│ DB │
+│ │ │ list() │ │ findAll() │ │selectAll │ │ │
+└────────┘ └──────────────┘ └───────────┘ └──────────┘ └────────┘
+▲ │ │ │ │
+│ │ │ │ │
+│ ▼ ▼ ▼ │
+│ ┌──────────┐ List&lt;Task&gt; List&lt;Task&gt; │
+│ │ list.html│◀──────────────────────────────────────────────┘
+│ └──────────┘
+│ │
+└─────────────────┘
+HTML Response
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">登録処理のフロー <span class="required">必須</span></div>
+            <div class="fill-hint">POST /tasks/create リクエストの処理（バリデーション分岐含む）＠ASCII図でなくてもよいです。</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+┌────────┐ ┌──────────────┐ ┌───────────────┐
+│ Client │────▶│TaskController│────▶│ Validation │
+│ Form │ │ create() │ │ @Valid check │
+└────────┘ └──────────────┘ └───────────────┘
+│ │
+│ ┌──────┴──────┐
+│ ▼ ▼
+│ エラーあり エラーなし
+│ │ │
+│ ▼ ▼
+│ ┌──────────┐ ┌───────────┐
+│ │create.html│ │TaskService│
+│ │(エラー表示)│ │ insert() │
+│ └──────────┘ └───────────┘
+│ │
+│ ▼
+│ ┌──────────┐
+│ │TaskMapper│
+│ │ insert │
+│ └──────────┘
+│ │
+│ ▼
+│ ┌──────────┐
+│◀─────────────────────│ redirect │
+│ │ /tasks │
+│ └──────────┘
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec3">
+          <h2 class="section-title"><span class="section-icon">3</span> 画面遷移フロー</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">全体の画面遷移図 <span class="required">必須</span></div>
+            <div class="fill-hint">Webアプリケーション全体の画面遷移＠ASCII図でなくてもよいです。</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+┌─────────────┐
+│ ログイン │
+│ /login │
+└──────┬──────┘
+│ 認証成功
+▼
+┌──────────────────────────────────────────────────────────────────┐
+│ メイン画面群 │
+├──────────────────────────────────────────────────────────────────┤
+│ │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │ 一覧画面 │───▶│ 詳細画面 │ │ 新規作成 │ │
+│ │ /tasks │◀───│ /tasks/{id}│ │ /tasks/new │ │
+│ └─────────────┘ └─────────────┘ └─────────────┘ │
+│ │ ▲ │ │ │
+│ │ │ │ │ │
+│ │ │ ▼ ▼ │
+│ │ │ ┌─────────────┐ ┌─────────────┐ │
+│ │ └──────────│ 編集画面 │ │ 確認画面 │ │
+│ │ │/tasks/{id}/edit │/tasks/confirm│ │
+│ │ └─────────────┘ └─────────────┘ │
+│ │ │ │ │
+│ │ ▼ ▼ │
+│ └───────────────────┴───────────────────┘ │
+│ 完了後リダイレクト │
+└──────────────────────────────────────────────────────────────────┘
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec4">
+          <h2 class="section-title"><span class="section-icon">4</span> データフロー</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">Form → Entity → DB の変換フロー <span class="required">必須</span></div>
+            <div class="fill-hint">画面入力からデータベース保存までのデータ変換の流れ＠ASCII図でなくてもよいです。</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+┌────────────────┐ ┌────────────────┐ ┌────────────────┐
+│ TaskForm │ │ Task │ │ tasks │
+│ (入力データ) │ ───▶ │ (Entity) │ ───▶ │ (DBテーブル) │
+├────────────────┤ ├────────────────┤ ├────────────────┤
+│ title: String │ │ id: Long │ │ id: BIGINT │
+│ content: String│ │ title: String │ │ title: VARCHAR │
+│ dueDate: String│ 変換 │ content: String│ 保存 │ content: TEXT │
+│ priority: int │ ───▶ │ dueDate: Date │ ───▶ │ due_date: DATE │
+│ │ │ priority: int │ │ priority: INT │
+│ │ │ createdAt: Date│ │ created_at: │
+│ │ │ updatedAt: Date│ │ TIMESTAMP │
+└────────────────┘ └────────────────┘ └────────────────┘
+│ │ │
+│ BeanUtils.copy │ MyBatis Mapper │
+│ または手動マッピング │ @Insert/@Update │
+└───────────────────────┴───────────────────────┘
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec5">
+          <h2 class="section-title"><span class="section-icon">5</span> 認証・認可フロー</h2>
+
+          <div class="fill-block">
+            <div class="fill-label">Spring Security の認証フロー <span class="required">必須</span></div>
+            <div class="fill-hint">ログイン処理の詳細フロー＠ASCII図でなくてもよいです。</div>
+            <div class="fill-content">
+              <div class="ascii-diagram">
+                <pre>
+┌────────┐ ┌─────────────────┐ ┌──────────────────┐
+│ Client │────▶│ SecurityFilter │────▶│UsernamePassword │
+│ Login │ │ Chain │ │Authentication │
+└────────┘ └─────────────────┘ │Filter │
+└──────────────────┘
+│
+▼
+┌──────────────────┐
+│Authentication │
+│Manager │
+└──────────────────┘
+│
+▼
+┌──────────────────┐
+│UserDetailsService│
+│ loadByUsername │
+└──────────────────┘
+│
+▼
+┌──────────────────┐
+│ UserMapper │
+│ selectByEmail │
+└──────────────────┘
+│
+┌──────────────┴──────────────┐
+▼ ▼
+認証成功 認証失敗
+│ │
+▼ ▼
+┌─────────────────┐ ┌─────────────────┐
+│ SecurityContext │ │ /login?error │
+│ にユーザー情報保存 │ │ にリダイレクト │
+└─────────────────┘ └─────────────────┘
+│
+▼
+┌─────────────────┐
+│ /tasks にリダイレクト │
+└─────────────────┘
+
+（上記を参考に編集してください）
+                </pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="fill-block">
+            <div class="fill-label">ロールによるアクセス制御 <span class="optional">任意</span></div>
+            <div class="fill-hint">管理者/一般ユーザーによるアクセス権限の違い</div>
+            <div class="fill-content">
+              <table class="doc-table">
+                <thead>
+                  <tr>
+                    <th>機能</th>
+                    <th>URL</th>
+                    <th>ADMIN</th>
+                    <th>USER</th>
+                    <th>未認証</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="template-row">
+                    <td>ログイン</td>
+                    <td>/login</td>
+                    <td>○</td>
+                    <td>○</td>
+                    <td>○</td>
+                  </tr>
+                  <tr class="template-row">
+                    <td>タスク一覧</td>
+                    <td>/tasks</td>
+                    <td>○</td>
+                    <td>○</td>
+                    <td>×</td>
+                  </tr>
+                  <tr class="template-row">
+                    <td>タスク作成</td>
+                    <td>/tasks/new</td>
+                    <td>○</td>
+                    <td>○</td>
+                    <td>×</td>
+                  </tr>
+                  <tr class="template-row">
+                    <td>ユーザー管理</td>
+                    <td>/admin/users</td>
+                    <td>○</td>
+                    <td>×</td>
+                    <td>×</td>
+                  </tr>
+                  <tr class="template-row">
+                    <td>システム設定</td>
+                    <td>/admin/settings</td>
+                    <td>○</td>
+                    <td>×</td>
+                    <td>×</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+
+</html>
