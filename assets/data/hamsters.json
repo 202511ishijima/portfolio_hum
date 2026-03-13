@@ -1,12 +1,86 @@
 [
-  { "id": "ham-01", "species": "Golden", "name": "Komugi", "sex": "female", "personality": "calm", "ease": "good", "price": 3200, "description": "A calm hamster that often accepts food gently from a hand.", "feature1": "Easy to observe", "feature2": "Slow movement", "feature3": "Best with wide cage" },
-  { "id": "ham-02", "species": "Golden", "name": "Kinako", "sex": "male", "personality": "curious", "ease": "good", "price": 3000, "description": "A lively hamster that loves tunnels and active play.", "feature1": "Active movement", "feature2": "Great appetite", "feature3": "Fun to watch" },
-  { "id": "ham-03", "species": "Djungarian", "name": "Shiratama", "sex": "female", "personality": "gentle", "ease": "easy", "price": 2800, "description": "A small hamster with a quiet and gentle mood.", "feature1": "Very cute size", "feature2": "Clear rest time", "feature3": "Popular for first owners" },
-  { "id": "ham-04", "species": "Djungarian", "name": "Azuki", "sex": "male", "personality": "quick", "ease": "normal", "price": 2800, "description": "A quick moving hamster that stays active at night.", "feature1": "Likes running", "feature2": "Enjoys sand bath", "feature3": "Energetic at night" },
-  { "id": "ham-05", "species": "Roborovski", "name": "Kohaku", "sex": "female", "personality": "careful", "ease": "hard", "price": 3000, "description": "A careful hamster that takes time to get used to new places.", "feature1": "Very small", "feature2": "Great for observation", "feature3": "Needs calm space" },
-  { "id": "ham-06", "species": "Roborovski", "name": "Milk", "sex": "male", "personality": "light", "ease": "hard", "price": 3000, "description": "A tiny active hamster with very charming movement.", "feature1": "Light steps", "feature2": "High activity", "feature3": "Likes hideouts" },
-  { "id": "ham-07", "species": "Campbell", "name": "Maron", "sex": "female", "personality": "steady", "ease": "normal", "price": 2900, "description": "A steady hamster that keeps a clear daily rhythm.", "feature1": "Stable routine", "feature2": "Easy to watch calmly", "feature3": "Good nest builder" },
-  { "id": "ham-08", "species": "Campbell", "name": "Kurumi", "sex": "male", "personality": "playful", "ease": "normal", "price": 2900, "description": "A playful hamster that enjoys toy layouts and movement.", "feature1": "Likes toys", "feature2": "Enjoys maze parts", "feature3": "High energy" },
-  { "id": "ham-09", "species": "Pearl White", "name": "Yuki", "sex": "female", "personality": "soft", "ease": "easy", "price": 3100, "description": "A soft looking white hamster with a calm mood.", "feature1": "Elegant white fur", "feature2": "Gentle rhythm", "feature3": "Popular with beginners" },
-  { "id": "ham-10", "species": "Pearl White", "name": "Mochi", "sex": "male", "personality": "easygoing", "ease": "easy", "price": 3100, "description": "An easygoing hamster with clear feeding and resting habits.", "feature1": "Easy pace", "feature2": "Good appetite", "feature3": "Soft gestures" }
+  {
+    "id": "ham-01",
+    "species": "ゴールデンハムスター",
+    "image": "ゴールデンハムスター.png",
+    "personality": "まじめ / おっとり",
+    "ease": "★★★★★",
+    "price": 3200,
+    "description": "ふっくらした見た目と落ち着いた雰囲気が魅力の種類です。ゆったり観察したい人に向いています。",
+    "feature1": "体が大きめで表情が見やすい",
+    "feature2": "おっとりした印象で観察しやすい",
+    "feature3": "広めのケージでゆったり暮らしやすい"
+  },
+  {
+    "id": "ham-02",
+    "species": "ジャンガリアンハムスター",
+    "image": "ジャンガリアンハムスター.png",
+    "personality": "すなお / ひかえめ",
+    "ease": "★★★★★",
+    "price": 3000,
+    "description": "小さくて親しみやすく、初めてハムスターを知る人にも人気が高い種類です。",
+    "feature1": "丸いシルエットで人気が高い",
+    "feature2": "初めての比較対象として分かりやすい",
+    "feature3": "小柄で愛らしい動きが見どころ"
+  },
+  {
+    "id": "ham-03",
+    "species": "ロボロフスキーハムスター",
+    "image": "ロボロフスキーハムスター.png",
+    "personality": "すばやい / おくびょう",
+    "ease": "★★★☆☆",
+    "price": 3000,
+    "description": "とても小さく、すばやい動きが魅力の種類です。そっと見守る楽しさがあります。",
+    "feature1": "とても小さく俊敏な動き",
+    "feature2": "観察向きで見ていて飽きにくい",
+    "feature3": "落ち着いた環境づくりが大切"
+  },
+  {
+    "id": "ham-04",
+    "species": "キャンベルハムスター",
+    "image": "キャンベルハムスター.png",
+    "personality": "やんちゃ / きまぐれ",
+    "ease": "★★★☆☆",
+    "price": 2900,
+    "description": "活発でレイアウトの変化を楽しみやすい種類です。遊び場づくりが好きな人に向いています。",
+    "feature1": "活発でおもちゃとの相性がよい",
+    "feature2": "動きの変化が楽しい",
+    "feature3": "環境の工夫で魅力が出やすい"
+  },
+  {
+    "id": "ham-05",
+    "species": "チャイニーズハムスター",
+    "image": "チャイニーズハムスター.png",
+    "personality": "れいせい / しんちょう",
+    "ease": "★★★☆☆",
+    "price": 3100,
+    "description": "すっきりした体つきと落ち着いた印象が特徴です。静かに観察したい人に向いています。",
+    "feature1": "すらっとした体つきが特徴",
+    "feature2": "慎重な動きが見どころ",
+    "feature3": "静かな空間との相性がよい"
+  },
+  {
+    "id": "ham-06",
+    "species": "シベリアンハムスター",
+    "image": "シベリアンハムスター.png",
+    "personality": "おだやか / がんばりや",
+    "ease": "★★★★☆",
+    "price": 3100,
+    "description": "やわらかな印象の毛並みと穏やかな雰囲気が魅力です。初心者にも比較しやすい種類です。",
+    "feature1": "やわらかな見た目で親しみやすい",
+    "feature2": "穏やかな印象で比較しやすい",
+    "feature3": "初めての人にもイメージしやすい"
+  },
+  {
+    "id": "ham-07",
+    "species": "ドワーフハムスター",
+    "image": "ドワーフハムスター.png",
+    "personality": "ようき / すなお",
+    "ease": "★★★★☆",
+    "price": 2800,
+    "description": "小柄で軽やかな動きが印象的な種類です。かわいらしさを重視したい人に人気です。",
+    "feature1": "小さな体で動きが軽やか",
+    "feature2": "愛らしいしぐさが見どころ",
+    "feature3": "初心者でも親しみやすい"
+  }
 ]

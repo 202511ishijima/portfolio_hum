@@ -12,10 +12,16 @@ window.ProductsPage = (function () {
     return productsCache;
   }
 
+  function productMedia(product) {
+    return product.image
+      ? `<figure class="media-photo"><img src="${SiteRouter.getBasePath()}image/${product.image}" alt="${product.name}"></figure>`
+      : `<div class="product-card__media"></div>`;
+  }
+
   function cardTemplate(product) {
     return `
       <article class="product-card">
-        <div class="product-card__media"></div>
+        ${productMedia(product)}
         <div class="product-card__meta">
           <span class="chip">${categoryLabel(product.category)}</span>
           ${product.badge ? `<span class="status-chip">${product.badge}</span>` : ""}
@@ -95,7 +101,9 @@ window.ProductsPage = (function () {
 
     target.innerHTML = `
       <div class="detail-layout">
-        <div class="detail-card detail-card__media"></div>
+        ${product.image
+          ? `<figure class="detail-card media-photo"><img src="${SiteRouter.getBasePath()}image/${product.image}" alt="${product.name}"></figure>`
+          : `<div class="detail-card detail-card__media"></div>`}
         <article class="detail-card">
           <p class="eyebrow">${categoryLabel(product.category)}</p>
           <h1>${product.name}</h1>
