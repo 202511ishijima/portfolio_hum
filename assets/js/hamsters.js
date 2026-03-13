@@ -7,18 +7,21 @@ window.HamstersPage = (function () {
     return hamstersCache;
   }
 
-  function getImagePath(filename) {
-    return `${SiteRouter.getBasePath()}image/${filename}`;
+  function imageHtml(filename, alt, detail = false) {
+    if (!filename) {
+      return detail
+        ? '<div class="detail-card detail-card__media"></div>'
+        : '<div class="hamster-card__media"></div>';
+    }
+
+    const className = detail ? "detail-card media-photo" : "media-photo";
+    return `<figure class="${className}"><img src="${SiteRouter.getBasePath()}image/${filename}" alt="${alt}"></figure>`;
   }
 
   function hamsterCard(hamster) {
-    const image = hamster.image
-      ? `<figure class="media-photo"><img src="${getImagePath(hamster.image)}" alt="${hamster.species}"></figure>`
-      : `<div class="hamster-card__media"></div>`;
-
     return `
       <article class="hamster-card">
-        ${image}
+        ${imageHtml(hamster.image, hamster.species)}
         <div class="hamster-card__meta">
           <span class="chip">${hamster.species}</span>
           <span class="status-chip">飼いやすさ ${hamster.ease}</span>
@@ -40,15 +43,16 @@ window.HamstersPage = (function () {
   }
 
   async function renderIndex() {
-    const list = document.getElementById("hamster-list");
-    if (!list) return;
+    const target = document.getElementById("hamster-list");
+    if (!target) return;
     const hamsters = await getHamsters();
-    list.innerHTML = hamsters.map(hamsterCard).join("");
+    target.innerHTML = hamsters.map(hamsterCard).join("");
   }
 
   async function renderDetail() {
     const target = document.getElementById("hamster-detail");
     if (!target) return;
+
     const hamsters = await getHamsters();
     const id = SiteRouter.getQueryParam("id") || hamsters[0]?.id;
     const hamster = hamsters.find((item) => item.id === id);
@@ -58,13 +62,9 @@ window.HamstersPage = (function () {
       return;
     }
 
-    const image = hamster.image
-      ? `<figure class="detail-card media-photo"><img src="${getImagePath(hamster.image)}" alt="${hamster.species}"></figure>`
-      : `<div class="detail-card detail-card__media"></div>`;
-
     target.innerHTML = `
       <div class="detail-layout">
-        ${image}
+        ${imageHtml(hamster.image, hamster.species, true)}
         <article class="detail-card">
           <p class="eyebrow">${hamster.species}</p>
           <h1>${hamster.species}</h1>
