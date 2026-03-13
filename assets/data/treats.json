@@ -1,5 +1,5 @@
 [
-  { "id": "treat-01", "name": "Sunflower Seed Trial", "price": 150, "description": "A small classic feeding experience.", "image": "Sunflower Seed Trial.png" },
-  { "id": "treat-02", "name": "Veggie Chip Trial", "price": 180, "description": "A gentle feeding menu with veggie chips.", "image": "Veggie Chip Trial.png" },
-  { "id": "treat-03", "name": "Round Snack Trial", "price": 200, "description": "A tiny snack that looks cute in photos.", "image": "Round Snack Trial.png" }
+  { "id": "treat-01", "name": "ひまわりの種おためし", "price": 150, "description": "定番のえさ体験を気軽に楽しめる小さめサイズです。", "image": "Sunflower Seed Trial.png" },
+  { "id": "treat-02", "name": "ベジチップおためし", "price": 180, "description": "やさしい味わいのベジチップを使った体験メニューです。", "image": "Veggie Chip Trial.png" },
+  { "id": "treat-03", "name": "まるころスナックおためし", "price": 200, "description": "写真にも映える、ころんとかわいい小さなスナックです。", "image": "Round Snack Trial.png" }
 ]
