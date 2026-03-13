@@ -38,15 +38,26 @@ window.MembershipPage = (function () {
     const menuTarget = document.getElementById("cafe-menu-list");
     const treatTarget = document.getElementById("cafe-treats-list");
     if (!menuTarget && !treatTarget) return;
+    const basePath = SiteRouter.getBasePath();
 
     if (menuTarget) {
       const menu = await SiteRouter.fetchJSON("cafe_menu.json");
-      menuTarget.innerHTML = menu.map((item) => `<article class="menu-card"><div class="menu-card__media"></div><h3>${item.name}</h3><p>${item.description}</p><p class="price">${SiteRouter.formatPrice(item.price)}</p></article>`).join("");
+      menuTarget.innerHTML = menu.map((item) => {
+        const media = item.image
+          ? `<figure class="media-photo"><img src="${basePath}image/${item.image}" alt="${item.name}"></figure>`
+          : `<div class="menu-card__media"></div>`;
+        return `<article class="menu-card">${media}<h3>${item.name}</h3><p>${item.description}</p><p class="price">${SiteRouter.formatPrice(item.price)}</p></article>`;
+      }).join("");
     }
 
     if (treatTarget) {
       const treats = await SiteRouter.fetchJSON("treats.json");
-      treatTarget.innerHTML = treats.map((item) => `<article class="menu-card"><div class="menu-card__media"></div><h3>${item.name}</h3><p>${item.description}</p><p class="price">${SiteRouter.formatPrice(item.price)}</p></article>`).join("");
+      treatTarget.innerHTML = treats.map((item) => {
+        const media = item.image
+          ? `<figure class="media-photo"><img src="${basePath}image/${item.image}" alt="${item.name}"></figure>`
+          : `<div class="menu-card__media"></div>`;
+        return `<article class="menu-card">${media}<h3>${item.name}</h3><p>${item.description}</p><p class="price">${SiteRouter.formatPrice(item.price)}</p></article>`;
+      }).join("");
     }
   }
 
