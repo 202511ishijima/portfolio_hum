@@ -2,39 +2,14 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=index.html">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>商品一覧 | はむのくらし</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/base.css">
-  <link rel="stylesheet" href="../assets/css/layout.css">
-  <link rel="stylesheet" href="../assets/css/components.css">
-  <link rel="stylesheet" href="../assets/css/pages.css">
+  <title>商品一覧へ移動中 | はむのくらし</title>
 </head>
-<body data-base-path="../" data-page="products">
-  <div id="site-header"></div>
-  <main class="container">
-    <section class="page-hero">
-      <p class="eyebrow">PRODUCT LIST</p>
-      <h1>商品一覧</h1>
-    </section>
-    <section class="section">
-      <div class="filter-row">
-        <button type="button" data-filter-category="all">すべて</button>
-        <button type="button" data-filter-category="cage">ケージ</button>
-        <button type="button" data-filter-category="food">餌</button>
-        <button type="button" data-filter-category="toy">おもちゃ</button>
-        <button type="button" data-filter-category="care">ケア用品</button>
-        <button type="button" data-filter-category="starter">スターターセット</button>
-      </div>
-      <div id="product-list" class="card-grid"></div>
-    </section>
-  </main>
-  <div id="site-footer"></div>
-  <script src="../assets/js/common.js"></script>
-  <script src="../assets/js/router.js"></script>
-  <script src="../assets/js/cart.js"></script>
-  <script src="../assets/js/products.js"></script>
+<body>
+  <script>
+    const query = window.location.search || "";
+    window.location.replace(`index.html${query}`);
+  </script>
 </body>
 </html>

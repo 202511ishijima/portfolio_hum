@@ -2,7 +2,13 @@ window.ProductsPage = (function () {
   let productsCache = [];
 
   function categoryLabel(category) {
-    const labels = { cage: "ケージ", food: "餌", toy: "おもちゃ", care: "ケア用品", starter: "スターターセット" };
+    const labels = {
+      cage: "ケージ",
+      food: "餌",
+      toy: "おもちゃ",
+      care: "ケア用品",
+      starter: "スターターセット"
+    };
     return labels[category] || category;
   }
 
@@ -64,7 +70,7 @@ window.ProductsPage = (function () {
     const products = await getProducts();
     target.innerHTML = ["cage", "food", "toy", "care", "starter"].map((category) => {
       const first = products.find((item) => item.category === category);
-      return `<article class="info-card"><h3>${categoryLabel(category)}</h3><p>${first ? first.shortDescription : ""}</p><a class="button button--ghost" href="list.html?category=${category}">一覧を見る</a></article>`;
+      return `<article class="info-card"><h3>${categoryLabel(category)}</h3><p>${first ? first.shortDescription : ""}</p><a class="button button--ghost" href="index.html?category=${category}">一覧を見る</a></article>`;
     }).join("");
   }
 
@@ -83,7 +89,7 @@ window.ProductsPage = (function () {
       }
       button.addEventListener("click", () => {
         const next = button.dataset.filterCategory;
-        window.location.href = next === "all" ? "list.html" : `list.html?category=${next}`;
+        window.location.href = next === "all" ? "index.html" : `index.html?category=${next}`;
       });
     });
   }
@@ -112,7 +118,7 @@ window.ProductsPage = (function () {
           <ul class="check-list">${product.features.map((feature) => `<li>${feature}</li>`).join("")}</ul>
           <div class="button-row">
             <button class="button" type="button" id="detail-add-cart">カートに追加</button>
-            <a class="button button--ghost" href="list.html?category=${product.category}">同じカテゴリを見る</a>
+            <a class="button button--ghost" href="index.html?category=${product.category}">同じカテゴリを見る</a>
           </div>
         </article>
       </div>
