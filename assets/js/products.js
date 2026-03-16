@@ -12,6 +12,22 @@ window.ProductsPage = (function () {
     return labels[category] || category;
   }
 
+  function badgeLabel(badge) {
+    const labels = {
+      popular: "人気",
+      new: "新着",
+      recommended: "おすすめ",
+      standard: "定番",
+      seasonal: "季節限定",
+      人気: "人気",
+      新着: "新着",
+      おすすめ: "おすすめ",
+      定番: "定番",
+      季節限定: "季節限定"
+    };
+    return labels[badge] || badge;
+  }
+
   async function getProducts() {
     if (productsCache.length) return productsCache;
     productsCache = await SiteRouter.fetchJSON("products.json");
@@ -30,7 +46,7 @@ window.ProductsPage = (function () {
         ${productMedia(product)}
         <div class="product-card__meta">
           <span class="chip">${categoryLabel(product.category)}</span>
-          ${product.badge ? `<span class="status-chip">${product.badge}</span>` : ""}
+          ${product.badge ? `<span class="status-chip">${badgeLabel(product.badge)}</span>` : ""}
         </div>
         <h3>${product.name}</h3>
         <p class="text-soft">${product.shortDescription}</p>
@@ -48,7 +64,12 @@ window.ProductsPage = (function () {
       button.addEventListener("click", () => {
         const product = products.find((item) => item.id === button.dataset.addProduct);
         if (!product) return;
-        Cart.addItem({ id: product.id, name: product.name, price: product.price, categoryLabel: categoryLabel(product.category) });
+        Cart.addItem({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          categoryLabel: categoryLabel(product.category)
+        });
       });
     });
   }
@@ -118,14 +139,19 @@ window.ProductsPage = (function () {
           <ul class="check-list">${product.features.map((feature) => `<li>${feature}</li>`).join("")}</ul>
           <div class="button-row">
             <button class="button" type="button" id="detail-add-cart">カートに追加</button>
-            <a class="button button--ghost" href="index.html?category=${product.category}">同じカテゴリを見る</a>
+            <a class="button button--ghost" href="index.html?category=${product.category}">一覧に戻る</a>
           </div>
         </article>
       </div>
     `;
 
     document.getElementById("detail-add-cart")?.addEventListener("click", () => {
-      Cart.addItem({ id: product.id, name: product.name, price: product.price, categoryLabel: categoryLabel(product.category) });
+      Cart.addItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        categoryLabel: categoryLabel(product.category)
+      });
     });
   }
 
