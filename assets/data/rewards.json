@@ -1,5 +1,34 @@
 [
-  { "id": "reward-01", "name": "Limited Tote Bag", "points": 300, "description": "Natural tote bag with logo art." },
-  { "id": "reward-02", "name": "Soft Plush Toy", "points": 500, "description": "Limited plush inspired by a golden hamster." },
-  { "id": "reward-03", "name": "Acrylic Keyholder", "points": 180, "description": "Mini charm popular for social posts." }
+  {
+    "id": "reward-01",
+    "name": "小さな遊び道具",
+    "points": 50,
+    "description": "最初の交換に選びやすい、小さな遊び道具です。",
+    "image": "小さな遊び道具.png",
+    "imageLabel": "景品画像を追加"
+  },
+  {
+    "id": "reward-02",
+    "name": "アクリルキーホルダー",
+    "points": 100,
+    "description": "バッグやポーチにつけやすい人気のキーホルダーです。",
+    "image": "アクリルキーホルダー.png",
+    "imageLabel": "景品画像を追加"
+  },
+  {
+    "id": "reward-03",
+    "name": "限定トートバッグ",
+    "points": 300,
+    "description": "ロゴ入りのナチュラルトートバッグです。",
+    "image": "限定トートバッグ.png",
+    "imageLabel": "景品画像を追加"
+  },
+  {
+    "id": "reward-04",
+    "name": "限定ぬいぐるみ",
+    "points": 500,
+    "description": "ゴールデンハムスターをイメージした限定ぬいぐるみです。",
+    "image": "限定ぬいぐるみ.png",
+    "imageLabel": "景品画像を追加"
+  }
 ]

@@ -1,4 +1,6 @@
 (function () {
+  let lastCartCount = null;
+
   async function injectPartial(targetId, fileName) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -12,9 +14,24 @@
   function updateCartCount() {
     const cart = JSON.parse(localStorage.getItem("hamu_cart") || "[]");
     const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+
     document.querySelectorAll("[data-cart-count]").forEach((node) => {
       node.textContent = String(count);
     });
+
+    document.querySelectorAll(".icon-link--cart").forEach((link) => {
+      link.setAttribute("aria-label", count > 0 ? `カート内商品 ${count}点` : "カート");
+    });
+
+    if (lastCartCount !== null && count > lastCartCount) {
+      document.querySelectorAll(".icon-link--cart").forEach((link) => {
+        link.classList.remove("is-bumped");
+        void link.offsetWidth;
+        link.classList.add("is-bumped");
+      });
+    }
+
+    lastCartCount = count;
   }
 
   function setActiveNav() {
@@ -42,12 +59,26 @@
     });
   }
 
+  function setupFavicon() {
+    const basePath = document.body.dataset.basePath || "./";
+    const href = `${basePath}image/アイコン.png`;
+    let link = document.querySelector('link[rel="icon"]');
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = href;
+  }
+
   document.addEventListener("DOMContentLoaded", async () => {
     await injectPartial("site-header", "header.html");
     await injectPartial("site-footer", "footer.html");
+    document.body.classList.add("has-fixed-header");
     setActiveNav();
     setupMenu();
     setupYear();
+    setupFavicon();
     updateCartCount();
     document.addEventListener("cart:updated", updateCartCount);
   });

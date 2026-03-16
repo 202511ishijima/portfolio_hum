@@ -18,16 +18,42 @@
     <section class="cart-layout">
       <form id="checkout-form" class="form-card form-grid">
         <h1>購入手続き</h1>
-        <label class="form-row">お名前<input type="text" required></label>
-        <label class="form-row">住所<input type="text" required></label>
-        <label class="form-row">電話番号<input type="tel" required></label>
-        <label class="form-row">お支払い方法
+        <label class="form-row">
+          お名前
+          <input type="text" required>
+        </label>
+        <label class="form-row">
+          郵便番号
+          <input id="postal-code" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="123-4567" required>
+        </label>
+        <div class="button-row" style="margin-top: 0;">
+          <button class="button button--ghost" type="button" id="postal-search">郵便番号から住所検索</button>
+        </div>
+        <p id="postal-feedback" class="text-soft" aria-live="polite">郵便番号を入力すると住所を自動で検索できます。</p>
+        <label class="form-row">
+          住所
+          <input id="address" type="text" autocomplete="street-address" placeholder="千葉県柏市..." required>
+        </label>
+        <label class="form-row">
+          電話番号
+          <input
+            id="phone-number"
+            type="tel"
+            inputmode="numeric"
+            autocomplete="tel"
+            placeholder="09012345678"
+            pattern="[0-9]{10,11}"
+            required
+          >
+        </label>
+        <label class="form-row">
+          お支払い方法
           <select>
             <option>クレジットカード（ダミー）</option>
             <option>銀行振込（ダミー）</option>
           </select>
         </label>
-        <button class="button" type="submit">注文を確定する</button>
+        <button class="button" type="submit">購入を確定する</button>
       </form>
       <div id="checkout-summary"></div>
     </section>

@@ -28,6 +28,12 @@ window.ProductsPage = (function () {
     return labels[badge] || badge;
   }
 
+  function getCartQuantity(productId) {
+    const cart = JSON.parse(localStorage.getItem("hamu_cart") || "[]");
+    const item = cart.find((entry) => entry.id === productId);
+    return item ? item.quantity : 0;
+  }
+
   async function getProducts() {
     if (productsCache.length) return productsCache;
     productsCache = await SiteRouter.fetchJSON("products.json");
@@ -38,6 +44,17 @@ window.ProductsPage = (function () {
     return product.image
       ? `<figure class="media-photo"><img src="${SiteRouter.getBasePath()}image/${product.image}" alt="${product.name}"></figure>`
       : `<div class="product-card__media"></div>`;
+  }
+
+  function quantityBadge(productId) {
+    const quantity = getCartQuantity(productId);
+    return `
+      <div class="cart-quantity-control${quantity > 0 ? " is-visible" : ""}" data-inline-cart-control="${productId}">
+        <button class="quantity-stepper" type="button" data-qty-minus="${productId}" aria-label="数量を1つ減らす">-</button>
+        <span class="cart-inline-count" data-inline-cart-count="${productId}" aria-live="polite">${quantity}</span>
+        <button class="quantity-stepper" type="button" data-qty-plus="${productId}" aria-label="数量を1つ増やす">+</button>
+      </div>
+    `;
   }
 
   function cardTemplate(product) {
@@ -54,9 +71,58 @@ window.ProductsPage = (function () {
         <div class="button-row">
           <a class="button button--ghost" href="${SiteRouter.getBasePath()}products/detail.html?id=${product.id}">詳細を見る</a>
           <button class="button" type="button" data-add-product="${product.id}">カートに追加</button>
+          ${quantityBadge(product.id)}
         </div>
       </article>
     `;
+  }
+
+  function refreshInlineCounts() {
+    document.querySelectorAll("[data-inline-cart-count]").forEach((node) => {
+      const quantity = getCartQuantity(node.dataset.inlineCartCount);
+      node.textContent = String(quantity);
+    });
+
+    document.querySelectorAll("[data-inline-cart-control]").forEach((node) => {
+      const quantity = getCartQuantity(node.dataset.inlineCartControl);
+      node.classList.toggle("is-visible", quantity > 0);
+    });
+  }
+
+  function changeQuantity(productId, diff) {
+    const quantity = getCartQuantity(productId);
+
+    if (diff > 0) {
+      if (quantity === 0) {
+        return false;
+      }
+      Cart.updateQuantity(productId, quantity + diff);
+      return true;
+    }
+
+    if (quantity <= 1) {
+      Cart.removeItem(productId);
+      return true;
+    }
+
+    Cart.updateQuantity(productId, quantity + diff);
+    return true;
+  }
+
+  function bindQuantityControls() {
+    document.querySelectorAll("[data-qty-plus]").forEach((button) => {
+      button.addEventListener("click", () => {
+        changeQuantity(button.dataset.qtyPlus, 1);
+        refreshInlineCounts();
+      });
+    });
+
+    document.querySelectorAll("[data-qty-minus]").forEach((button) => {
+      button.addEventListener("click", () => {
+        changeQuantity(button.dataset.qtyMinus, -1);
+        refreshInlineCounts();
+      });
+    });
   }
 
   function bindAddButtons(products) {
@@ -64,12 +130,15 @@ window.ProductsPage = (function () {
       button.addEventListener("click", () => {
         const product = products.find((item) => item.id === button.dataset.addProduct);
         if (!product) return;
+
         Cart.addItem({
           id: product.id,
           name: product.name,
           price: product.price,
           categoryLabel: categoryLabel(product.category)
         });
+
+        refreshInlineCounts();
       });
     });
   }
@@ -83,31 +152,45 @@ window.ProductsPage = (function () {
     renderList(document.getElementById("starter-products"), products.filter((item) => item.category === "starter"));
     renderList(document.getElementById("popular-products"), products.filter((item) => item.popular).slice(0, 6));
     bindAddButtons(products);
+    bindQuantityControls();
+    refreshInlineCounts();
   }
 
   async function renderProductLanding() {
     const target = document.getElementById("product-category-preview");
     if (!target) return;
+
     const products = await getProducts();
     target.innerHTML = ["cage", "food", "toy", "care", "starter"].map((category) => {
       const first = products.find((item) => item.category === category);
-      return `<article class="info-card"><h3>${categoryLabel(category)}</h3><p>${first ? first.shortDescription : ""}</p><a class="button button--ghost" href="index.html?category=${category}">一覧を見る</a></article>`;
+      return `
+        <article class="info-card">
+          <h3>${categoryLabel(category)}</h3>
+          <p>${first ? first.shortDescription : ""}</p>
+          <a class="button button--ghost" href="index.html?category=${category}">一覧を見る</a>
+        </article>
+      `;
     }).join("");
   }
 
   async function renderProductListPage() {
     const target = document.getElementById("product-list");
     if (!target) return;
+
     const products = await getProducts();
     const filter = SiteRouter.getQueryParam("category");
     const filtered = filter ? products.filter((item) => item.category === filter) : products;
+
     target.innerHTML = filtered.map(cardTemplate).join("");
     bindAddButtons(products);
+    bindQuantityControls();
+    refreshInlineCounts();
 
     document.querySelectorAll("[data-filter-category]").forEach((button) => {
       if (button.dataset.filterCategory === filter || (!filter && button.dataset.filterCategory === "all")) {
         button.classList.add("is-active");
       }
+
       button.addEventListener("click", () => {
         const next = button.dataset.filterCategory;
         window.location.href = next === "all" ? "index.html" : `index.html?category=${next}`;
@@ -118,6 +201,7 @@ window.ProductsPage = (function () {
   async function renderProductDetailPage() {
     const target = document.getElementById("product-detail");
     if (!target) return;
+
     const products = await getProducts();
     const id = SiteRouter.getQueryParam("id") || products[0]?.id;
     const product = products.find((item) => item.id === id);
@@ -140,6 +224,7 @@ window.ProductsPage = (function () {
           <ul class="check-list">${product.features.map((feature) => `<li>${feature}</li>`).join("")}</ul>
           <div class="button-row">
             <button class="button" type="button" id="detail-add-cart">カートに追加</button>
+            ${quantityBadge(product.id)}
             <a class="button button--ghost" href="index.html?category=${product.category}">一覧に戻る</a>
           </div>
         </article>
@@ -153,7 +238,12 @@ window.ProductsPage = (function () {
         price: product.price,
         categoryLabel: categoryLabel(product.category)
       });
+
+      refreshInlineCounts();
     });
+
+    bindQuantityControls();
+    refreshInlineCounts();
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -161,5 +251,7 @@ window.ProductsPage = (function () {
     renderProductLanding();
     renderProductListPage();
     renderProductDetailPage();
+
+    document.addEventListener("cart:updated", refreshInlineCounts);
   });
 })();

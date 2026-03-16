@@ -36,13 +36,22 @@ window.MembershipPage = (function () {
     }
   }
 
+  function rewardMedia(item, basePath) {
+    if (item.image) {
+      return `<figure class="media-photo"><img src="${basePath}image/${item.image}" alt="${item.name}"></figure>`;
+    }
+    return `<div class="media-placeholder" data-label="${item.imageLabel || "景品画像を追加"}"></div>`;
+  }
+
   async function renderRewards() {
     const target = document.getElementById("rewards-list");
     const preview = document.getElementById("membership-rewards");
     if (!target && !preview) return;
     const rewards = await SiteRouter.fetchJSON("rewards.json");
+    const basePath = SiteRouter.getBasePath();
     const html = rewards.map((item) => `
       <article class="reward-card">
+        ${rewardMedia(item, basePath)}
         <h3>${item.name}</h3>
         <p>${item.description}</p>
         <p class="price">${item.points} pt</p>
@@ -86,7 +95,7 @@ window.MembershipPage = (function () {
       <div class="stats-row">
         <div class="stats-card">会員名<strong>${member.name}</strong></div>
         <div class="stats-card">現在ポイント<strong>${member.points} pt</strong></div>
-        <div class="stats-card">景品交換<strong><a href="rewards.html">交換一覧を見る</a></strong></div>
+        <div class="stats-card">景品交換<strong><a href="rewards.html">景品一覧を見る</a></strong></div>
       </div>
     `;
   }

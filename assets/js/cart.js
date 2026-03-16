@@ -95,6 +95,40 @@ window.Cart = (function () {
     });
   }
 
+  function normalizePostalCode(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  function normalizePhoneNumber(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  async function lookupAddress(postalCode, addressInput, feedback) {
+    const normalized = normalizePostalCode(postalCode);
+    if (normalized.length !== 7) {
+      feedback.textContent = "郵便番号は7桁で入力してください。";
+      return;
+    }
+
+    feedback.textContent = "住所を検索しています...";
+
+    try {
+      const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${normalized}`);
+      const data = await response.json();
+      const result = data.results?.[0];
+
+      if (!result) {
+        feedback.textContent = "該当する住所が見つかりませんでした。";
+        return;
+      }
+
+      addressInput.value = `${result.address1}${result.address2}${result.address3}`;
+      feedback.textContent = "住所を自動入力しました。番地以降を必要に応じて追記してください。";
+    } catch (error) {
+      feedback.textContent = "住所検索に失敗しました。時間をおいて再度お試しください。";
+    }
+  }
+
   function renderCheckoutPage() {
     const summary = document.getElementById("checkout-summary");
     const form = document.getElementById("checkout-form");
@@ -111,8 +145,50 @@ window.Cart = (function () {
       </div>
     `;
 
+    const postalInput = document.getElementById("postal-code");
+    const addressInput = document.getElementById("address");
+    const phoneInput = document.getElementById("phone-number");
+    const feedback = document.getElementById("postal-feedback");
+    const searchButton = document.getElementById("postal-search");
+
+    if (postalInput && addressInput && feedback) {
+      searchButton?.addEventListener("click", () => {
+        lookupAddress(postalInput.value, addressInput, feedback);
+      });
+
+      postalInput.addEventListener("blur", () => {
+        const normalized = normalizePostalCode(postalInput.value);
+        if (normalized.length === 7) {
+          lookupAddress(normalized, addressInput, feedback);
+        }
+      });
+    }
+
+    if (phoneInput) {
+      phoneInput.addEventListener("input", () => {
+        phoneInput.value = normalizePhoneNumber(phoneInput.value);
+        phoneInput.setCustomValidity("");
+      });
+    }
+
     form.addEventListener("submit", (event) => {
       event.preventDefault();
+
+      if (phoneInput) {
+        const normalizedPhone = normalizePhoneNumber(phoneInput.value);
+        const isValidPhone = /^\d{10,11}$/.test(normalizedPhone);
+
+        phoneInput.value = normalizedPhone;
+
+        if (!isValidPhone) {
+          phoneInput.setCustomValidity("電話番号は数字10桁または11桁で入力してください。");
+          phoneInput.reportValidity();
+          return;
+        }
+
+        phoneInput.setCustomValidity("");
+      }
+
       localStorage.setItem("hamu_last_order_total", String(data.total));
       clear();
       const completePath = document.body.dataset.completePath || "complete.html";
@@ -134,5 +210,5 @@ window.Cart = (function () {
     renderCompletePage();
   });
 
-  return { addItem, getCart, getSummary, clear };
+  return { addItem, updateQuantity, removeItem, getCart, getSummary, clear };
 })();

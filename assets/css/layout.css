@@ -1,10 +1,17 @@
 .site-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 30;
   background: rgba(255, 250, 243, 0.92);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(234, 220, 207, 0.9);
+  box-shadow: 0 8px 24px rgba(109, 80, 57, 0.08);
+}
+
+body.has-fixed-header {
+  padding-top: 92px;
 }
 
 .header__inner {
