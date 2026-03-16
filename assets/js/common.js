@@ -1,5 +1,6 @@
 (function () {
   let lastCartCount = null;
+  const memberKey = "hamu_member";
 
   async function injectPartial(targetId, fileName) {
     const target = document.getElementById(targetId);
@@ -32,6 +33,29 @@
     }
 
     lastCartCount = count;
+  }
+
+  function getMember() {
+    try {
+      return JSON.parse(localStorage.getItem(memberKey) || "null");
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function updateMemberLink() {
+    const member = getMember();
+    const isLoggedIn = Boolean(member?.loggedIn && member?.name);
+    const basePath = document.body.dataset.basePath || "./";
+
+    document.querySelectorAll("[data-member-label]").forEach((node) => {
+      node.textContent = isLoggedIn ? member.name : "会員";
+    });
+
+    document.querySelectorAll("[data-member-link]").forEach((node) => {
+      node.setAttribute("href", isLoggedIn ? `${basePath}pages/mypage.html` : `${basePath}pages/login.html`);
+      node.setAttribute("aria-label", isLoggedIn ? `${member.name} さんのマイページ` : "会員ページ");
+    });
   }
 
   function setActiveNav() {
@@ -80,6 +104,8 @@
     setupYear();
     setupFavicon();
     updateCartCount();
+    updateMemberLink();
     document.addEventListener("cart:updated", updateCartCount);
+    document.addEventListener("member:updated", updateMemberLink);
   });
 })();

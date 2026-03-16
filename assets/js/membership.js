@@ -1,18 +1,39 @@
 window.MembershipPage = (function () {
   const memberKey = "hamu_member";
 
+  function getDefaultMember() {
+    return {
+      name: "ゲストさま",
+      points: 0,
+      email: "",
+      loggedIn: false
+    };
+  }
+
   function getMember() {
-    return JSON.parse(localStorage.getItem(memberKey) || '{"name":"ゲストさま","points":128}');
+    try {
+      const stored = JSON.parse(localStorage.getItem(memberKey) || "null");
+      if (!stored) return getDefaultMember();
+      return { ...getDefaultMember(), ...stored };
+    } catch (error) {
+      return getDefaultMember();
+    }
   }
 
   function saveMember(member) {
     localStorage.setItem(memberKey, JSON.stringify(member));
+    document.dispatchEvent(new Event("member:updated"));
+  }
+
+  function logoutMember() {
+    saveMember(getDefaultMember());
   }
 
   async function renderNews() {
     const target = document.getElementById("home-news");
     const listPage = document.getElementById("news-list");
     if (!target && !listPage) return;
+
     const news = await SiteRouter.fetchJSON("news.json");
 
     if (target) {
@@ -47,6 +68,7 @@ window.MembershipPage = (function () {
     const target = document.getElementById("rewards-list");
     const preview = document.getElementById("membership-rewards");
     if (!target && !preview) return;
+
     const rewards = await SiteRouter.fetchJSON("rewards.json");
     const basePath = SiteRouter.getBasePath();
     const html = rewards.map((item) => `
@@ -57,6 +79,7 @@ window.MembershipPage = (function () {
         <p class="price">${item.points} pt</p>
       </article>
     `).join("");
+
     if (target) target.innerHTML = html;
     if (preview) preview.innerHTML = html;
   }
@@ -90,14 +113,31 @@ window.MembershipPage = (function () {
   function renderMemberSummary() {
     const target = document.getElementById("member-summary");
     if (!target) return;
+
     const member = getMember();
+    const name = member.loggedIn ? member.name : "未ログイン";
+    const points = member.loggedIn ? `${member.points} pt` : "ログインすると表示されます";
+    const linkLabel = member.loggedIn ? "景品一覧を見る" : "ログインする";
+    const linkHref = member.loggedIn ? "rewards.html" : "login.html";
+
     target.innerHTML = `
-      <div class="stats-row">
-        <div class="stats-card">会員名<strong>${member.name}</strong></div>
-        <div class="stats-card">現在ポイント<strong>${member.points} pt</strong></div>
-        <div class="stats-card">景品交換<strong><a href="rewards.html">景品一覧を見る</a></strong></div>
+      <div class="section-stack">
+        <div class="stats-row">
+          <div class="stats-card">会員名<strong>${name}</strong></div>
+          <div class="stats-card">現在ポイント<strong>${points}</strong></div>
+          <div class="stats-card">次のステップ<strong><a href="${linkHref}">${linkLabel}</a></strong></div>
+        </div>
+        ${member.loggedIn ? '<div class="button-row"><button class="button button--ghost" type="button" id="logout-button">ログアウト</button></div>' : ""}
       </div>
     `;
+  }
+
+  function bindLogoutButton() {
+    document.getElementById("logout-button")?.addEventListener("click", () => {
+      logoutMember();
+      renderMemberSummary();
+      window.location.href = "login.html";
+    });
   }
 
   function bindAuthForms() {
@@ -109,7 +149,9 @@ window.MembershipPage = (function () {
       const formData = new FormData(register);
       saveMember({
         name: String(formData.get("name") || "新規会員さま"),
-        points: 100
+        email: String(formData.get("email") || ""),
+        points: 100,
+        loggedIn: true
       });
       window.location.href = "mypage.html";
     });
@@ -117,9 +159,16 @@ window.MembershipPage = (function () {
     login?.addEventListener("submit", (event) => {
       event.preventDefault();
       const formData = new FormData(login);
+      const email = String(formData.get("email") || "member@example.com");
+      const current = getMember();
       saveMember({
-        name: String(formData.get("email") || "member@example.com").split("@")[0],
-        points: 128
+        ...current,
+        name: current.loggedIn && current.email === email
+          ? current.name
+          : email.split("@")[0],
+        email,
+        points: current.points || 128,
+        loggedIn: true
       });
       window.location.href = "mypage.html";
     });
@@ -131,5 +180,6 @@ window.MembershipPage = (function () {
     renderCafeMenus();
     renderMemberSummary();
     bindAuthForms();
+    bindLogoutButton();
   });
 })();

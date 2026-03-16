@@ -68,6 +68,33 @@
   font-size: 1.4rem;
 }
 
+.stats-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stats-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff7f0 0%, #f6e5d9 100%);
+  border: 1px solid rgba(122, 74, 44, 0.12);
+  color: var(--color-main-deep);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  box-shadow: 0 6px 16px rgba(122, 74, 44, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.stats-list a:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #fff3ea 0%, #f2ddd0 100%);
+  box-shadow: 0 10px 18px rgba(122, 74, 44, 0.12);
+}
+
 .section-stack {
   display: grid;
   gap: 18px;
