@@ -79,9 +79,7 @@ window.HamstersPage = (function () {
       }).join("");
 
       Array.from(dotsWrap.querySelectorAll("[data-carousel-dot]")).forEach((dot) => {
-        dot.addEventListener("click", () => {
-          updateCarousel(Number(dot.dataset.carouselDot));
-        });
+        dot.addEventListener("click", () => updateCarousel(Number(dot.dataset.carouselDot)));
       });
     }
 

@@ -51,16 +51,20 @@ window.Cart = (function () {
 
     const data = getSummary();
     if (!data.items.length) {
-      list.innerHTML = '<div class="empty-state">カートに商品がありません。商品一覧から追加してください。</div>';
-      summary.innerHTML = '<div class="summary-card"><h2>ご注文内容</h2><p>商品が追加されるとここに合計が表示されます。</p><a class="button button--ghost" href="list.html">商品一覧へ</a></div>';
+      list.innerHTML = '<div class="empty-state">カートに商品が入っていません。商品一覧から追加してください。</div>';
+      summary.innerHTML = '<div class="summary-card"><h2>ご購入について</h2><p>商品を追加すると、ここに合計金額が表示されます。</p><a class="button button--ghost" href="index.html">商品一覧へ</a></div>';
       return;
     }
 
     list.innerHTML = data.items.map((item) => `
       <article class="cart-item">
-        <div><h3>${item.name}</h3><p class="text-soft">${item.categoryLabel}</p><p class="price">${SiteRouter.formatPrice(item.price)}</p></div>
+        <div>
+          <h3>${item.name}</h3>
+          <p class="text-soft">${item.categoryLabel}</p>
+          <p class="price">${SiteRouter.formatPrice(item.price)}</p>
+        </div>
         <div class="qty-row">
-          <label>数量<input type="number" min="1" value="${item.quantity}" data-cart-qty="${item.id}"></label>
+          <label>数量 <input type="number" min="1" value="${item.quantity}" data-cart-qty="${item.id}"></label>
           <button class="button button--ghost" type="button" data-cart-remove="${item.id}">削除</button>
         </div>
       </article>
@@ -69,10 +73,10 @@ window.Cart = (function () {
     summary.innerHTML = `
       <div class="summary-card">
         <h2>ご注文内容</h2>
-        <p>小計: <strong>${SiteRouter.formatPrice(data.subtotal)}</strong></p>
-        <p>送料: <strong>${SiteRouter.formatPrice(data.shipping)}</strong></p>
-        <p>合計: <strong class="price">${SiteRouter.formatPrice(data.total)}</strong></p>
-        <a class="button" href="checkout.html">ダミー購入へ進む</a>
+        <p>小計 <strong>${SiteRouter.formatPrice(data.subtotal)}</strong></p>
+        <p>送料 <strong>${SiteRouter.formatPrice(data.shipping)}</strong></p>
+        <p>合計 <strong class="price">${SiteRouter.formatPrice(data.total)}</strong></p>
+        <a class="button" href="checkout.html">購入手続きへ進む</a>
       </div>
     `;
 
@@ -99,11 +103,11 @@ window.Cart = (function () {
     const data = getSummary();
     summary.innerHTML = `
       <div class="summary-card">
-        <h2>お支払い内容</h2>
-        <p>商品点数: <strong>${data.items.length}</strong></p>
-        <p>小計: <strong>${SiteRouter.formatPrice(data.subtotal)}</strong></p>
-        <p>送料: <strong>${SiteRouter.formatPrice(data.shipping)}</strong></p>
-        <p>合計: <strong class="price">${SiteRouter.formatPrice(data.total)}</strong></p>
+        <h2>ご注文内容</h2>
+        <p>商品点数 <strong>${data.items.length}</strong></p>
+        <p>小計 <strong>${SiteRouter.formatPrice(data.subtotal)}</strong></p>
+        <p>送料 <strong>${SiteRouter.formatPrice(data.shipping)}</strong></p>
+        <p>合計 <strong class="price">${SiteRouter.formatPrice(data.total)}</strong></p>
       </div>
     `;
 

@@ -121,6 +121,7 @@ window.ProductsPage = (function () {
     const products = await getProducts();
     const id = SiteRouter.getQueryParam("id") || products[0]?.id;
     const product = products.find((item) => item.id === id);
+
     if (!product) {
       target.innerHTML = '<div class="empty-state">商品が見つかりませんでした。</div>';
       return;
