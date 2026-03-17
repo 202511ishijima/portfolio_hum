@@ -305,7 +305,7 @@ a:hover { color: var(--black); }
   min-height: 48px;
   font-size: 14px;
   line-height: 1.7;
-  color: var(--text-muted);
+  color: var(--gray-800);
 }
 
 .fill-content p {
