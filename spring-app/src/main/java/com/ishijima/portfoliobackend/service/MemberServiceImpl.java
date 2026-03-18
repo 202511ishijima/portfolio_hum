@@ -49,6 +49,12 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
+	public Member findByEmail(String email) {
+		return memberMapper.findByEmail(email)
+			.orElseThrow(() -> new IllegalArgumentException("会員が見つかりません。email=" + email));
+	}
+
+	@Override
 	@Transactional
 	public void toggleStatus(Long id) {
 		Member member = findById(id);
@@ -63,5 +69,16 @@ public class MemberServiceImpl implements MemberService {
 		int currentPoints = member.getPoints() == null ? 0 : member.getPoints();
 		int nextPoints = Math.max(0, currentPoints + delta);
 		memberMapper.updatePoints(id, nextPoints);
+	}
+
+	@Override
+	@Transactional
+	public Member adjustPointsByEmail(String email, Integer delta) {
+		Member member = findByEmail(email);
+		int currentPoints = member.getPoints() == null ? 0 : member.getPoints();
+		int nextPoints = Math.max(0, currentPoints + delta);
+		memberMapper.updatePoints(member.getId(), nextPoints);
+		member.setPoints(nextPoints);
+		return member;
 	}
 }

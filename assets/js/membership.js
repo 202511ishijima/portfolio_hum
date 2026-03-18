@@ -1,12 +1,14 @@
 window.MembershipPage = (function () {
   const memberKey = "hamu_member";
+  const backendBaseUrl = "http://localhost:8080";
 
   function getDefaultMember() {
     return {
       name: "ゲストさま",
       points: 0,
       email: "",
-      loggedIn: false
+      loggedIn: false,
+      status: "ACTIVE"
     };
   }
 
@@ -27,6 +29,18 @@ window.MembershipPage = (function () {
 
   function logoutMember() {
     saveMember(getDefaultMember());
+  }
+
+  async function fetchMemberStatus(email) {
+    if (!email) return null;
+
+    try {
+      const response = await fetch(`${backendBaseUrl}/api/members/status?email=${encodeURIComponent(email)}`);
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (error) {
+      return null;
+    }
   }
 
   async function renderNews() {
@@ -117,6 +131,9 @@ window.MembershipPage = (function () {
     const member = getMember();
     const name = member.loggedIn ? member.name : "未ログイン";
     const points = member.loggedIn ? `${member.points} pt` : "ログインすると表示されます";
+    const statusLabel = member.loggedIn
+      ? (member.status === "SUSPENDED" ? "停止中" : "利用中")
+      : "ログイン前";
     const linkLabel = member.loggedIn ? "景品一覧を見る" : "ログインする";
     const linkHref = member.loggedIn ? "rewards.html" : "login.html";
 
@@ -125,6 +142,7 @@ window.MembershipPage = (function () {
         <div class="stats-row">
           <div class="stats-card">会員名<strong>${name}</strong></div>
           <div class="stats-card">現在ポイント<strong>${points}</strong></div>
+          <div class="stats-card">アカウント状態<strong>${statusLabel}</strong></div>
           <div class="stats-card">次のステップ<strong><a href="${linkHref}">${linkLabel}</a></strong></div>
         </div>
         ${member.loggedIn ? '<div class="button-row"><button class="button button--ghost" type="button" id="logout-button">ログアウト</button></div>' : ""}
@@ -156,35 +174,106 @@ window.MembershipPage = (function () {
     });
   }
 
+  function showFormMessage(target, message, isError) {
+    if (!target) {
+      alert(message);
+      return;
+    }
+
+    target.textContent = message;
+    target.className = isError ? "form-message error" : "form-message success";
+  }
+
+  async function submitRegisterForm(form) {
+    const status = document.getElementById("register-status");
+    const formData = new FormData(form);
+    const payload = {
+      name: String(formData.get("name") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
+      password: String(formData.get("password") || "")
+    };
+
+    if (!payload.name || !payload.email || !payload.password) {
+      showFormMessage(status, "未入力の項目があります。すべて入力してください。", true);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendBaseUrl}/api/members/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.message || "アカウントを作成できませんでした。");
+      }
+
+      saveMember({
+        name: result.name || payload.name,
+        email: result.email || payload.email,
+        points: Number(result.points || 0),
+        loggedIn: true,
+        status: result.status || "ACTIVE"
+      });
+
+      showFormMessage(status, result.message || "アカウントを作成しました。", false);
+      setTimeout(() => {
+        window.location.href = "mypage.html";
+      }, 600);
+    } catch (error) {
+      showFormMessage(
+        status,
+        error.message || "登録できませんでした。Spring Boot が起動しているか確認してください。",
+        true
+      );
+    }
+  }
+
+  function getSuspendedPagePath() {
+    const basePath = document.body.dataset.basePath || "../";
+    return `${basePath}pages/account-suspended.html`;
+  }
+
   function bindAuthForms() {
     const register = document.getElementById("register-form");
     const login = document.getElementById("login-form");
 
-    register?.addEventListener("submit", (event) => {
+    register?.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const formData = new FormData(register);
-      saveMember({
-        name: String(formData.get("name") || "新規会員さま"),
-        email: String(formData.get("email") || ""),
-        points: 100,
-        loggedIn: true
-      });
-      window.location.href = "mypage.html";
+      await submitRegisterForm(register);
     });
 
-    login?.addEventListener("submit", (event) => {
+    login?.addEventListener("submit", async (event) => {
       event.preventDefault();
       const formData = new FormData(login);
-      const email = String(formData.get("email") || "member@example.com");
+      const email = String(formData.get("email") || "").trim();
       const current = getMember();
+      const status = await fetchMemberStatus(email);
+
+      if (status?.status === "SUSPENDED") {
+        saveMember({
+          ...current,
+          name: status.name || email.split("@")[0],
+          email,
+          points: Number(status.points || 0),
+          loggedIn: true,
+          status: "SUSPENDED"
+        });
+        window.location.href = getSuspendedPagePath();
+        return;
+      }
+
       saveMember({
         ...current,
-        name: current.loggedIn && current.email === email
-          ? current.name
-          : email.split("@")[0],
+        name: status?.name || (current.loggedIn && current.email === email ? current.name : email.split("@")[0]),
         email,
-        points: current.points || 128,
-        loggedIn: true
+        points: Number(status?.points ?? current.points ?? 128),
+        loggedIn: true,
+        status: status?.status || "ACTIVE"
       });
       window.location.href = "mypage.html";
     });

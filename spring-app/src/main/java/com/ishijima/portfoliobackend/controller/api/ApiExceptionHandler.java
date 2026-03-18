@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@RestControllerAdvice(assignableTypes = InquiryApiController.class)
+@RestControllerAdvice(assignableTypes = {InquiryApiController.class, MemberApiController.class})
 public class ApiExceptionHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

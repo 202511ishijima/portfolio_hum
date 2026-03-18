@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アカウント停止中 | はむのくらし</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+<body data-base-path="../" data-page="contact">
+  <div id="site-header"></div>
+  <main class="container page-shell">
+    <section class="page-hero">
+      <p class="eyebrow">ACCOUNT STATUS</p>
+      <h1>アカウントは現在停止中です</h1>
+      <p>現在このアカウントでは購入や会員向け機能をご利用いただけません。内容確認や再開相談をご希望の場合は、下のお問い合わせフォームからご連絡ください。</p>
+    </section>
+
+    <section class="split-visual">
+      <div class="visual-card section-stack">
+        <h2>ご案内</h2>
+        <p>停止理由の詳細は個別にご案内しています。ご本人確認のため、お名前と登録メールアドレスを入れたうえでご連絡ください。</p>
+        <figure class="media-photo">
+          <img src="../image/会員イメージ画像.png" alt="アカウント案内イメージ">
+        </figure>
+      </div>
+      <div class="summary-card">
+        <h2>お問い合わせ前のご確認</h2>
+        <ul class="check-list">
+          <li>登録メールアドレスを入力してください</li>
+          <li>再開希望か確認希望かを件名に入れると案内が早くなります</li>
+          <li>返信には2営業日ほどいただく場合があります</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-stack">
+      <article class="form-card">
+        <h2>停止中アカウントのお問い合わせ</h2>
+        <form class="form-grid" data-contact-form data-endpoint="http://localhost:8080/api/inquiries">
+          <label class="form-row">お名前
+            <input name="name" type="text" maxlength="100" required>
+          </label>
+          <label class="form-row">メールアドレス
+            <input name="email" type="email" maxlength="255" required>
+          </label>
+          <label class="form-row">件名
+            <select name="subject" required>
+              <option value="">選択してください</option>
+              <option>アカウント停止理由の確認</option>
+              <option>アカウント再開の相談</option>
+              <option>その他</option>
+            </select>
+          </label>
+          <label class="form-row">お問い合わせ内容
+            <textarea name="message" maxlength="1000" placeholder="停止中アカウントに関する内容をご入力ください" required></textarea>
+          </label>
+          <p class="form-status" data-contact-status aria-live="polite"></p>
+          <button class="button" type="submit">送信する</button>
+        </form>
+      </article>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../assets/js/common.js"></script>
+  <script src="../assets/js/contact.js"></script>
+</body>
+</html>

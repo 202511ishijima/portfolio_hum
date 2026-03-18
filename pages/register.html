@@ -20,7 +20,7 @@
         <div class="visual-card section-stack">
           <p class="eyebrow">ACCOUNT</p>
           <h1>アカウント作成</h1>
-          <p>会員登録をすると、ポイント管理や景品確認がしやすくなり、お問い合わせフォームでもお名前とメールアドレスが自動入力されます。</p>
+          <p>会員登録をすると、ポイント確認や景品交換がしやすくなり、お問い合わせフォームでもお名前とメールアドレスが自動入力されます。</p>
           <figure class="media-photo">
             <img src="../image/ぬいぐるみ訴求画像.png" alt="会員特典イメージ">
           </figure>
@@ -51,9 +51,10 @@
             <input name="email" type="email" placeholder="hamu@example.com" required>
           </label>
           <label class="form-row">パスワード
-            <input name="password" type="password" placeholder="8文字以上を推奨" required>
+            <input name="password" type="password" placeholder="8文字以上で入力" required>
           </label>
           <button class="button" type="submit">アカウントを作成する</button>
+          <p id="register-status" class="form-message" aria-live="polite"></p>
         </form>
         <div class="link-row">
           <a class="button button--secondary" href="./login.html">ログインへ</a>

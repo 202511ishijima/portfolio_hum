@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="../assets/css/components.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
 </head>
-<body data-base-path="../" data-page="cart" data-complete-path="complete.html">
+<body data-base-path="../" data-page="cart" data-complete-path="complete.html" data-member-guard="active">
   <div id="site-header"></div>
   <main class="container">
     <section class="cart-layout">
@@ -20,11 +20,11 @@
         <h1>購入手続き</h1>
         <label class="form-row">
           お名前
-          <input type="text" required>
+          <input id="checkout-name" name="name" type="text" autocomplete="name" required>
         </label>
         <label class="form-row">
           郵便番号
-          <input id="postal-code" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="123-4567" required>
+          <input id="postal-code" name="postalCode" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="123-4567" required>
         </label>
         <div class="button-row" style="margin-top: 0;">
           <button class="button button--ghost" type="button" id="postal-search">郵便番号から住所検索</button>
@@ -32,12 +32,13 @@
         <p id="postal-feedback" class="text-soft" aria-live="polite">郵便番号を入力すると住所を自動で検索できます。</p>
         <label class="form-row">
           住所
-          <input id="address" type="text" autocomplete="street-address" placeholder="千葉県柏市..." required>
+          <input id="address" name="address" type="text" autocomplete="street-address" placeholder="千葉県柏市..." required>
         </label>
         <label class="form-row">
           電話番号
           <input
             id="phone-number"
+            name="phoneNumber"
             type="tel"
             inputmode="numeric"
             autocomplete="tel"
@@ -48,12 +49,15 @@
         </label>
         <label class="form-row">
           お支払い方法
-          <select>
-            <option>クレジットカード（ダミー）</option>
-            <option>銀行振込（ダミー）</option>
+          <select id="payment-method" name="paymentMethod">
+            <option value="credit-card">クレジットカード（ダミー）</option>
+            <option value="cash-on-delivery">代金引換（ダミー）</option>
           </select>
         </label>
-        <button class="button" type="submit">購入を確定する</button>
+        <div class="button-row">
+          <button class="button" type="submit">購入を確定する</button>
+          <button class="button button--ghost" type="button" id="clear-checkout-profile">前回入力内容をクリア</button>
+        </div>
       </form>
       <div id="checkout-summary"></div>
     </section>

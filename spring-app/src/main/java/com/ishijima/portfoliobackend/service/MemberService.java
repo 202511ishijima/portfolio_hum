@@ -13,7 +13,11 @@ public interface MemberService {
 
 	Member findById(Long id);
 
+	Member findByEmail(String email);
+
 	void toggleStatus(Long id);
 
 	void adjustPoints(Long id, Integer delta);
+
+	Member adjustPointsByEmail(String email, Integer delta);
 }

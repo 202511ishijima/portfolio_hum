@@ -1,6 +1,7 @@
 (function () {
   let lastCartCount = null;
   const memberKey = "hamu_member";
+  const backendBaseUrl = "http://localhost:8080";
 
   async function injectPartial(targetId, fileName) {
     const target = document.getElementById(targetId);
@@ -41,6 +42,11 @@
     } catch (error) {
       return null;
     }
+  }
+
+  function saveMember(member) {
+    localStorage.setItem(memberKey, JSON.stringify(member));
+    document.dispatchEvent(new Event("member:updated"));
   }
 
   function updateMemberLink() {
@@ -95,6 +101,44 @@
     link.href = href;
   }
 
+  async function fetchMemberStatus(email) {
+    if (!email) return null;
+
+    try {
+      const response = await fetch(`${backendBaseUrl}/api/members/status?email=${encodeURIComponent(email)}`);
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async function enforceMemberGuard() {
+    if (document.body.dataset.memberGuard !== "active") return;
+
+    const member = getMember();
+    if (!member?.loggedIn || !member?.email) return;
+
+    const status = await fetchMemberStatus(member.email);
+    if (!status) return;
+
+    saveMember({
+      ...member,
+      name: status.name || member.name,
+      email: status.email || member.email,
+      points: Number(status.points ?? member.points ?? 0),
+      status: status.status || member.status
+    });
+
+    if (status.status === "SUSPENDED") {
+      const basePath = document.body.dataset.basePath || "./";
+      const suspendedPage = `${basePath}pages/account-suspended.html`;
+      if (!window.location.href.includes("/pages/account-suspended.html")) {
+        window.location.href = suspendedPage;
+      }
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", async () => {
     await injectPartial("site-header", "header.html");
     await injectPartial("site-footer", "footer.html");
@@ -107,5 +151,6 @@
     updateMemberLink();
     document.addEventListener("cart:updated", updateCartCount);
     document.addEventListener("member:updated", updateMemberLink);
+    await enforceMemberGuard();
   });
 })();

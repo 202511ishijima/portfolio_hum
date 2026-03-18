@@ -1,8 +1,10 @@
 window.Cart = (function () {
   const storageKey = "hamu_cart";
   const memberKey = "hamu_member";
+  const checkoutProfileKey = "hamu_checkout_profile";
   const lastOrderTotalKey = "hamu_last_order_total";
   const lastOrderPointsKey = "hamu_last_order_points";
+  const backendBaseUrl = "http://localhost:8080";
 
   function getCart() {
     return JSON.parse(localStorage.getItem(storageKey) || "[]");
@@ -60,7 +62,43 @@ window.Cart = (function () {
     document.dispatchEvent(new Event("member:updated"));
   }
 
-  function awardPoints(total) {
+  function getCheckoutProfile() {
+    try {
+      return JSON.parse(localStorage.getItem(checkoutProfileKey) || "null") || {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function saveCheckoutProfile(profile) {
+    localStorage.setItem(checkoutProfileKey, JSON.stringify(profile));
+  }
+
+  function clearCheckoutProfile() {
+    localStorage.removeItem(checkoutProfileKey);
+  }
+
+  async function syncPointsToBackend(email, earnedPoints) {
+    const response = await fetch(`${backendBaseUrl}/api/members/points`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8"
+      },
+      body: JSON.stringify({
+        email,
+        delta: earnedPoints
+      })
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.message || "ポイントの反映に失敗しました。");
+    }
+
+    return result;
+  }
+
+  async function awardPoints(total) {
     const member = getMember();
     if (!member?.loggedIn) {
       localStorage.setItem(lastOrderPointsKey, "0");
@@ -68,11 +106,16 @@ window.Cart = (function () {
     }
 
     const earnedPoints = Math.floor(Number(total || 0) / 100);
-    const nextPoints = Number(member.points || 0) + earnedPoints;
+    if (earnedPoints <= 0) {
+      localStorage.setItem(lastOrderPointsKey, "0");
+      return 0;
+    }
+
+    const result = await syncPointsToBackend(member.email, earnedPoints);
 
     saveMember({
       ...member,
-      points: nextPoints
+      points: Number(result.points || 0)
     });
 
     localStorage.setItem(lastOrderPointsKey, String(earnedPoints));
@@ -87,7 +130,7 @@ window.Cart = (function () {
     const data = getSummary();
     if (!data.items.length) {
       list.innerHTML = '<div class="empty-state">カートに商品が入っていません。商品一覧から追加してください。</div>';
-      summary.innerHTML = '<div class="summary-card"><h2>ご購入について</h2><p>商品を追加すると、ここに合計金額が表示されます。</p><a class="button button--ghost" href="index.html">商品一覧へ</a></div>';
+      summary.innerHTML = '<div class="summary-card"><h2>ご購入前に</h2><p>商品を追加すると、ここに合計金額が表示されます。</p><a class="button button--ghost" href="index.html">商品一覧へ</a></div>';
       return;
     }
 
@@ -99,7 +142,7 @@ window.Cart = (function () {
           <p class="price">${SiteRouter.formatPrice(item.price)}</p>
         </div>
         <div class="qty-row">
-          <label>数量 <input type="number" min="1" value="${item.quantity}" data-cart-qty="${item.id}"></label>
+          <label>数量<input type="number" min="1" value="${item.quantity}" data-cart-qty="${item.id}"></label>
           <button class="button button--ghost" type="button" data-cart-remove="${item.id}">削除</button>
         </div>
       </article>
@@ -107,7 +150,7 @@ window.Cart = (function () {
 
     summary.innerHTML = `
       <div class="summary-card">
-        <h2>お支払い金額</h2>
+        <h2>ご注文内容</h2>
         <p>小計 <strong>${SiteRouter.formatPrice(data.subtotal)}</strong></p>
         <p>送料 <strong>${SiteRouter.formatPrice(data.shipping)}</strong></p>
         <p>合計 <strong class="price">${SiteRouter.formatPrice(data.total)}</strong></p>
@@ -138,6 +181,79 @@ window.Cart = (function () {
     return String(value || "").replace(/\D/g, "");
   }
 
+  function collectCheckoutProfile() {
+    return {
+      name: document.getElementById("checkout-name")?.value || "",
+      postalCode: document.getElementById("postal-code")?.value || "",
+      address: document.getElementById("address")?.value || "",
+      phoneNumber: document.getElementById("phone-number")?.value || "",
+      paymentMethod: document.getElementById("payment-method")?.value || "credit-card"
+    };
+  }
+
+  function fillCheckoutProfile() {
+    const profile = getCheckoutProfile();
+    const member = getMember();
+
+    const nameInput = document.getElementById("checkout-name");
+    const postalInput = document.getElementById("postal-code");
+    const addressInput = document.getElementById("address");
+    const phoneInput = document.getElementById("phone-number");
+    const paymentSelect = document.getElementById("payment-method");
+
+    if (nameInput) {
+      nameInput.value = profile.name || member?.name || "";
+    }
+    if (postalInput) {
+      postalInput.value = profile.postalCode || "";
+    }
+    if (addressInput) {
+      addressInput.value = profile.address || "";
+    }
+    if (phoneInput) {
+      phoneInput.value = profile.phoneNumber || "";
+    }
+    if (paymentSelect && profile.paymentMethod) {
+      paymentSelect.value = profile.paymentMethod;
+    }
+  }
+
+  function resetCheckoutForm() {
+    document.getElementById("checkout-name").value = "";
+    document.getElementById("postal-code").value = "";
+    document.getElementById("address").value = "";
+    document.getElementById("phone-number").value = "";
+    document.getElementById("payment-method").value = "credit-card";
+    const feedback = document.getElementById("postal-feedback");
+    if (feedback) {
+      feedback.textContent = "郵便番号を入力すると住所を自動で検索できます。";
+    }
+  }
+
+  function bindCheckoutProfilePersistence() {
+    const fields = [
+      document.getElementById("checkout-name"),
+      document.getElementById("postal-code"),
+      document.getElementById("address"),
+      document.getElementById("phone-number"),
+      document.getElementById("payment-method")
+    ].filter(Boolean);
+
+    fields.forEach((field) => {
+      field.addEventListener("input", () => {
+        saveCheckoutProfile(collectCheckoutProfile());
+      });
+      field.addEventListener("change", () => {
+        saveCheckoutProfile(collectCheckoutProfile());
+      });
+    });
+
+    document.getElementById("clear-checkout-profile")?.addEventListener("click", () => {
+      clearCheckoutProfile();
+      resetCheckoutForm();
+    });
+  }
+
   async function lookupAddress(postalCode, addressInput, feedback) {
     const normalized = normalizePostalCode(postalCode);
     if (normalized.length !== 7) {
@@ -158,7 +274,8 @@ window.Cart = (function () {
       }
 
       addressInput.value = `${result.address1}${result.address2}${result.address3}`;
-      feedback.textContent = "住所を自動入力しました。必要に応じて補足を入力してください。";
+      saveCheckoutProfile(collectCheckoutProfile());
+      feedback.textContent = "住所を自動入力しました。必要に応じて建物名を入力してください。";
     } catch (error) {
       feedback.textContent = "住所検索に失敗しました。時間をおいて再度お試しください。";
     }
@@ -173,14 +290,17 @@ window.Cart = (function () {
     const expectedPoints = Math.floor(data.total / 100);
     summary.innerHTML = `
       <div class="summary-card">
-        <h2>お支払い金額</h2>
+        <h2>ご注文内容</h2>
         <p>商品点数 <strong>${data.items.length}</strong></p>
         <p>小計 <strong>${SiteRouter.formatPrice(data.subtotal)}</strong></p>
         <p>送料 <strong>${SiteRouter.formatPrice(data.shipping)}</strong></p>
         <p>合計 <strong class="price">${SiteRouter.formatPrice(data.total)}</strong></p>
-        <p>付与予定ポイント <strong>${expectedPoints} pt</strong></p>
+        <p>今回付与ポイント <strong>${expectedPoints} pt</strong></p>
       </div>
     `;
+
+    fillCheckoutProfile();
+    bindCheckoutProfilePersistence();
 
     const postalInput = document.getElementById("postal-code");
     const addressInput = document.getElementById("address");
@@ -208,7 +328,7 @@ window.Cart = (function () {
       });
     }
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       if (phoneInput) {
@@ -226,11 +346,16 @@ window.Cart = (function () {
         phoneInput.setCustomValidity("");
       }
 
-      localStorage.setItem(lastOrderTotalKey, String(data.total));
-      awardPoints(data.total);
-      clear();
-      const completePath = document.body.dataset.completePath || "complete.html";
-      window.location.href = completePath;
+      try {
+        saveCheckoutProfile(collectCheckoutProfile());
+        localStorage.setItem(lastOrderTotalKey, String(data.total));
+        await awardPoints(data.total);
+        clear();
+        const completePath = document.body.dataset.completePath || "complete.html";
+        window.location.href = completePath;
+      } catch (error) {
+        alert(error.message || "購入処理に失敗しました。");
+      }
     });
   }
 

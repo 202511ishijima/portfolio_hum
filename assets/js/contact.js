@@ -40,8 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     if (!payload.name || !payload.email || !payload.subject || !payload.message) {
-      setStatus("未入力の項目があります。すべて入力してください。", "error");
-      alert("未入力の項目があります。すべて入力してください。");
+      const message = "未入力の項目があります。すべて入力してください。";
+      setStatus(message, "error");
+      alert(message);
       return;
     }
 
