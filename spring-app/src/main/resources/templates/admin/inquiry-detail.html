@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>問い合わせ詳細</title>
+</head>
+<body>
+	<h1>問い合わせ詳細</h1>
+
+	<p th:if="${statusMessage}" th:text="${statusMessage}">更新しました。</p>
+	<p th:if="${statusError}" th:text="${statusError}">更新に失敗しました。</p>
+
+	<dl>
+		<dt>ID</dt>
+		<dd th:text="${inquiry.id}">1</dd>
+		<dt>氏名</dt>
+		<dd th:text="${inquiry.name}">山田 太郎</dd>
+		<dt>メールアドレス</dt>
+		<dd th:text="${inquiry.email}">sample@example.com</dd>
+		<dt>件名</dt>
+		<dd th:text="${inquiry.subject}">件名</dd>
+		<dt>本文</dt>
+		<dd th:text="${inquiry.message}">本文</dd>
+		<dt>受付日時</dt>
+		<dd th:text="${inquiry.createdAt}">2026-03-18T10:00:00</dd>
+		<dt>対応状況</dt>
+		<dd th:text="${inquiry.status}">NEW</dd>
+	</dl>
+
+	<form th:action="@{/admin/inquiries/{id}/status(id=${inquiry.id})}" method="post" th:object="${statusForm}">
+		<label for="status">対応状況</label>
+		<select id="status" th:field="*{status}">
+			<option value="NEW">未対応</option>
+			<option value="IN_PROGRESS">対応中</option>
+			<option value="COMPLETED">完了</option>
+		</select>
+		<button type="submit">更新する</button>
+	</form>
+
+	<p><a th:href="@{/admin/inquiries}">一覧へ戻る</a></p>
+</body>
+</html>

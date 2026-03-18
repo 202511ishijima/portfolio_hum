@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>問い合わせ一覧</title>
+</head>
+<body>
+	<h1>問い合わせ一覧</h1>
+
+	<table border="1">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>受付日時</th>
+				<th>氏名</th>
+				<th>メールアドレス</th>
+				<th>件名</th>
+				<th>対応状況</th>
+				<th>詳細</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="inquiry : ${inquiries}">
+				<td th:text="${inquiry.id}">1</td>
+				<td th:text="${inquiry.createdAt}">2026-03-18T10:00:00</td>
+				<td th:text="${inquiry.name}">山田 太郎</td>
+				<td th:text="${inquiry.email}">sample@example.com</td>
+				<td th:text="${inquiry.subject}">件名</td>
+				<td th:text="${inquiry.status}">NEW</td>
+				<td><a th:href="@{/admin/inquiries/{id}(id=${inquiry.id})}">詳細</a></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<form th:action="@{/admin/logout}" method="post">
+		<button type="submit">ログアウト</button>
+	</form>
+</body>
+</html>
