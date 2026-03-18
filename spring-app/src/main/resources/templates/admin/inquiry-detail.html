@@ -3,41 +3,88 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>問い合わせ詳細</title>
+	<title>問い合わせ詳細 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
 </head>
-<body>
-	<h1>問い合わせ詳細</h1>
+<body class="admin-body">
+	<div class="admin-shell">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">DETAIL</p>
+				<h1>問い合わせ詳細</h1>
+				<p class="admin-lead">問い合わせ内容を確認し、対応状況を更新できます。</p>
+			</div>
+			<a class="admin-button admin-button--ghost" th:href="@{/admin/inquiries}">一覧へ戻る</a>
+		</header>
 
-	<p th:if="${statusMessage}" th:text="${statusMessage}">更新しました。</p>
-	<p th:if="${statusError}" th:text="${statusError}">更新に失敗しました。</p>
+		<p class="admin-alert admin-alert--success" th:if="${statusMessage}" th:text="${statusMessage}">対応状況を更新しました。</p>
+		<p class="admin-alert admin-alert--error" th:if="${statusError}" th:text="${statusError}">対応状況の更新に失敗しました。</p>
 
-	<dl>
-		<dt>ID</dt>
-		<dd th:text="${inquiry.id}">1</dd>
-		<dt>氏名</dt>
-		<dd th:text="${inquiry.name}">山田 太郎</dd>
-		<dt>メールアドレス</dt>
-		<dd th:text="${inquiry.email}">sample@example.com</dd>
-		<dt>件名</dt>
-		<dd th:text="${inquiry.subject}">件名</dd>
-		<dt>本文</dt>
-		<dd th:text="${inquiry.message}">本文</dd>
-		<dt>受付日時</dt>
-		<dd th:text="${inquiry.createdAt}">2026-03-18T10:00:00</dd>
-		<dt>対応状況</dt>
-		<dd th:text="${inquiry.status}">NEW</dd>
-	</dl>
+		<div class="admin-detail-grid">
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<h2>基本情報</h2>
+					<span class="admin-status"
+					      th:classappend="${inquiry.status == 'NEW'} ? ' admin-status--new' : (${inquiry.status == 'IN_PROGRESS'} ? ' admin-status--progress' : ' admin-status--done')"
+					      th:text="${inquiry.status == 'NEW'} ? '未対応' : (${inquiry.status == 'IN_PROGRESS'} ? '対応中' : '完了')">
+						未対応
+					</span>
+				</div>
 
-	<form th:action="@{/admin/inquiries/{id}/status(id=${inquiry.id})}" method="post" th:object="${statusForm}">
-		<label for="status">対応状況</label>
-		<select id="status" th:field="*{status}">
-			<option value="NEW">未対応</option>
-			<option value="IN_PROGRESS">対応中</option>
-			<option value="COMPLETED">完了</option>
-		</select>
-		<button type="submit">更新する</button>
-	</form>
+				<dl class="admin-detail-list">
+					<div>
+						<dt>ID</dt>
+						<dd th:text="${inquiry.id}">1</dd>
+					</div>
+					<div>
+						<dt>受信日時</dt>
+						<dd th:text="${#temporals.format(inquiry.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/18 10:00</dd>
+					</div>
+					<div>
+						<dt>お名前</dt>
+						<dd th:text="${inquiry.name}">石島 智司</dd>
+					</div>
+					<div>
+						<dt>メールアドレス</dt>
+						<dd th:text="${inquiry.email}">sample@example.com</dd>
+					</div>
+					<div>
+						<dt>件名</dt>
+						<dd th:text="${inquiry.subject}">件名</dd>
+					</div>
+				</dl>
+			</section>
 
-	<p><a th:href="@{/admin/inquiries}">一覧へ戻る</a></p>
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<h2>対応更新</h2>
+				</div>
+
+				<form class="admin-form" th:action="@{/admin/inquiries/{id}/status(id=${inquiry.id})}" method="post" th:object="${statusForm}">
+					<label class="admin-field">
+						<span>対応状況</span>
+						<select id="status" th:field="*{status}">
+							<option value="NEW">未対応</option>
+							<option value="IN_PROGRESS">対応中</option>
+							<option value="COMPLETED">完了</option>
+						</select>
+					</label>
+					<button class="admin-button" type="submit">更新する</button>
+				</form>
+			</section>
+		</div>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<h2>お問い合わせ内容</h2>
+			</div>
+			<div class="admin-message-box" th:text="${inquiry.message}">
+				お問い合わせ本文
+			</div>
+		</section>
+	</div>
 </body>
 </html>

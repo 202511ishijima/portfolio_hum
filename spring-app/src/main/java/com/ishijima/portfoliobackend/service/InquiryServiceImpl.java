@@ -41,7 +41,7 @@ public class InquiryServiceImpl implements InquiryService {
 	@Override
 	public Inquiry findById(Long id) {
 		return inquiryMapper.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("お問い合わせが見つかりません。 id=" + id));
+			.orElseThrow(() -> new IllegalArgumentException("問い合わせが見つかりません。id=" + id));
 	}
 
 	@Override

@@ -1,5 +1,8 @@
 window.Cart = (function () {
   const storageKey = "hamu_cart";
+  const memberKey = "hamu_member";
+  const lastOrderTotalKey = "hamu_last_order_total";
+  const lastOrderPointsKey = "hamu_last_order_points";
 
   function getCart() {
     return JSON.parse(localStorage.getItem(storageKey) || "[]");
@@ -44,6 +47,38 @@ window.Cart = (function () {
     return { items: cart, subtotal, shipping, total: subtotal + shipping };
   }
 
+  function getMember() {
+    try {
+      return JSON.parse(localStorage.getItem(memberKey) || "null");
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function saveMember(member) {
+    localStorage.setItem(memberKey, JSON.stringify(member));
+    document.dispatchEvent(new Event("member:updated"));
+  }
+
+  function awardPoints(total) {
+    const member = getMember();
+    if (!member?.loggedIn) {
+      localStorage.setItem(lastOrderPointsKey, "0");
+      return 0;
+    }
+
+    const earnedPoints = Math.floor(Number(total || 0) / 100);
+    const nextPoints = Number(member.points || 0) + earnedPoints;
+
+    saveMember({
+      ...member,
+      points: nextPoints
+    });
+
+    localStorage.setItem(lastOrderPointsKey, String(earnedPoints));
+    return earnedPoints;
+  }
+
   function renderCartPage() {
     const list = document.getElementById("cart-items");
     const summary = document.getElementById("cart-summary");
@@ -72,7 +107,7 @@ window.Cart = (function () {
 
     summary.innerHTML = `
       <div class="summary-card">
-        <h2>ご注文内容</h2>
+        <h2>お支払い金額</h2>
         <p>小計 <strong>${SiteRouter.formatPrice(data.subtotal)}</strong></p>
         <p>送料 <strong>${SiteRouter.formatPrice(data.shipping)}</strong></p>
         <p>合計 <strong class="price">${SiteRouter.formatPrice(data.total)}</strong></p>
@@ -123,7 +158,7 @@ window.Cart = (function () {
       }
 
       addressInput.value = `${result.address1}${result.address2}${result.address3}`;
-      feedback.textContent = "住所を自動入力しました。番地以降を必要に応じて追記してください。";
+      feedback.textContent = "住所を自動入力しました。必要に応じて補足を入力してください。";
     } catch (error) {
       feedback.textContent = "住所検索に失敗しました。時間をおいて再度お試しください。";
     }
@@ -135,13 +170,15 @@ window.Cart = (function () {
     if (!summary || !form) return;
 
     const data = getSummary();
+    const expectedPoints = Math.floor(data.total / 100);
     summary.innerHTML = `
       <div class="summary-card">
-        <h2>ご注文内容</h2>
+        <h2>お支払い金額</h2>
         <p>商品点数 <strong>${data.items.length}</strong></p>
         <p>小計 <strong>${SiteRouter.formatPrice(data.subtotal)}</strong></p>
         <p>送料 <strong>${SiteRouter.formatPrice(data.shipping)}</strong></p>
         <p>合計 <strong class="price">${SiteRouter.formatPrice(data.total)}</strong></p>
+        <p>付与予定ポイント <strong>${expectedPoints} pt</strong></p>
       </div>
     `;
 
@@ -189,7 +226,8 @@ window.Cart = (function () {
         phoneInput.setCustomValidity("");
       }
 
-      localStorage.setItem("hamu_last_order_total", String(data.total));
+      localStorage.setItem(lastOrderTotalKey, String(data.total));
+      awardPoints(data.total);
       clear();
       const completePath = document.body.dataset.completePath || "complete.html";
       window.location.href = completePath;
@@ -199,8 +237,14 @@ window.Cart = (function () {
   function renderCompletePage() {
     const total = document.getElementById("complete-total");
     if (total) {
-      const value = Number(localStorage.getItem("hamu_last_order_total") || 0);
+      const value = Number(localStorage.getItem(lastOrderTotalKey) || 0);
       total.textContent = SiteRouter.formatPrice(value);
+    }
+
+    const points = document.getElementById("complete-points");
+    if (points) {
+      const value = Number(localStorage.getItem(lastOrderPointsKey) || 0);
+      points.textContent = `${value} pt`;
     }
   }
 

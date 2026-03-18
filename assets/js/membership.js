@@ -132,6 +132,22 @@ window.MembershipPage = (function () {
     `;
   }
 
+  function renderMembershipActions() {
+    const target = document.getElementById("membership-actions");
+    if (!target) return;
+
+    const member = getMember();
+    if (member.loggedIn) {
+      target.innerHTML = "";
+      return;
+    }
+
+    target.innerHTML = `
+      <a class="button" href="register.html">アカウント作成</a>
+      <a class="button button--ghost" href="login.html">ログイン</a>
+    `;
+  }
+
   function bindLogoutButton() {
     document.getElementById("logout-button")?.addEventListener("click", () => {
       logoutMember();
@@ -179,7 +195,15 @@ window.MembershipPage = (function () {
     renderRewards();
     renderCafeMenus();
     renderMemberSummary();
+    renderMembershipActions();
     bindAuthForms();
     bindLogoutButton();
   });
+
+  return {
+    getMember,
+    saveMember,
+    logoutMember,
+    renderMembershipActions
+  };
 })();

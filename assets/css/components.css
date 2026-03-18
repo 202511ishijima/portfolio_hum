@@ -456,3 +456,18 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+.form-status {
+  min-height: 1.5rem;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.form-status[data-state="success"] {
+  color: #7a5a2f;
+}
+
+.form-status[data-state="error"] {
+  color: #b05a5a;
+}
