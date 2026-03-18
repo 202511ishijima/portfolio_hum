@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.MemberMapper">
+
+	<resultMap id="MemberResultMap" type="com.ishijima.portfoliobackend.entity.Member">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="email" column="email"/>
+		<result property="password" column="password"/>
+		<result property="status" column="status"/>
+		<result property="points" column="points"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.ishijima.portfoliobackend.entity.Member" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO members (
+			name,
+			email,
+			password,
+			status,
+			points,
+			created_at,
+			updated_at
+		) VALUES (
+			#{name},
+			#{email},
+			#{password},
+			#{status},
+			#{points},
+			#{createdAt},
+			#{updatedAt}
+		)
+	</insert>
+
+	<select id="findAll" resultMap="MemberResultMap">
+		SELECT
+			id,
+			name,
+			email,
+			password,
+			status,
+			points,
+			created_at,
+			updated_at
+		FROM members
+		ORDER BY created_at DESC, id DESC
+	</select>
+
+	<select id="findById" resultMap="MemberResultMap">
+		SELECT
+			id,
+			name,
+			email,
+			password,
+			status,
+			points,
+			created_at,
+			updated_at
+		FROM members
+		WHERE id = #{id}
+	</select>
+
+	<select id="findByEmail" resultMap="MemberResultMap">
+		SELECT
+			id,
+			name,
+			email,
+			password,
+			status,
+			points,
+			created_at,
+			updated_at
+		FROM members
+		WHERE email = #{email}
+	</select>
+
+	<update id="updateStatus">
+		UPDATE members
+		SET
+			status = #{status},
+			updated_at = CURRENT_TIMESTAMP()
+		WHERE id = #{id}
+	</update>
+
+	<update id="updatePoints">
+		UPDATE members
+		SET
+			points = #{points},
+			updated_at = CURRENT_TIMESTAMP()
+		WHERE id = #{id}
+	</update>
+</mapper>

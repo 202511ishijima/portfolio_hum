@@ -1,6 +1,7 @@
 package com.ishijima.portfoliobackend;
 
 import com.ishijima.portfoliobackend.mapper.InquiryMapper;
+import com.ishijima.portfoliobackend.mapper.MemberMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -12,6 +13,9 @@ class PortfolioBackendApplicationTests {
 
 	@MockBean
 	private InquiryMapper inquiryMapper;
+
+	@MockBean
+	private MemberMapper memberMapper;
 
 	@Test
 	void contextLoads() {

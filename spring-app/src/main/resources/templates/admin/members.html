@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>会員管理 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
+</head>
+<body class="admin-body">
+	<div class="admin-shell">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1>会員管理</h1>
+				<p class="admin-lead">会員アカウントの作成、停止、ポイント調整をここでまとめて行えます。</p>
+			</div>
+			<form th:action="@{/admin/logout}" method="post">
+				<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
+			</form>
+		</header>
+
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
+			   th:href="@{/admin/inquiries}">問い合わせ管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
+			   th:href="@{/admin/members}">会員管理</a>
+		</nav>
+
+		<p class="admin-alert admin-alert--success" th:if="${memberMessage}" th:text="${memberMessage}">会員情報を更新しました。</p>
+		<p class="admin-alert admin-alert--error" th:if="${memberError}" th:text="${memberError}">入力内容を確認してください。</p>
+
+		<section class="admin-summary-grid admin-summary-grid--compact">
+			<article class="admin-summary-card">
+				<h2>総会員数</h2>
+				<p class="admin-summary-number" th:text="${memberCount}">0</p>
+			</article>
+			<article class="admin-summary-card">
+				<h2>利用中</h2>
+				<p class="admin-summary-number" th:text="${activeCount}">0</p>
+			</article>
+			<article class="admin-summary-card">
+				<h2>停止中</h2>
+				<p class="admin-summary-number" th:text="${suspendedCount}">0</p>
+			</article>
+		</section>
+
+		<div class="admin-two-column">
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>新規アカウント作成</h2>
+						<p>管理画面から会員アカウントを追加できます。</p>
+					</div>
+				</div>
+
+				<form class="admin-form" th:action="@{/admin/members}" th:object="${memberForm}" method="post">
+					<label class="admin-field">
+						<span>お名前</span>
+						<input th:field="*{name}" type="text" placeholder="例: 石島 智司">
+						<small class="admin-field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラー</small>
+					</label>
+					<label class="admin-field">
+						<span>メールアドレス</span>
+						<input th:field="*{email}" type="email" placeholder="sample@example.com">
+						<small class="admin-field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">エラー</small>
+					</label>
+					<label class="admin-field">
+						<span>パスワード</span>
+						<input th:field="*{password}" type="text" placeholder="8文字以上で入力">
+						<small class="admin-field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">エラー</small>
+					</label>
+					<button class="admin-button" type="submit">アカウントを作成する</button>
+				</form>
+			</section>
+
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>ポイント調整の考え方</h2>
+						<p>必要なときだけ手動調整できるようにしています。</p>
+					</div>
+				</div>
+
+				<div class="admin-message-box">
+					<p>正の数を入力するとポイント付与、負の数を入力するとポイント没収になります。</p>
+					<p>ポイントは 0 未満にならないように自動調整されます。</p>
+					<p>会員停止中でも履歴確認やポイント調整は可能です。</p>
+				</div>
+			</section>
+		</div>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>会員一覧</h2>
+					<p>会員の状態確認、停止、ポイント反映ができます。</p>
+				</div>
+			</div>
+
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(members)}">
+				<table class="admin-table admin-table--members">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>お名前</th>
+							<th>メールアドレス</th>
+							<th>現在ポイント</th>
+							<th>状態</th>
+							<th>作成日</th>
+							<th>停止 / 再開</th>
+							<th>ポイント調整</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="member : ${members}">
+							<td th:text="${member.id}">1</td>
+							<td th:text="${member.name}">石島 智司</td>
+							<td th:text="${member.email}">sample@example.com</td>
+							<td th:text="${member.points}">0</td>
+							<td>
+								<span class="admin-status"
+								      th:classappend="${member.status == 'ACTIVE'} ? ' admin-status--done' : ' admin-status--progress'"
+								      th:text="${member.status == 'ACTIVE'} ? '利用中' : '停止中'">
+									利用中
+								</span>
+							</td>
+							<td th:text="${#temporals.format(member.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/18 10:00</td>
+							<td>
+								<form th:action="@{/admin/members/{id}/status(id=${member.id})}" method="post">
+									<button class="admin-button admin-button--ghost" type="submit"
+									        th:text="${member.status == 'ACTIVE'} ? '停止する' : '再開する'">停止する</button>
+								</form>
+							</td>
+							<td>
+								<form class="admin-inline-form" th:action="@{/admin/members/{id}/points(id=${member.id})}" method="post">
+									<input type="number" name="delta" value="0" step="1" required>
+									<button class="admin-button" type="submit">反映</button>
+								</form>
+								<p class="admin-help-text">例: 100 で付与 / -50 で没収</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<p th:if="${#lists.isEmpty(members)}">まだ会員アカウントはありません。</p>
+		</section>
+	</div>
+</body>
+</html>

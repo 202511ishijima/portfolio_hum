@@ -44,6 +44,7 @@ public class AdminInquiryController {
 		model.addAttribute("inquiries", sortedInquiries);
 		model.addAttribute("sort", normalizeSort(sort));
 		model.addAttribute("order", normalizeOrder(order));
+		model.addAttribute("adminSection", "inquiries");
 		return "admin/inquiries";
 	}
 
@@ -52,6 +53,7 @@ public class AdminInquiryController {
 		Inquiry inquiry = inquiryService.findById(id);
 		model.addAttribute("inquiry", inquiry);
 		model.addAttribute("statusForm", new InquiryStatusUpdateForm(inquiry.getStatus()));
+		model.addAttribute("adminSection", "inquiries");
 		return "admin/inquiry-detail";
 	}
 

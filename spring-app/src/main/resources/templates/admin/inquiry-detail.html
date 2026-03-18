@@ -13,25 +13,37 @@
 	<div class="admin-shell">
 		<header class="admin-header">
 			<div>
-				<p class="admin-eyebrow">DETAIL</p>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>問い合わせ詳細</h1>
-				<p class="admin-lead">問い合わせ内容を確認し、対応状況を更新できます。</p>
+				<p class="admin-lead">内容を確認して、対応状況を更新できます。</p>
 			</div>
-			<a class="admin-button admin-button--ghost" th:href="@{/admin/inquiries}">一覧へ戻る</a>
+			<div class="admin-header-actions">
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/inquiries}">一覧へ戻る</a>
+				<form th:action="@{/admin/logout}" method="post">
+					<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
+				</form>
+			</div>
 		</header>
 
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
+			   th:href="@{/admin/inquiries}">問い合わせ管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
+			   th:href="@{/admin/members}">会員管理</a>
+		</nav>
+
 		<p class="admin-alert admin-alert--success" th:if="${statusMessage}" th:text="${statusMessage}">対応状況を更新しました。</p>
-		<p class="admin-alert admin-alert--error" th:if="${statusError}" th:text="${statusError}">対応状況の更新に失敗しました。</p>
+		<p class="admin-alert admin-alert--error" th:if="${statusError}" th:text="${statusError}">更新に失敗しました。</p>
 
 		<div class="admin-detail-grid">
 			<section class="admin-card">
 				<div class="admin-card-header">
-					<h2>基本情報</h2>
-					<span class="admin-status"
-					      th:classappend="${inquiry.status == 'NEW'} ? ' admin-status--new' : (${inquiry.status == 'IN_PROGRESS'} ? ' admin-status--progress' : ' admin-status--done')"
-					      th:text="${inquiry.status == 'NEW'} ? '未対応' : (${inquiry.status == 'IN_PROGRESS'} ? '対応中' : '完了')">
-						未対応
-					</span>
+					<div>
+						<h2>内容</h2>
+						<p>受信内容をそのまま確認できます。</p>
+					</div>
 				</div>
 
 				<dl class="admin-detail-list">
@@ -56,17 +68,24 @@
 						<dd th:text="${inquiry.subject}">件名</dd>
 					</div>
 				</dl>
+
+				<section class="admin-message-box" th:text="${inquiry.message}">
+					お問い合わせ本文
+				</section>
 			</section>
 
 			<section class="admin-card">
 				<div class="admin-card-header">
-					<h2>対応更新</h2>
+					<div>
+						<h2>対応状況</h2>
+						<p>状況を選んで更新してください。</p>
+					</div>
 				</div>
 
-				<form class="admin-form" th:action="@{/admin/inquiries/{id}/status(id=${inquiry.id})}" method="post" th:object="${statusForm}">
+				<form class="admin-form" th:action="@{/admin/inquiries/{id}/status(id=${inquiry.id})}" th:object="${statusForm}" method="post">
 					<label class="admin-field">
-						<span>対応状況</span>
-						<select id="status" th:field="*{status}">
+						<span>現在の対応状況</span>
+						<select th:field="*{status}">
 							<option value="NEW">未対応</option>
 							<option value="IN_PROGRESS">対応中</option>
 							<option value="COMPLETED">完了</option>
@@ -76,15 +95,6 @@
 				</form>
 			</section>
 		</div>
-
-		<section class="admin-card">
-			<div class="admin-card-header">
-				<h2>お問い合わせ内容</h2>
-			</div>
-			<div class="admin-message-box" th:text="${inquiry.message}">
-				お問い合わせ本文
-			</div>
-		</section>
 	</div>
 </body>
 </html>
