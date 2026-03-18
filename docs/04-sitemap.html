@@ -20,9 +20,9 @@
         <div class="doc-category">DOCUMENT 04</div>
         <h1 class="doc-title">サイトマップ</h1>
         <div class="doc-meta">
-          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 更新日: 2026-03-12</span>
-          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者: はむのくらし企画案</span>
-          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 更新日: 2026-03-18</span>
+          <span><span class="material-symbols-outlined icon-sm">person</span> 作成者: 石島　智司</span>
+          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 2.0</span>
         </div>
       </header>
 
@@ -42,15 +42,17 @@
 
           <div class="fill-block completed">
             <div class="fill-label">Webサイト構造図 <span class="required">必須</span></div>
-            <div class="fill-hint">トップページから下層ページまでの階層構造をツリー形式で整理する。</div>
+            <div class="fill-hint">現在の実装ファイル構成に合わせた階層図を示す。</div>
             <div class="fill-content ascii-diagram">
               <pre>TOP
 ├ はむのくらしについて
 ├ カフェ
-├ ハムスターお迎え
-│  ├ 生体一覧
-│  └ 生体詳細
+├ ハムスター
+│  ├ ハムスター一覧
+│  └ ハムスター詳細
+├ お迎えガイド
 ├ 商品
+│  ├ 商品トップ
 │  ├ 商品一覧
 │  ├ 商品詳細
 │  ├ カート
@@ -59,27 +61,28 @@
 ├ はじめての方へ
 ├ 会員制度
 │  ├ ログイン
-│  ├ 会員登録
+│  ├ 新規会員登録
 │  ├ マイページ
 │  └ 景品交換
 ├ お知らせ
 ├ FAQ
-└ お問い合わせ</pre>
+├ お問い合わせ
+└ アクセス</pre>
             </div>
           </div>
 
           <div class="fill-block completed">
             <div class="fill-label">Webアプリケーション構造図 <span class="required">必須</span></div>
-            <div class="fill-hint">疑似ECアプリとしての画面構造をツリー形式で整理する。</div>
+            <div class="fill-hint">疑似ECアプリと会員導線を含む画面構造を示す。</div>
             <div class="fill-content ascii-diagram">
               <pre>ECアプリ
-├ ログイン
-├ 会員登録
 ├ 商品一覧
 ├ 商品詳細
 ├ カート
 ├ 購入手続き
 ├ 購入完了
+├ ログイン
+├ 新規会員登録
 ├ マイページ
 └ 景品交換</pre>
             </div>
@@ -93,30 +96,31 @@
             <div class="fill-label">Webサイトページ一覧 <span class="required">必須</span></div>
             <table class="doc-table">
               <thead>
-                <tr><th>No</th><th>ページ名</th><th>ページの目的</th><th>主要コンテンツ</th></tr>
+                <tr><th>No</th><th>ページ名</th><th>目的</th><th>主要コンテンツ</th></tr>
               </thead>
               <tbody>
-                <tr><td>1</td><td>トップページ</td><td>サービス全体の魅力を伝え、各導線へ案内する</td><td>ヒーロー、ブランド紹介、カフェ紹介、生体紹介、人気商品、CTA</td></tr>
-                <tr><td>2</td><td>はむのくらしについて</td><td>ブランドの想いと世界観を伝える</td><td>ブランドメッセージ、ストーリー、方針</td></tr>
-                <tr><td>3</td><td>カフェ</td><td>来店意欲を高める</td><td>店内紹介、利用案内、メニュー、フォトスポット</td></tr>
-                <tr><td>4</td><td>ハムスターお迎え</td><td>お迎えの考え方と流れを伝える</td><td>販売ポリシー、お迎え手順、相談導線</td></tr>
-                <tr><td>5</td><td>生体一覧</td><td>種類や個体情報を比較できるようにする</td><td>種類、性格、飼いやすさ、価格</td></tr>
-                <tr><td>6</td><td>生体詳細</td><td>各個体の特徴を詳しく伝える</td><td>説明文、性格、価格、問い合わせ導線</td></tr>
-                <tr><td>7</td><td>商品トップ</td><td>商品カテゴリへの入口を作る</td><td>カテゴリ紹介、おすすめ導線</td></tr>
-                <tr><td>8</td><td>商品一覧</td><td>商品を比較・選択しやすくする</td><td>カテゴリ導線、商品カード、カート追加</td></tr>
-                <tr><td>9</td><td>商品詳細</td><td>商品の購入判断を支援する</td><td>商品説明、価格、特徴、購入ボタン</td></tr>
-                <tr><td>10</td><td>カート</td><td>購入内容を確認する</td><td>商品一覧、数量変更、合計金額</td></tr>
-                <tr><td>11</td><td>購入手続き</td><td>ダミー購入を行う</td><td>フォーム、購入確認、注文確定</td></tr>
-                <tr><td>12</td><td>購入完了</td><td>購入完了を知らせる</td><td>完了メッセージ、次の導線</td></tr>
-                <tr><td>13</td><td>はじめての方へ</td><td>初心者の不安を減らす</td><td>飼育の基本、準備物、導線案内</td></tr>
-                <tr><td>14</td><td>会員制度</td><td>会員メリットを伝える</td><td>ポイント説明、景品紹介、登録導線</td></tr>
-                <tr><td>15</td><td>ログイン</td><td>会員機能への入口を作る</td><td>ログインフォーム</td></tr>
-                <tr><td>16</td><td>会員登録</td><td>新規会員を獲得する</td><td>登録フォーム、登録特典案内</td></tr>
-                <tr><td>17</td><td>マイページ</td><td>会員情報を確認させる</td><td>ポイント表示、景品交換導線</td></tr>
-                <tr><td>18</td><td>景品交換</td><td>会員制度の魅力を高める</td><td>景品一覧、必要ポイント</td></tr>
-                <tr><td>19</td><td>お知らせ</td><td>新着情報を発信する</td><td>新メニュー、イベント、営業情報</td></tr>
-                <tr><td>20</td><td>FAQ</td><td>よくある疑問を解消する</td><td>飼育、販売、会員制度に関するQ&amp;A</td></tr>
-                <tr><td>21</td><td>お問い合わせ</td><td>相談や連絡を受け付ける</td><td>問い合わせフォーム、案内情報</td></tr>
+                <tr><td>1</td><td>トップページ</td><td>ブランド全体と主要導線を伝える</td><td>ヒーロー、コンセプト、カフェ紹介、ハムスター紹介、人気商品、会員制度、アクセス</td></tr>
+                <tr><td>2</td><td>はむのくらしについて</td><td>ブランドの想いと世界観を伝える</td><td>ブランドメッセージ、ストーリー、店舗イメージ</td></tr>
+                <tr><td>3</td><td>カフェ</td><td>カフェ利用の魅力を伝える</td><td>店内写真、利用案内、ドリンク、フード、体験用えさ</td></tr>
+                <tr><td>4</td><td>ハムスター一覧</td><td>取扱ハムスターを一覧表示する</td><td>種類タグ、画像、性格、飼いやすさ、価格</td></tr>
+                <tr><td>5</td><td>ハムスター詳細</td><td>選択した種類の詳細を見せる</td><td>画像、特徴、性格、飼いやすさ、価格</td></tr>
+                <tr><td>6</td><td>お迎えガイド</td><td>お迎えの流れと販売方針を伝える</td><td>取扱種類、価格目安、対面説明、販売ポリシー</td></tr>
+                <tr><td>7</td><td>商品トップ</td><td>カテゴリ導線を見せる</td><td>カテゴリ紹介、看板商品、一覧導線</td></tr>
+                <tr><td>8</td><td>商品一覧</td><td>商品をカテゴリ別に選ばせる</td><td>カテゴリフィルタ、商品カード、カート追加</td></tr>
+                <tr><td>9</td><td>商品詳細</td><td>商品の詳細情報を提供する</td><td>商品画像、説明、価格、特徴、数量操作</td></tr>
+                <tr><td>10</td><td>カート</td><td>購入内容を確認させる</td><td>商品一覧、数量変更、削除、小計、合計</td></tr>
+                <tr><td>11</td><td>購入手続き</td><td>配送先入力と購入確定を行う</td><td>名前、郵便番号、住所、電話番号、支払い方法</td></tr>
+                <tr><td>12</td><td>購入完了</td><td>注文完了を伝える</td><td>完了メッセージ、合計金額、トップ導線</td></tr>
+                <tr><td>13</td><td>はじめての方へ</td><td>初心者向けの不安を減らす</td><td>飼育の基本、スターターセット導線</td></tr>
+                <tr><td>14</td><td>会員制度</td><td>ポイント制度の魅力を伝える</td><td>ポイント説明、景品紹介、会員導線</td></tr>
+                <tr><td>15</td><td>ログイン</td><td>会員機能へ入る入口とする</td><td>ログインフォーム、制度紹介</td></tr>
+                <tr><td>16</td><td>新規会員登録</td><td>新規会員登録を行う</td><td>登録フォーム、ポイント特典紹介</td></tr>
+                <tr><td>17</td><td>マイページ</td><td>会員情報とポイントを確認させる</td><td>会員名、ポイント、景品導線、ログアウト</td></tr>
+                <tr><td>18</td><td>景品交換</td><td>交換できる景品を見せる</td><td>景品一覧、必要ポイント</td></tr>
+                <tr><td>19</td><td>お知らせ</td><td>新着情報を知らせる</td><td>ニュース一覧、イベント情報</td></tr>
+                <tr><td>20</td><td>FAQ</td><td>よくある質問を解決する</td><td>飼育、カフェ、会員制度に関するQ&amp;A</td></tr>
+                <tr><td>21</td><td>お問い合わせ</td><td>問い合わせや連絡を受ける</td><td>問い合わせフォーム、案内文</td></tr>
+                <tr><td>22</td><td>アクセス</td><td>店舗への行き方を示す</td><td>柏駅周辺案内、店舗情報、マップ</td></tr>
               </tbody>
             </table>
           </div>
@@ -125,18 +129,18 @@
             <div class="fill-label">Webアプリ画面一覧 <span class="required">必須</span></div>
             <table class="doc-table">
               <thead>
-                <tr><th>No</th><th>画面名</th><th>画面の目的</th><th>主要機能</th></tr>
+                <tr><th>No</th><th>画面名</th><th>目的</th><th>主要機能</th></tr>
               </thead>
               <tbody>
-                <tr><td>1</td><td>ログイン画面</td><td>会員状態でサイトを利用できる入口にする</td><td>メールアドレス入力、パスワード入力</td></tr>
-                <tr><td>2</td><td>会員登録画面</td><td>新規ユーザーを会員化する</td><td>登録フォーム、登録完了導線</td></tr>
-                <tr><td>3</td><td>商品一覧画面</td><td>商品を比較・選択させる</td><td>カテゴリフィルタ、商品表示、カート追加</td></tr>
-                <tr><td>4</td><td>商品詳細画面</td><td>購入判断を促す</td><td>詳細説明、価格表示、カート追加</td></tr>
-                <tr><td>5</td><td>カート画面</td><td>購入内容を整理する</td><td>数量変更、削除、合計表示</td></tr>
-                <tr><td>6</td><td>購入手続き画面</td><td>ダミー購入を完了させる</td><td>住所入力、支払方法選択、注文確定</td></tr>
-                <tr><td>7</td><td>購入完了画面</td><td>処理結果を伝える</td><td>完了メッセージ、トップへの導線</td></tr>
-                <tr><td>8</td><td>マイページ</td><td>会員情報を見せる</td><td>ポイント表示、景品交換リンク</td></tr>
-                <tr><td>9</td><td>景品交換画面</td><td>ポイント制度の利用価値を見せる</td><td>景品一覧、必要ポイント表示</td></tr>
+                <tr><td>1</td><td>ログイン画面</td><td>会員状態で機能を利用可能にする</td><td>メールアドレス入力、パスワード入力</td></tr>
+                <tr><td>2</td><td>新規会員登録画面</td><td>新規ユーザーを会員化する</td><td>登録フォーム、初期ポイント付与</td></tr>
+                <tr><td>3</td><td>商品一覧画面</td><td>商品選択を行う</td><td>カテゴリ絞り込み、カート追加、数量変更</td></tr>
+                <tr><td>4</td><td>商品詳細画面</td><td>商品理解を深める</td><td>画像表示、説明、数量調整、カート追加</td></tr>
+                <tr><td>5</td><td>カート画面</td><td>注文前確認を行う</td><td>数量変更、削除、合計表示</td></tr>
+                <tr><td>6</td><td>購入手続き画面</td><td>配送先入力を行う</td><td>住所自動入力、電話番号バリデーション</td></tr>
+                <tr><td>7</td><td>購入完了画面</td><td>購入完了を示す</td><td>注文完了メッセージ、金額表示</td></tr>
+                <tr><td>8</td><td>マイページ</td><td>会員状態を確認する</td><td>会員名表示、ポイント表示、ログアウト</td></tr>
+                <tr><td>9</td><td>景品交換画面</td><td>会員特典を確認する</td><td>景品一覧、必要ポイント表示</td></tr>
               </tbody>
             </table>
           </div>
@@ -154,57 +158,49 @@
 ↓
 カフェ紹介を見る
 ↓
-ハムスターに興味を持つ
+ハムスター一覧を見る
 ↓
-ハムスターお迎えページを見る
+商品ページでスターターセットを見る
 ↓
-生体一覧・詳細を見る
-↓
-スターターセットや用品を見る
-↓
-商品をカートに入れる
+カートに追加
 ↓
 購入手続き
 ↓
 購入完了
 ↓
-会員制度を知り、再来店・再購入につながる</pre>
+会員制度を確認する</pre>
             </div>
           </div>
 
           <div class="fill-block completed">
             <div class="fill-label">サブシナリオ 1 <span class="required">必須</span></div>
             <div class="fill-content ascii-diagram">
-              <pre>Instagram投稿を見る
+              <pre>SNS投稿からサイト訪問
 ↓
-サイト訪問
+ハムスター一覧を見る
 ↓
-カフェページを見る
+気になる種類の詳細を見る
 ↓
-フォトスポットやメニューに興味を持つ
+お迎えガイドを読む
 ↓
-来店を検討する
-↓
-会員制度を見る</pre>
+会員制度を確認する</pre>
             </div>
           </div>
 
           <div class="fill-block completed">
             <div class="fill-label">サブシナリオ 2 <span class="required">必須</span></div>
             <div class="fill-content ascii-diagram">
-              <pre>飼育用品を探して検索流入
+              <pre>飼育用品を探して訪問
 ↓
 商品一覧ページを見る
 ↓
-商品詳細を比較する
+商品詳細を確認する
 ↓
-はじめての方へページで不安を解消する
-↓
-カート追加
+カートに追加
 ↓
 購入手続き
 ↓
-会員登録を検討する</pre>
+新規会員登録を行う</pre>
             </div>
           </div>
         </section>
@@ -219,32 +215,29 @@
                 <tr><th>URL</th><th>HTTPメソッド</th><th>画面 / 機能</th><th>説明</th></tr>
               </thead>
               <tbody>
-                <tr><td>/</td><td>GET</td><td>トップページ</td><td>サイトトップ表示</td></tr>
-                <tr><td>/about</td><td>GET</td><td>はむのくらしについて</td><td>ブランド紹介表示</td></tr>
-                <tr><td>/cafe</td><td>GET</td><td>カフェ</td><td>カフェ紹介・メニュー表示</td></tr>
-                <tr><td>/receive</td><td>GET</td><td>ハムスターお迎え</td><td>お迎え案内表示</td></tr>
-                <tr><td>/hamsters</td><td>GET</td><td>生体一覧</td><td>生体一覧表示</td></tr>
-                <tr><td>/hamsters/{id}</td><td>GET</td><td>生体詳細</td><td>生体詳細表示</td></tr>
-                <tr><td>/products</td><td>GET</td><td>商品トップ</td><td>商品カテゴリ導線表示</td></tr>
-                <tr><td>/products/list</td><td>GET</td><td>商品一覧</td><td>商品一覧表示</td></tr>
-                <tr><td>/products/{id}</td><td>GET</td><td>商品詳細</td><td>商品詳細表示</td></tr>
-                <tr><td>/cart</td><td>GET</td><td>カート</td><td>カート内容表示</td></tr>
-                <tr><td>/cart</td><td>POST</td><td>カート追加</td><td>商品をカートへ追加する疑似処理</td></tr>
-                <tr><td>/checkout</td><td>GET</td><td>購入手続き</td><td>購入フォーム表示</td></tr>
-                <tr><td>/checkout</td><td>POST</td><td>購入処理</td><td>ダミー注文確定処理</td></tr>
-                <tr><td>/complete</td><td>GET</td><td>購入完了</td><td>購入完了画面表示</td></tr>
-                <tr><td>/beginner</td><td>GET</td><td>はじめての方へ</td><td>初心者向け情報表示</td></tr>
-                <tr><td>/membership</td><td>GET</td><td>会員制度</td><td>会員制度説明表示</td></tr>
-                <tr><td>/login</td><td>GET</td><td>ログイン画面</td><td>ログインフォーム表示</td></tr>
-                <tr><td>/login</td><td>POST</td><td>ログイン処理</td><td>ダミー認証処理</td></tr>
-                <tr><td>/register</td><td>GET</td><td>会員登録画面</td><td>登録フォーム表示</td></tr>
-                <tr><td>/register</td><td>POST</td><td>会員登録処理</td><td>ダミー会員登録処理</td></tr>
-                <tr><td>/mypage</td><td>GET</td><td>マイページ</td><td>ポイント情報表示</td></tr>
-                <tr><td>/rewards</td><td>GET</td><td>景品交換</td><td>景品一覧表示</td></tr>
-                <tr><td>/news</td><td>GET</td><td>お知らせ</td><td>新着情報表示</td></tr>
-                <tr><td>/faq</td><td>GET</td><td>FAQ</td><td>よくある質問表示</td></tr>
-                <tr><td>/contact</td><td>GET</td><td>お問い合わせ</td><td>問い合わせフォーム表示</td></tr>
-                <tr><td>/contact</td><td>POST</td><td>問い合わせ送信</td><td>ダミー送信処理</td></tr>
+                <tr><td>/</td><td>GET</td><td>トップページ</td><td>サイトトップを表示する</td></tr>
+                <tr><td>/pages/about.html</td><td>GET</td><td>はむのくらしについて</td><td>ブランド紹介ページを表示する</td></tr>
+                <tr><td>/pages/cafe.html</td><td>GET</td><td>カフェ</td><td>カフェ紹介とメニューを表示する</td></tr>
+                <tr><td>/pages/receive.html</td><td>GET</td><td>お迎えガイド</td><td>お迎えの流れとポリシーを表示する</td></tr>
+                <tr><td>/hamsters/index.html</td><td>GET</td><td>ハムスター一覧</td><td>ハムスター一覧を表示する</td></tr>
+                <tr><td>/hamsters/detail.html?id={id}</td><td>GET</td><td>ハムスター詳細</td><td>種類別の詳細を表示する</td></tr>
+                <tr><td>/products/index.html</td><td>GET</td><td>商品トップ / 商品一覧</td><td>カテゴリ導線または商品一覧を表示する</td></tr>
+                <tr><td>/products/index.html?category={category}</td><td>GET</td><td>商品一覧</td><td>カテゴリで絞り込んだ商品一覧を表示する</td></tr>
+                <tr><td>/products/list.html</td><td>GET</td><td>商品一覧互換ページ</td><td>旧一覧URLから index.html へ誘導する</td></tr>
+                <tr><td>/products/detail.html?id={id}</td><td>GET</td><td>商品詳細</td><td>選択商品の詳細を表示する</td></tr>
+                <tr><td>/products/cart.html</td><td>GET</td><td>カート</td><td>カート内容を表示する</td></tr>
+                <tr><td>/products/checkout.html</td><td>GET</td><td>購入手続き</td><td>購入フォームを表示する</td></tr>
+                <tr><td>/products/complete.html</td><td>GET</td><td>購入完了</td><td>購入完了ページを表示する</td></tr>
+                <tr><td>/pages/beginner.html</td><td>GET</td><td>はじめての方へ</td><td>初心者向け案内を表示する</td></tr>
+                <tr><td>/pages/membership.html</td><td>GET</td><td>会員制度</td><td>会員制度ページを表示する</td></tr>
+                <tr><td>/pages/login.html</td><td>GET</td><td>ログイン画面</td><td>ログインフォームを表示する</td></tr>
+                <tr><td>/pages/register.html</td><td>GET</td><td>新規会員登録</td><td>会員登録フォームを表示する</td></tr>
+                <tr><td>/pages/mypage.html</td><td>GET</td><td>マイページ</td><td>会員情報とポイントを表示する</td></tr>
+                <tr><td>/pages/rewards.html</td><td>GET</td><td>景品交換</td><td>景品一覧を表示する</td></tr>
+                <tr><td>/pages/news.html</td><td>GET</td><td>お知らせ</td><td>ニュース一覧を表示する</td></tr>
+                <tr><td>/pages/faq.html</td><td>GET</td><td>FAQ</td><td>よくある質問を表示する</td></tr>
+                <tr><td>/pages/contact.html</td><td>GET</td><td>お問い合わせ</td><td>お問い合わせフォームを表示する</td></tr>
+                <tr><td>/pages/access.html</td><td>GET</td><td>アクセス</td><td>店舗アクセス情報を表示する</td></tr>
               </tbody>
             </table>
           </div>

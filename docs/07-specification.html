@@ -20,9 +20,9 @@
         <div class="doc-category">DOCUMENT 07</div>
         <h1 class="doc-title">仕様書</h1>
         <div class="doc-meta">
-          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 更新日: 2026-03-17</span>
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 更新日: 2026-03-18</span>
           <span><span class="material-symbols-outlined icon-sm">person</span> 作成者: 石島　智司</span>
-          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 2.0</span>
         </div>
       </header>
 
@@ -31,10 +31,10 @@
           <div class="toc-title">目次</div>
           <ol class="toc-list">
             <li><a href="#sec1">システム概要</a></li>
-            <li><a href="#sec2">機能一覧</a></li>
-            <li><a href="#sec3">画面遷移概要</a></li>
-            <li><a href="#sec4">機能詳細</a></li>
-            <li><a href="#sec5">非機能要件</a></li>
+            <li><a href="#sec2">機能要件</a></li>
+            <li><a href="#sec3">画面仕様</a></li>
+            <li><a href="#sec4">REST API設計</a></li>
+            <li><a href="#sec5">バリデーション・セキュリティ</a></li>
           </ol>
         </div>
 
@@ -42,172 +42,169 @@
           <h2 class="section-title"><span class="section-icon">1</span> システム概要</h2>
 
           <div class="fill-block completed">
-            <div class="fill-label">システムの目的 <span class="required">必須</span></div>
+            <div class="fill-label">前提 <span class="required">必須</span></div>
             <div class="fill-content">
-              <p>本システムは、架空サービス「はむのくらし」の紹介、ハムスター一覧表示、関連商品の疑似EC、会員制度案内を行う静的 Web サイトである。</p>
-              <p>利用者がカフェ体験からハムスターへの興味を持ち、生体情報を確認し、飼育用品を購入し、会員制度によって継続的に利用したくなる流れを作ることを目的とする。</p>
+              <p>本仕様書は、演習1で制作したポートフォリオサイトを前提に、バックエンドを追加実装するためのたたき台である。</p>
+              <p>既存のHTML/CSSデザインはできるだけ維持し、Spring Boot + MyBatis を用いて、お問い合わせ機能と管理画面機能を追加する。</p>
+              <p>将来的には作品管理CRUDを追加できるよう、API設計とDB設計は拡張しやすい構成とする。</p>
             </div>
           </div>
 
           <div class="fill-block completed">
-            <div class="fill-label">システム構成 <span class="required">必須</span></div>
+            <div class="fill-label">今回の対象機能 <span class="required">必須</span></div>
             <div class="fill-content">
-              <p>本システムは HTML / CSS / JavaScript のみで構成された静的サイトである。</p>
-              <p>商品情報、ハムスター情報、ニュース、景品情報などは JSON ファイルから取得し、画面表示時に JavaScript で描画する。</p>
-              <p>カート情報、会員状態、直近注文金額は localStorage に保存し、簡易的な疑似EC機能として実装する。</p>
+              <p>1. 公開側のお問い合わせフォーム送信</p>
+              <p>2. 管理者ログイン</p>
+              <p>3. 管理画面でのお問い合わせ一覧表示</p>
+              <p>4. お問い合わせ詳細表示</p>
+              <p>5. 将来拡張として作品管理CRUDを追加できる構造</p>
             </div>
           </div>
         </section>
 
         <section class="section" id="sec2">
-          <h2 class="section-title"><span class="section-icon">2</span> 機能一覧</h2>
+          <h2 class="section-title"><span class="section-icon">2</span> 機能要件</h2>
 
           <div class="fill-block completed">
-            <div class="fill-label">機能一覧表 <span class="required">必須</span></div>
+            <div class="fill-label">機能一覧 <span class="required">必須</span></div>
             <table class="doc-table">
               <thead>
-                <tr><th>No.</th><th>機能名</th><th>概要</th><th>対象画面</th><th>優先度</th></tr>
+                <tr><th>No.</th><th>機能名</th><th>概要</th><th>対象</th><th>優先度</th></tr>
               </thead>
               <tbody>
-                <tr><td>F-001</td><td>トップページ表示</td><td>ブランド紹介と主要導線を表示する</td><td>index.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-002</td><td>共通ヘッダー表示</td><td>全ページでグローバルナビ、会員、カートを表示する</td><td>全画面</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-003</td><td>カフェ情報表示</td><td>カフェ紹介、メニュー、体験用えさを表示する</td><td>pages/cafe.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-004</td><td>ハムスター一覧表示</td><td>7種類のハムスター情報を一覧表示する</td><td>hamsters/index.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-005</td><td>ハムスター詳細表示</td><td>選択したハムスターの詳細情報を表示する</td><td>hamsters/detail.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-006</td><td>商品一覧表示</td><td>カテゴリ別に商品情報を一覧表示する</td><td>products/index.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-007</td><td>商品詳細表示</td><td>選択した商品の詳細情報を表示する</td><td>products/detail.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-008</td><td>カート追加</td><td>商品をカートへ追加する</td><td>商品一覧 / 商品詳細</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-009</td><td>数量調整</td><td>商品ごとの数量を + / - で変更する</td><td>商品一覧 / 商品詳細 / カート</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-010</td><td>カート表示</td><td>商品一覧、数量、小計、合計を表示する</td><td>products/cart.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-011</td><td>購入手続き</td><td>配送先と支払い方法を入力し注文完了へ進める</td><td>products/checkout.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-012</td><td>住所自動入力</td><td>郵便番号から住所を検索して入力補助を行う</td><td>products/checkout.html</td><td><span class="badge badge-should">Should</span></td></tr>
-                <tr><td>F-013</td><td>ログイン機能</td><td>疑似ログインを行い、会員名を保持する</td><td>pages/login.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-014</td><td>新規会員登録</td><td>簡易会員登録を行う</td><td>pages/register.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-015</td><td>マイページ表示</td><td>会員名とポイント情報を表示する</td><td>pages/mypage.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-016</td><td>ログアウト</td><td>ログイン状態を解除する</td><td>pages/mypage.html</td><td><span class="badge badge-should">Should</span></td></tr>
-                <tr><td>F-017</td><td>景品一覧表示</td><td>ポイント交換景品を表示する</td><td>pages/rewards.html</td><td><span class="badge badge-must">Must</span></td></tr>
-                <tr><td>F-018</td><td>ニュース表示</td><td>お知らせ一覧を表示する</td><td>pages/news.html / index.html</td><td><span class="badge badge-should">Should</span></td></tr>
+                <tr><td>F-001</td><td>お問い合わせ入力</td><td>公開側フォームから氏名・メールアドレス・件名・本文を入力する</td><td>利用者</td><td><span class="badge badge-must">Must</span></td></tr>
+                <tr><td>F-002</td><td>お問い合わせ送信</td><td>入力内容をバリデーション後にDBへ保存する</td><td>利用者</td><td><span class="badge badge-must">Must</span></td></tr>
+                <tr><td>F-003</td><td>お問い合わせ完了表示</td><td>送信成功後に完了メッセージを表示する</td><td>利用者</td><td><span class="badge badge-must">Must</span></td></tr>
+                <tr><td>F-004</td><td>管理者ログイン</td><td>Spring Security による管理者認証を行う</td><td>管理者</td><td><span class="badge badge-must">Must</span></td></tr>
+                <tr><td>F-005</td><td>問い合わせ一覧表示</td><td>登録されたお問い合わせを管理画面で一覧表示する</td><td>管理者</td><td><span class="badge badge-must">Must</span></td></tr>
+                <tr><td>F-006</td><td>問い合わせ詳細表示</td><td>一覧から選択した問い合わせ内容を詳細表示する</td><td>管理者</td><td><span class="badge badge-must">Must</span></td></tr>
+                <tr><td>F-007</td><td>対応状況更新</td><td>未対応 / 対応中 / 完了 の状態を更新する</td><td>管理者</td><td><span class="badge badge-should">Should</span></td></tr>
+                <tr><td>F-008</td><td>作品一覧取得API</td><td>将来の作品管理CRUD用に作品一覧APIを用意できる構造にする</td><td>管理者 / 公開側</td><td><span class="badge badge-could">Could</span></td></tr>
+                <tr><td>F-009</td><td>作品登録・更新・削除API</td><td>将来の作品管理用REST APIを追加可能な構成とする</td><td>管理者</td><td><span class="badge badge-could">Could</span></td></tr>
               </tbody>
             </table>
           </div>
         </section>
 
         <section class="section" id="sec3">
-          <h2 class="section-title"><span class="section-icon">3</span> 画面遷移概要</h2>
+          <h2 class="section-title"><span class="section-icon">3</span> 画面仕様</h2>
 
           <div class="fill-block completed">
-            <div class="fill-label">画面遷移図 <span class="required">必須</span></div>
-            <div class="fill-content ascii-diagram">
-              <pre>TOP
- ├ カフェ
- ├ ハムスター
- │  ├ ハムスター一覧
- │  └ ハムスター詳細
- ├ 商品
- │  ├ 商品一覧
- │  ├ 商品詳細
- │  ├ カート
- │  ├ 購入手続き
- │  └ 購入完了
- ├ はじめての方へ
- ├ 会員制度
- │  ├ ログイン
- │  ├ 新規会員登録
- │  ├ マイページ
- │  └ 景品交換
- ├ お知らせ
- ├ FAQ
- ├ お問い合わせ
- └ アクセス</pre>
+            <div class="fill-label">公開側: お問い合わせページ <span class="required">必須</span></div>
+            <div class="fill-content">
+              <p>画面URL: `/pages/contact.html`</p>
+              <p>入力項目: 氏名、メールアドレス、件名、問い合わせ本文</p>
+              <p>送信ボタン押下時にAPIへPOSTし、成功時は完了メッセージまたは完了ページへ遷移する。</p>
+              <p>入力エラー時は各項目の下、またはフォーム上部にエラーメッセージを表示する。</p>
             </div>
           </div>
 
           <div class="fill-block completed">
-            <div class="fill-label">主な利用フロー <span class="required">必須</span></div>
+            <div class="fill-label">管理側: ログイン画面 <span class="required">必須</span></div>
             <div class="fill-content">
-              <p>利用者はトップページからカフェ紹介やハムスター一覧へ進み、興味を持ったあとに商品ページでスターターセットや飼育用品を選ぶ。</p>
-              <p>商品をカートへ追加したあとは、カート、購入手続き、購入完了へ進み、購入後は会員制度やマイページを確認する流れを想定している。</p>
+              <p>画面URL: `/admin/login`</p>
+              <p>入力項目: ログインID、パスワード</p>
+              <p>認証成功時は問い合わせ一覧画面へ遷移し、失敗時はログイン画面にエラーメッセージを表示する。</p>
+            </div>
+          </div>
+
+          <div class="fill-block completed">
+            <div class="fill-label">管理側: 問い合わせ一覧画面 <span class="required">必須</span></div>
+            <div class="fill-content">
+              <p>画面URL: `/admin/inquiries`</p>
+              <p>表示項目: 受付日時、氏名、メールアドレス、件名、対応状況</p>
+              <p>機能: 詳細画面への遷移、対応状況の絞り込み、将来的なページング対応</p>
+            </div>
+          </div>
+
+          <div class="fill-block completed">
+            <div class="fill-label">管理側: 問い合わせ詳細画面 <span class="required">必須</span></div>
+            <div class="fill-content">
+              <p>画面URL: `/admin/inquiries/{id}`</p>
+              <p>表示項目: 氏名、メールアドレス、件名、問い合わせ本文、受付日時、対応状況</p>
+              <p>機能: 対応状況更新、一覧へ戻る</p>
             </div>
           </div>
         </section>
 
         <section class="section" id="sec4">
-          <h2 class="section-title"><span class="section-icon">4</span> 機能詳細</h2>
+          <h2 class="section-title"><span class="section-icon">4</span> REST API設計</h2>
 
-          <div class="subsection">
-            <h3 class="subsection-title">商品一覧・商品詳細</h3>
-
-            <div class="fill-block completed">
-              <div class="fill-label">入力 / 出力 / 動作 <span class="required">必須</span></div>
-              <div class="fill-content">
-                <p>入力: 商品カテゴリ選択、カート追加ボタン、数量の増減ボタン</p>
-                <p>出力: 商品名、説明、価格、画像、カテゴリ、現在の数量表示</p>
-                <p>動作: JSON から商品データを取得し、一覧・詳細を描画する。カート追加後は localStorage に保存し、画面上の数量とヘッダーのカート件数を更新する。</p>
-              </div>
-            </div>
+          <div class="fill-block completed">
+            <div class="fill-label">エンドポイント一覧 <span class="required">必須</span></div>
+            <table class="doc-table">
+              <thead>
+                <tr><th>HTTPメソッド</th><th>URL</th><th>用途</th><th>認証</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>POST</td><td>/api/inquiries</td><td>お問い合わせ登録</td><td>不要</td></tr>
+                <tr><td>GET</td><td>/api/admin/inquiries</td><td>問い合わせ一覧取得</td><td>必要</td></tr>
+                <tr><td>GET</td><td>/api/admin/inquiries/{id}</td><td>問い合わせ詳細取得</td><td>必要</td></tr>
+                <tr><td>PATCH</td><td>/api/admin/inquiries/{id}/status</td><td>対応状況更新</td><td>必要</td></tr>
+                <tr><td>GET</td><td>/api/works</td><td>作品一覧取得</td><td>不要</td></tr>
+                <tr><td>POST</td><td>/api/admin/works</td><td>作品登録</td><td>必要</td></tr>
+                <tr><td>PUT</td><td>/api/admin/works/{id}</td><td>作品更新</td><td>必要</td></tr>
+                <tr><td>DELETE</td><td>/api/admin/works/{id}</td><td>作品削除</td><td>必要</td></tr>
+              </tbody>
+            </table>
           </div>
 
-          <div class="subsection">
-            <h3 class="subsection-title">購入手続き</h3>
+          <div class="fill-block completed">
+            <div class="fill-label">リクエスト / レスポンス例 <span class="required">必須</span></div>
+            <div class="fill-content ascii-diagram">
+              <pre>POST /api/inquiries
 
-            <div class="fill-block completed">
-              <div class="fill-label">入力 / 出力 / 動作 <span class="required">必須</span></div>
-              <div class="fill-content">
-                <p>入力: 名前、郵便番号、住所、電話番号、支払い方法</p>
-                <p>出力: 注文サマリー、小計、送料、合計金額</p>
-                <p>動作: 郵便番号から住所検索を行い、電話番号は数字のみ受け付ける。送信後は購入完了ページへ遷移する。</p>
-              </div>
-            </div>
-          </div>
+Request JSON
+{
+  "name": "石島 智司",
+  "email": "sample@example.com",
+  "subject": "お問い合わせテスト",
+  "message": "お問い合わせ本文です。"
+}
 
-          <div class="subsection">
-            <h3 class="subsection-title">ログイン・会員登録・マイページ</h3>
+Response JSON
+{
+  "id": 1,
+  "message": "お問い合わせを受け付けました。"
+}
 
-            <div class="fill-block completed">
-              <div class="fill-label">入力 / 出力 / 動作 <span class="required">必須</span></div>
-              <div class="fill-content">
-                <p>入力: 氏名、メールアドレス、パスワード</p>
-                <p>出力: 会員名、現在ポイント、景品ページへの導線</p>
-                <p>動作: localStorage に会員情報を保存し、ログイン状態を保持する。ログイン中はヘッダーにアカウント名を表示し、マイページからログアウトできる。</p>
-              </div>
-            </div>
-          </div>
+GET /api/admin/inquiries
 
-          <div class="subsection">
-            <h3 class="subsection-title">ハムスター一覧・詳細</h3>
-
-            <div class="fill-block completed">
-              <div class="fill-label">入力 / 出力 / 動作 <span class="required">必須</span></div>
-              <div class="fill-content">
-                <p>入力: 種類タグ、詳細リンク</p>
-                <p>出力: 種類名、性格、飼いやすさ、価格、説明、画像</p>
-                <p>動作: JSON からハムスターデータを取得し、一覧と詳細を表示する。種類タグから詳細ページへ遷移できる。</p>
-              </div>
+Response JSON
+[
+  {
+    "id": 1,
+    "name": "石島 智司",
+    "email": "sample@example.com",
+    "subject": "お問い合わせテスト",
+    "status": "NEW",
+    "createdAt": "2026-03-18T10:00:00"
+  }
+]</pre>
             </div>
           </div>
         </section>
 
         <section class="section" id="sec5">
-          <h2 class="section-title"><span class="section-icon">5</span> 非機能要件</h2>
+          <h2 class="section-title"><span class="section-icon">5</span> バリデーション・セキュリティ</h2>
 
           <div class="fill-block completed">
-            <div class="fill-label">対応ブラウザ <span class="required">必須</span></div>
+            <div class="fill-label">バリデーション要件 <span class="required">必須</span></div>
             <div class="fill-content">
-              <p>Google Chrome、Microsoft Edge を主な確認対象とする。実装はモダンブラウザ環境での動作を前提とする。</p>
+              <p>氏名: 必須、100文字以内</p>
+              <p>メールアドレス: 必須、メール形式、255文字以内</p>
+              <p>件名: 必須、150文字以内</p>
+              <p>本文: 必須、1000文字以内</p>
+              <p>管理者ログインID / パスワード: 必須</p>
             </div>
           </div>
 
           <div class="fill-block completed">
-            <div class="fill-label">デザイン要件 <span class="required">必須</span></div>
+            <div class="fill-label">セキュリティ要件 <span class="required">必須</span></div>
             <div class="fill-content">
-              <p>スマホファーストで設計し、ベージュ系ナチュラル上品を基調とする。ブランドトーンは「上品 60% + 可愛い 40%」とし、SNS へ投稿したくなる雰囲気を意識する。</p>
-            </div>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">運用上の前提 <span class="required">必須</span></div>
-            <div class="fill-content">
-              <p>本システムはローカルサーバー上で動作確認を行う。JSON 読み込みの都合上、file:// 直開きではなく http://127.0.0.1:3000/ などのサーバー経由で閲覧することを前提とする。</p>
+              <p>Spring Security を用いて `/admin/**` と `/api/admin/**` を認証必須とする。</p>
+              <p>パスワードは平文保存せず、BCrypt などでハッシュ化する。</p>
+              <p>CSRF対策、認可制御、入力値検証を行い、不正アクセスや不正入力を防止する。</p>
             </div>
           </div>
         </section>

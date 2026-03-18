@@ -20,9 +20,9 @@
         <div class="doc-category">DOCUMENT 08</div>
         <h1 class="doc-title">データベース設計書</h1>
         <div class="doc-meta">
-          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 更新日: 2026-03-17</span>
+          <span><span class="material-symbols-outlined icon-sm">calendar_today</span> 更新日: 2026-03-18</span>
           <span><span class="material-symbols-outlined icon-sm">person</span> 作成者: 石島　智司</span>
-          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 1.0</span>
+          <span><span class="material-symbols-outlined icon-sm">push_pin</span> Ver 2.0</span>
         </div>
       </header>
 
@@ -33,8 +33,8 @@
             <li><a href="#sec1">設計方針</a></li>
             <li><a href="#sec2">ER図</a></li>
             <li><a href="#sec3">テーブル設計</a></li>
-            <li><a href="#sec4">インデックス設計</a></li>
-            <li><a href="#sec5">初期データ</a></li>
+            <li><a href="#sec4">MyBatis設計</a></li>
+            <li><a href="#sec5">CREATE TABLE / 初期データ</a></li>
           </ol>
         </div>
 
@@ -42,19 +42,11 @@
           <h2 class="section-title"><span class="section-icon">1</span> 設計方針</h2>
 
           <div class="fill-block completed">
-            <div class="fill-label">設計前提 <span class="required">必須</span></div>
+            <div class="fill-label">対象範囲 <span class="required">必須</span></div>
             <div class="fill-content">
-              <p>本課題のサイト本体は HTML / CSS / JavaScript による静的サイトとして実装しており、現在は JSON と localStorage を用いてデータを管理している。</p>
-              <p>ただし、将来的に本物の Web アプリケーションとして運用することを想定し、会員情報、商品情報、ハムスター情報、注文情報、景品情報などをデータベースで管理できるように設計を行う。</p>
-              <p>本設計書では「はむのくらし」をハムスターカフェ、ハムスター生体販売、関連商品の EC、会員制度を持つサービスとして想定し、必要なテーブルと関連を整理する。</p>
-            </div>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">管理対象データ <span class="required">必須</span></div>
-            <div class="fill-content">
-              <p>管理対象は、会員、商品、商品カテゴリ、ハムスター、注文、注文詳細、カート、カート内商品、景品、ポイント履歴の 9 系統とする。</p>
-              <p>これにより、商品購入、会員管理、景品交換、ハムスター一覧表示、購入履歴の確認まで一貫して扱える構成とする。</p>
+              <p>本DB設計は、課題2で追加する「お問い合わせフォーム」「管理画面での問い合わせ一覧表示」を中心に構成する。</p>
+              <p>今後の拡張として「作品管理CRUD」を追加できるよう、works テーブルと関連設計も含める。</p>
+              <p>DB は MySQL を想定し、バックエンドは Spring Boot + MyBatis で実装する前提とする。</p>
             </div>
           </div>
         </section>
@@ -64,34 +56,26 @@
 
           <div class="fill-block completed">
             <div class="fill-label">ER図 <span class="required">必須</span></div>
-            <div class="fill-hint">テキスト形式でエンティティの関連を示す。</div>
             <div class="fill-content ascii-diagram">
-              <pre>members
- ├ carts
- │  └ cart_items
- │      └ products
- ├ orders
- │  └ order_items
- │      └ products
- └ point_histories
-    └ rewards
+              <pre>admins
+ └ admin_roles
 
-product_categories
- └ products
+inquiries
 
-hamsters
+works
+ └ work_tags
 
-rewards</pre>
+tags
+ └ work_tags</pre>
             </div>
           </div>
 
           <div class="fill-block completed">
             <div class="fill-label">ER図の説明 <span class="required">必須</span></div>
             <div class="fill-content">
-              <p>会員はカート、注文、ポイント履歴と関連し、EC と会員制度の中心となる。</p>
-              <p>商品は商品カテゴリに属し、カート内商品と注文詳細から参照される。</p>
-              <p>ハムスター情報は商品とは分離し、生体販売用の一覧・詳細ページで使用する独立エンティティとして扱う。</p>
-              <p>景品はポイント履歴と関連し、会員がどの景品へ交換したかを管理できるようにする。</p>
+              <p>inquiries は公開側から送信された問い合わせ情報を保存する中心テーブルである。</p>
+              <p>admins は管理画面ログイン用の管理者テーブルであり、admin_roles によって権限種別を管理する。</p>
+              <p>works は将来の作品管理CRUD用テーブルであり、tags / work_tags によりタグ付けできる構成とする。</p>
             </div>
           </div>
         </section>
@@ -100,17 +84,70 @@ rewards</pre>
           <h2 class="section-title"><span class="section-icon">3</span> テーブル設計</h2>
 
           <div class="fill-block completed">
-            <div class="fill-label">members テーブル <span class="required">必須</span></div>
+            <div class="fill-label">inquiries テーブル <span class="required">必須</span></div>
             <table class="doc-table">
               <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
+                <tr><th>カラム名</th><th>型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
               </thead>
               <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>会員ID</td></tr>
-                <tr><td>name</td><td>VARCHAR(100)</td><td>NO</td><td>NOT NULL</td><td>会員名</td></tr>
-                <tr><td>email</td><td>VARCHAR(255)</td><td>NO</td><td>UNIQUE, NOT NULL</td><td>メールアドレス</td></tr>
-                <tr><td>password</td><td>VARCHAR(255)</td><td>NO</td><td>NOT NULL</td><td>パスワード</td></tr>
-                <tr><td>points</td><td>INT</td><td>NO</td><td>DEFAULT 0</td><td>保有ポイント</td></tr>
+                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>問い合わせID</td></tr>
+                <tr><td>name</td><td>VARCHAR(100)</td><td>NO</td><td>NOT NULL</td><td>氏名</td></tr>
+                <tr><td>email</td><td>VARCHAR(255)</td><td>NO</td><td>NOT NULL</td><td>メールアドレス</td></tr>
+                <tr><td>subject</td><td>VARCHAR(150)</td><td>NO</td><td>NOT NULL</td><td>件名</td></tr>
+                <tr><td>message</td><td>TEXT</td><td>NO</td><td>NOT NULL</td><td>本文</td></tr>
+                <tr><td>status</td><td>VARCHAR(20)</td><td>NO</td><td>DEFAULT 'NEW'</td><td>対応状況</td></tr>
+                <tr><td>created_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>受付日時</td></tr>
+                <tr><td>updated_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>更新日時</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="fill-block completed">
+            <div class="fill-label">admins テーブル <span class="required">必須</span></div>
+            <table class="doc-table">
+              <thead>
+                <tr><th>カラム名</th><th>型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>管理者ID</td></tr>
+                <tr><td>login_id</td><td>VARCHAR(100)</td><td>NO</td><td>UNIQUE, NOT NULL</td><td>ログインID</td></tr>
+                <tr><td>password_hash</td><td>VARCHAR(255)</td><td>NO</td><td>NOT NULL</td><td>ハッシュ化済みパスワード</td></tr>
+                <tr><td>name</td><td>VARCHAR(100)</td><td>NO</td><td>NOT NULL</td><td>管理者名</td></tr>
+                <tr><td>enabled</td><td>BOOLEAN</td><td>NO</td><td>DEFAULT true</td><td>有効フラグ</td></tr>
+                <tr><td>created_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>登録日時</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="fill-block completed">
+            <div class="fill-label">admin_roles テーブル <span class="required">必須</span></div>
+            <table class="doc-table">
+              <thead>
+                <tr><th>カラム名</th><th>型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>権限ID</td></tr>
+                <tr><td>admin_id</td><td>BIGINT</td><td>NO</td><td>FK, NOT NULL</td><td>管理者ID</td></tr>
+                <tr><td>role_name</td><td>VARCHAR(50)</td><td>NO</td><td>NOT NULL</td><td>権限名</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="fill-block completed">
+            <div class="fill-label">works テーブル <span class="required">必須</span></div>
+            <table class="doc-table">
+              <thead>
+                <tr><th>カラム名</th><th>型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>作品ID</td></tr>
+                <tr><td>title</td><td>VARCHAR(150)</td><td>NO</td><td>NOT NULL</td><td>作品名</td></tr>
+                <tr><td>summary</td><td>VARCHAR(255)</td><td>YES</td><td>-</td><td>概要</td></tr>
+                <tr><td>description</td><td>TEXT</td><td>YES</td><td>-</td><td>詳細説明</td></tr>
+                <tr><td>thumbnail_path</td><td>VARCHAR(255)</td><td>YES</td><td>-</td><td>サムネイル画像</td></tr>
+                <tr><td>site_url</td><td>VARCHAR(255)</td><td>YES</td><td>-</td><td>作品URL</td></tr>
+                <tr><td>github_url</td><td>VARCHAR(255)</td><td>YES</td><td>-</td><td>GitHub URL</td></tr>
+                <tr><td>published</td><td>BOOLEAN</td><td>NO</td><td>DEFAULT true</td><td>公開フラグ</td></tr>
                 <tr><td>created_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>登録日時</td></tr>
                 <tr><td>updated_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>更新日時</td></tr>
               </tbody>
@@ -118,204 +155,76 @@ rewards</pre>
           </div>
 
           <div class="fill-block completed">
-            <div class="fill-label">product_categories テーブル <span class="required">必須</span></div>
+            <div class="fill-label">tags / work_tags テーブル <span class="required">必須</span></div>
             <table class="doc-table">
               <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
+                <tr><th>テーブル</th><th>主要カラム</th><th>説明</th></tr>
               </thead>
               <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>カテゴリID</td></tr>
-                <tr><td>name</td><td>VARCHAR(100)</td><td>NO</td><td>NOT NULL</td><td>カテゴリ名</td></tr>
-                <tr><td>slug</td><td>VARCHAR(100)</td><td>NO</td><td>UNIQUE, NOT NULL</td><td>カテゴリ識別子</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">products テーブル <span class="required">必須</span></div>
-            <table class="doc-table">
-              <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>商品ID</td></tr>
-                <tr><td>category_id</td><td>BIGINT</td><td>NO</td><td>FK, NOT NULL</td><td>カテゴリID</td></tr>
-                <tr><td>name</td><td>VARCHAR(150)</td><td>NO</td><td>NOT NULL</td><td>商品名</td></tr>
-                <tr><td>description</td><td>TEXT</td><td>YES</td><td>-</td><td>商品説明</td></tr>
-                <tr><td>price</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>価格</td></tr>
-                <tr><td>image_path</td><td>VARCHAR(255)</td><td>YES</td><td>-</td><td>画像パス</td></tr>
-                <tr><td>is_active</td><td>BOOLEAN</td><td>NO</td><td>DEFAULT true</td><td>販売中フラグ</td></tr>
-                <tr><td>created_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>登録日時</td></tr>
-                <tr><td>updated_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>更新日時</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">hamsters テーブル <span class="required">必須</span></div>
-            <table class="doc-table">
-              <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>ハムスターID</td></tr>
-                <tr><td>species_name</td><td>VARCHAR(150)</td><td>NO</td><td>NOT NULL</td><td>種類名</td></tr>
-                <tr><td>personality</td><td>VARCHAR(100)</td><td>YES</td><td>-</td><td>性格</td></tr>
-                <tr><td>care_level</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>飼いやすさ</td></tr>
-                <tr><td>price</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>価格</td></tr>
-                <tr><td>description</td><td>TEXT</td><td>YES</td><td>-</td><td>説明</td></tr>
-                <tr><td>image_path</td><td>VARCHAR(255)</td><td>YES</td><td>-</td><td>画像パス</td></tr>
-                <tr><td>is_available</td><td>BOOLEAN</td><td>NO</td><td>DEFAULT true</td><td>紹介中フラグ</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">carts テーブル <span class="required">必須</span></div>
-            <table class="doc-table">
-              <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>カートID</td></tr>
-                <tr><td>member_id</td><td>BIGINT</td><td>YES</td><td>FK</td><td>会員ID</td></tr>
-                <tr><td>status</td><td>VARCHAR(30)</td><td>NO</td><td>NOT NULL</td><td>カート状態</td></tr>
-                <tr><td>created_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>作成日時</td></tr>
-                <tr><td>updated_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>更新日時</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">cart_items テーブル <span class="required">必須</span></div>
-            <table class="doc-table">
-              <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>カート内商品ID</td></tr>
-                <tr><td>cart_id</td><td>BIGINT</td><td>NO</td><td>FK, NOT NULL</td><td>カートID</td></tr>
-                <tr><td>product_id</td><td>BIGINT</td><td>NO</td><td>FK, NOT NULL</td><td>商品ID</td></tr>
-                <tr><td>quantity</td><td>INT</td><td>NO</td><td>DEFAULT 1</td><td>数量</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">orders テーブル <span class="required">必須</span></div>
-            <table class="doc-table">
-              <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>注文ID</td></tr>
-                <tr><td>member_id</td><td>BIGINT</td><td>YES</td><td>FK</td><td>会員ID</td></tr>
-                <tr><td>order_number</td><td>VARCHAR(50)</td><td>NO</td><td>UNIQUE, NOT NULL</td><td>注文番号</td></tr>
-                <tr><td>postal_code</td><td>VARCHAR(8)</td><td>NO</td><td>NOT NULL</td><td>郵便番号</td></tr>
-                <tr><td>address</td><td>VARCHAR(255)</td><td>NO</td><td>NOT NULL</td><td>住所</td></tr>
-                <tr><td>phone_number</td><td>VARCHAR(20)</td><td>NO</td><td>NOT NULL</td><td>電話番号</td></tr>
-                <tr><td>payment_method</td><td>VARCHAR(50)</td><td>NO</td><td>NOT NULL</td><td>支払い方法</td></tr>
-                <tr><td>subtotal</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>小計</td></tr>
-                <tr><td>shipping_fee</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>送料</td></tr>
-                <tr><td>total_amount</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>合計金額</td></tr>
-                <tr><td>created_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>注文日時</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">order_items テーブル <span class="required">必須</span></div>
-            <table class="doc-table">
-              <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>注文詳細ID</td></tr>
-                <tr><td>order_id</td><td>BIGINT</td><td>NO</td><td>FK, NOT NULL</td><td>注文ID</td></tr>
-                <tr><td>product_id</td><td>BIGINT</td><td>NO</td><td>FK, NOT NULL</td><td>商品ID</td></tr>
-                <tr><td>product_name</td><td>VARCHAR(150)</td><td>NO</td><td>NOT NULL</td><td>購入時の商品名</td></tr>
-                <tr><td>unit_price</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>購入時単価</td></tr>
-                <tr><td>quantity</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>数量</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">rewards テーブル <span class="required">必須</span></div>
-            <table class="doc-table">
-              <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>景品ID</td></tr>
-                <tr><td>name</td><td>VARCHAR(150)</td><td>NO</td><td>NOT NULL</td><td>景品名</td></tr>
-                <tr><td>points_required</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>必要ポイント</td></tr>
-                <tr><td>description</td><td>TEXT</td><td>YES</td><td>-</td><td>景品説明</td></tr>
-                <tr><td>image_path</td><td>VARCHAR(255)</td><td>YES</td><td>-</td><td>画像パス</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="fill-block completed">
-            <div class="fill-label">point_histories テーブル <span class="required">必須</span></div>
-            <table class="doc-table">
-              <thead>
-                <tr><th>カラム名</th><th>データ型</th><th>NULL</th><th>制約</th><th>説明</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>id</td><td>BIGINT</td><td>NO</td><td>PK, AUTO_INCREMENT</td><td>ポイント履歴ID</td></tr>
-                <tr><td>member_id</td><td>BIGINT</td><td>NO</td><td>FK, NOT NULL</td><td>会員ID</td></tr>
-                <tr><td>reward_id</td><td>BIGINT</td><td>YES</td><td>FK</td><td>交換景品ID</td></tr>
-                <tr><td>type</td><td>VARCHAR(30)</td><td>NO</td><td>NOT NULL</td><td>付与 / 消費区分</td></tr>
-                <tr><td>point_amount</td><td>INT</td><td>NO</td><td>NOT NULL</td><td>増減ポイント</td></tr>
-                <tr><td>description</td><td>VARCHAR(255)</td><td>YES</td><td>-</td><td>履歴説明</td></tr>
-                <tr><td>created_at</td><td>DATETIME</td><td>NO</td><td>NOT NULL</td><td>発生日</td></tr>
+                <tr><td>tags</td><td>id, name</td><td>作品に付与するタグを管理する</td></tr>
+                <tr><td>work_tags</td><td>id, work_id, tag_id</td><td>作品とタグの中間テーブル</td></tr>
               </tbody>
             </table>
           </div>
         </section>
 
         <section class="section" id="sec4">
-          <h2 class="section-title"><span class="section-icon">4</span> インデックス設計</h2>
+          <h2 class="section-title"><span class="section-icon">4</span> MyBatis設計</h2>
 
           <div class="fill-block completed">
-            <div class="fill-label">インデックス一覧 <span class="required">必須</span></div>
-            <table class="doc-table">
-              <thead>
-                <tr><th>テーブル名</th><th>インデックス名</th><th>対象カラム</th><th>種類</th><th>目的</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>members</td><td>uk_members_email</td><td>email</td><td>UNIQUE</td><td>ログイン時の検索と重複防止</td></tr>
-                <tr><td>product_categories</td><td>uk_product_categories_slug</td><td>slug</td><td>UNIQUE</td><td>カテゴリ識別子の重複防止</td></tr>
-                <tr><td>products</td><td>idx_products_category_id</td><td>category_id</td><td>INDEX</td><td>カテゴリ別商品一覧表示の高速化</td></tr>
-                <tr><td>hamsters</td><td>idx_hamsters_species_name</td><td>species_name</td><td>INDEX</td><td>種類別検索の高速化</td></tr>
-                <tr><td>orders</td><td>uk_orders_order_number</td><td>order_number</td><td>UNIQUE</td><td>注文番号の重複防止</td></tr>
-                <tr><td>orders</td><td>idx_orders_member_id</td><td>member_id</td><td>INDEX</td><td>会員別注文履歴表示の高速化</td></tr>
-                <tr><td>cart_items</td><td>idx_cart_items_cart_id</td><td>cart_id</td><td>INDEX</td><td>カート内商品取得の高速化</td></tr>
-                <tr><td>order_items</td><td>idx_order_items_order_id</td><td>order_id</td><td>INDEX</td><td>注文詳細取得の高速化</td></tr>
-                <tr><td>point_histories</td><td>idx_point_histories_member_id</td><td>member_id</td><td>INDEX</td><td>ポイント履歴取得の高速化</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section class="section" id="sec5">
-          <h2 class="section-title"><span class="section-icon">5</span> 初期データ</h2>
-
-          <div class="fill-block completed">
-            <div class="fill-label">初期データ方針 <span class="required">必須</span></div>
+            <div class="fill-label">Mapper設計方針 <span class="required">必須</span></div>
             <div class="fill-content">
-              <p>商品カテゴリには「ケージ」「餌」「おもちゃ」「ケア用品」「スターターセット」を登録する。</p>
-              <p>商品テーブルには現在の JSON データに合わせて約 26 商品を登録し、画像パスはローカルファイル名に対応する値を保持する。</p>
-              <p>ハムスターテーブルには 7 種類を登録し、種類名、性格、飼いやすさ、価格、説明、画像パスを保持する。</p>
-              <p>景品テーブルには「小さな遊び道具」「アクリルキーホルダー」「限定トートバッグ」「限定ぬいぐるみ」を登録する。</p>
+              <p>`InquiryMapper` では、問い合わせ登録、一覧取得、詳細取得、対応状況更新を担当する。</p>
+              <p>`AdminMapper` では、管理者ログインに必要な管理者情報と権限情報の取得を担当する。</p>
+              <p>`WorkMapper` では、将来の作品一覧、登録、更新、削除のCRUD処理を担当する。</p>
             </div>
           </div>
 
           <div class="fill-block completed">
-            <div class="fill-label">備考 <span class="required">必須</span></div>
+            <div class="fill-label">想定Mapperメソッド <span class="required">必須</span></div>
+            <div class="fill-content ascii-diagram">
+              <pre>InquiryMapper
+- insertInquiry(Inquiry inquiry)
+- findAllInquiries()
+- findInquiryById(Long id)
+- updateInquiryStatus(Long id, String status)
+
+AdminMapper
+- findAdminByLoginId(String loginId)
+- findRolesByAdminId(Long adminId)
+
+WorkMapper
+- findAllWorks()
+- findWorkById(Long id)
+- insertWork(Work work)
+- updateWork(Work work)
+- deleteWork(Long id)</pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec5">
+          <h2 class="section-title"><span class="section-icon">5</span> CREATE TABLE / 初期データ</h2>
+
+          <div class="fill-block completed">
+            <div class="fill-label">CREATE TABLE方針 <span class="required">必須</span></div>
             <div class="fill-content">
-              <p>本課題では実際のデータベースは実装していないが、本設計をもとに Spring Boot と MySQL などを導入すれば、会員認証、注文管理、商品管理、景品交換履歴管理へ発展できる構成となっている。</p>
+              <p>MySQL 8 系を想定し、主キーは BIGINT AUTO_INCREMENT を用いる。日時は DATETIME で管理する。</p>
+              <p>問い合わせステータスは `NEW`, `IN_PROGRESS`, `COMPLETED` を文字列で保持する。</p>
+            </div>
+          </div>
+
+          <div class="fill-block completed">
+            <div class="fill-label">初期データ <span class="required">必須</span></div>
+            <div class="fill-content ascii-diagram">
+              <pre>INSERT INTO admins (login_id, password_hash, name, enabled, created_at)
+VALUES ('admin', '{bcrypt-hash}', '管理者', true, NOW());
+
+INSERT INTO admin_roles (admin_id, role_name)
+VALUES (1, 'ROLE_ADMIN');
+
+INSERT INTO tags (name)
+VALUES ('HTML/CSS'), ('JavaScript'), ('Spring Boot');</pre>
             </div>
           </div>
         </section>
