@@ -17,6 +17,8 @@ public class Inquiry {
 	private String email;
 	private String subject;
 	private String message;
+	private String adminReply;
+	private LocalDateTime repliedAt;
 	private String status;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;

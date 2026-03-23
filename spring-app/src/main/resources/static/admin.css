@@ -354,6 +354,20 @@ body.admin-body {
   border-bottom: none;
 }
 
+.admin-table-row-link {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.admin-table-row-link:hover {
+  background: rgba(244, 236, 225, 0.75);
+}
+
+.admin-table-row-link:focus-visible {
+  outline: 2px solid var(--admin-main);
+  outline-offset: -2px;
+}
+
 .admin-status {
   display: inline-flex;
   align-items: center;
@@ -512,6 +526,27 @@ body.admin-body {
   background: var(--admin-surface-soft);
   line-height: 1.8;
   white-space: pre-wrap;
+}
+
+.admin-card-section {
+  margin-top: 24px;
+}
+
+.admin-card-section h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+.admin-textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 14px;
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--admin-text);
+  font: inherit;
+  resize: vertical;
 }
 
 .admin-alert {

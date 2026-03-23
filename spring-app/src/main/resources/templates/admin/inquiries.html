@@ -118,7 +118,10 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="inquiry : ${inquiries}">
+						<tr th:each="inquiry : ${inquiries}"
+						    class="admin-table-row-link"
+						    th:data-href="@{/admin/inquiries/{id}(id=${inquiry.id})}"
+						    tabindex="0">
 							<td th:text="${inquiry.id}">1</td>
 							<td th:text="${#temporals.format(inquiry.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/18 10:00</td>
 							<td th:text="${inquiry.name}">石島 智司</td>
@@ -132,7 +135,9 @@
 								</span>
 							</td>
 							<td>
-								<a class="admin-link-button" th:href="@{/admin/inquiries/{id}(id=${inquiry.id})}">詳細を見る</a>
+								<a class="admin-link-button"
+								   th:href="@{/admin/inquiries/{id}(id=${inquiry.id})}"
+								   onclick="event.stopPropagation()">詳細を見る</a>
 							</td>
 						</tr>
 					</tbody>
@@ -140,5 +145,24 @@
 			</div>
 		</section>
 	</div>
+	<script>
+		document.querySelectorAll('.admin-table-row-link').forEach((row) => {
+			row.addEventListener('click', () => {
+				const href = row.dataset.href;
+				if (href) {
+					window.location.href = href;
+				}
+			});
+			row.addEventListener('keydown', (event) => {
+				if (event.key === 'Enter' || event.key === ' ') {
+					event.preventDefault();
+					const href = row.dataset.href;
+					if (href) {
+						window.location.href = href;
+					}
+				}
+			});
+		});
+	</script>
 </body>
 </html>

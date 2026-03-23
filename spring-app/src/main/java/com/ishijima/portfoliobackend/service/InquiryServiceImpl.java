@@ -50,4 +50,11 @@ public class InquiryServiceImpl implements InquiryService {
 		findById(id);
 		inquiryMapper.updateStatus(id, status);
 	}
+
+	@Override
+	@Transactional
+	public void saveReply(Long id, String reply) {
+		findById(id);
+		inquiryMapper.updateReply(id, reply, LocalDateTime.now());
+	}
 }

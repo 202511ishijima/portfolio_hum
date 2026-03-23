@@ -17,4 +17,6 @@ public interface InquiryMapper {
 	Optional<Inquiry> findById(@Param("id") Long id);
 
 	void updateStatus(@Param("id") Long id, @Param("status") String status);
+
+	void updateReply(@Param("id") Long id, @Param("reply") String reply, @Param("repliedAt") java.time.LocalDateTime repliedAt);
 }

@@ -14,4 +14,6 @@ public interface InquiryService {
 	Inquiry findById(Long id);
 
 	void updateStatus(Long id, String status);
+
+	void saveReply(Long id, String reply);
 }

@@ -39,6 +39,8 @@
 
 		<p class="admin-alert admin-alert--success" th:if="${statusMessage}" th:text="${statusMessage}">対応状況を更新しました。</p>
 		<p class="admin-alert admin-alert--error" th:if="${statusError}" th:text="${statusError}">更新に失敗しました。</p>
+		<p class="admin-alert admin-alert--success" th:if="${replyMessage}" th:text="${replyMessage}">返信内容を保存しました。</p>
+		<p class="admin-alert admin-alert--error" th:if="${replyError}" th:text="${replyError}">返信内容を確認してください。</p>
 
 		<div class="admin-detail-grid">
 			<section class="admin-card">
@@ -75,6 +77,12 @@
 				<section class="admin-message-box" th:text="${inquiry.message}">
 					お問い合わせ本文
 				</section>
+
+				<section class="admin-card-section" th:if="${inquiry.adminReply}">
+					<h3>保存済みの返信内容</h3>
+					<p class="admin-help-text" th:if="${inquiry.repliedAt}" th:text="${'最終保存: ' + #temporals.format(inquiry.repliedAt, 'yyyy/MM/dd HH:mm')}">最終保存: 2026/03/18 10:00</p>
+					<div class="admin-message-box" th:text="${inquiry.adminReply}">返信内容</div>
+				</section>
 			</section>
 
 			<section class="admin-card">
@@ -96,6 +104,22 @@
 					</label>
 					<button class="admin-button" type="submit">更新する</button>
 				</form>
+
+				<section class="admin-card-section">
+					<div class="admin-card-header">
+						<div>
+							<h2>返信内容</h2>
+							<p>管理画面上で返信文面を作成・保存できます。</p>
+						</div>
+					</div>
+					<form class="admin-form" th:action="@{/admin/inquiries/{id}/reply(id=${inquiry.id})}" th:object="${replyForm}" method="post">
+						<label class="admin-field">
+							<span>返信文面</span>
+							<textarea class="admin-textarea" th:field="*{reply}" rows="10" placeholder="お問い合わせへの返信内容を入力してください。"></textarea>
+						</label>
+						<button class="admin-button" type="submit">返信内容を保存する</button>
+					</form>
+				</section>
 			</section>
 		</div>
 	</div>
