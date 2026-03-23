@@ -10,33 +10,70 @@
 	<link rel="stylesheet" th:href="@{/admin.css}">
 </head>
 <body class="admin-body admin-login-body">
-	<main class="admin-login-shell">
-		<section class="admin-login-card">
-			<p class="admin-eyebrow">ADMIN</p>
-			<h1>管理者ログイン</h1>
-			<p class="admin-lead">お問い合わせ管理や会員管理を行うための管理画面です。</p>
-
-			<p class="admin-alert admin-alert--error" th:if="${param.error}">ログインIDまたはパスワードが正しくありません。</p>
-			<p class="admin-alert admin-alert--success" th:if="${param.logout}">ログアウトしました。</p>
-
-			<form class="admin-form" th:action="@{/admin/login}" method="post">
-				<label class="admin-field">
-					<span>ログインID</span>
-					<input id="username" name="username" type="text" autocomplete="username" required>
-				</label>
-				<label class="admin-field">
-					<span>パスワード</span>
-					<input id="password" name="password" type="password" autocomplete="current-password" required>
-				</label>
-				<button class="admin-button" type="submit">ログイン</button>
-			</form>
-
-			<div class="admin-login-note">
-				<p>確認用アカウント</p>
-				<p>ID: <strong>admin</strong></p>
-				<p>Password: <strong>admin1234</strong></p>
+	<div class="admin-shell admin-shell--narrow">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1>管理者ログイン</h1>
+				<p class="admin-lead">お問い合わせ管理や会員管理を行うための管理画面です。</p>
 			</div>
-		</section>
-	</main>
+		</header>
+
+		<div class="admin-two-column admin-two-column--equal">
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>ログイン情報を入力</h2>
+						<p>管理画面に入るには、管理者アカウントでログインしてください。</p>
+					</div>
+				</div>
+
+				<p class="admin-alert admin-alert--error" th:if="${param.error}">ログインIDまたはパスワードが正しくありません。</p>
+				<p class="admin-alert admin-alert--success" th:if="${param.logout}">ログアウトしました。</p>
+
+				<form class="admin-form" th:action="@{/admin/login}" method="post">
+					<label class="admin-field">
+						<span>ログインID</span>
+						<input id="username" name="username" type="text" autocomplete="username" placeholder="admin" required>
+					</label>
+					<label class="admin-field">
+						<span>パスワード</span>
+						<input id="password" name="password" type="password" autocomplete="current-password" placeholder="パスワードを入力" required>
+					</label>
+					<button class="admin-button admin-button--wide" type="submit">ログイン</button>
+				</form>
+			</section>
+
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>この画面でできること</h2>
+						<p>ログイン後は管理画面トップへ移動します。</p>
+					</div>
+				</div>
+
+				<div class="admin-stat-list">
+					<div class="admin-stat-item">
+						<span>お問い合わせ一覧</span>
+						<strong>確認</strong>
+					</div>
+					<div class="admin-stat-item">
+						<span>会員管理</span>
+						<strong>調整</strong>
+					</div>
+					<div class="admin-stat-item">
+						<span>ダッシュボード</span>
+						<strong>集計</strong>
+					</div>
+				</div>
+
+				<div class="admin-login-note admin-login-note--accent">
+					<p class="admin-login-note-title">確認用アカウント</p>
+					<p>ID: <strong>admin</strong></p>
+					<p>Password: <strong>admin1234</strong></p>
+				</div>
+			</section>
+		</div>
+	</div>
 </body>
 </html>

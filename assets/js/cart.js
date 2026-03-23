@@ -62,20 +62,26 @@ window.Cart = (function () {
     document.dispatchEvent(new Event("member:updated"));
   }
 
+  function getCheckoutProfileKey() {
+    const member = getMember();
+    const email = member?.loggedIn ? String(member.email || "").trim().toLowerCase() : "";
+    return email ? `${checkoutProfileKey}_${email}` : checkoutProfileKey;
+  }
+
   function getCheckoutProfile() {
     try {
-      return JSON.parse(localStorage.getItem(checkoutProfileKey) || "null") || {};
+      return JSON.parse(localStorage.getItem(getCheckoutProfileKey()) || "null") || {};
     } catch (error) {
       return {};
     }
   }
 
   function saveCheckoutProfile(profile) {
-    localStorage.setItem(checkoutProfileKey, JSON.stringify(profile));
+    localStorage.setItem(getCheckoutProfileKey(), JSON.stringify(profile));
   }
 
   function clearCheckoutProfile() {
-    localStorage.removeItem(checkoutProfileKey);
+    localStorage.removeItem(getCheckoutProfileKey());
   }
 
   async function syncPointsToBackend(email, earnedPoints) {

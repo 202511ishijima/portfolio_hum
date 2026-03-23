@@ -38,6 +38,10 @@ body.admin-body {
   padding: 40px 0 56px;
 }
 
+.admin-shell--narrow {
+  width: min(980px, calc(100% - 32px));
+}
+
 .admin-login-shell {
   min-height: 100vh;
   display: grid;
@@ -57,6 +61,67 @@ body.admin-body {
 .admin-login-card {
   width: min(520px, 100%);
   padding: 32px;
+}
+
+.admin-login-card--wide {
+  width: min(980px, 100%);
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-login-layout {
+  display: grid;
+}
+
+.admin-login-brand {
+  padding: 36px 32px;
+  background:
+    radial-gradient(circle at top right, rgba(215, 164, 168, 0.22), transparent 30%),
+    linear-gradient(180deg, rgba(255, 251, 245, 0.96) 0%, rgba(244, 236, 225, 0.96) 100%);
+}
+
+.admin-login-panel {
+  padding: 36px 32px;
+  background: rgba(255, 253, 250, 0.95);
+}
+
+.admin-login-panel-head {
+  margin-bottom: 20px;
+}
+
+.admin-login-panel-head h2 {
+  margin: 0 0 8px;
+  font-size: 1.3rem;
+}
+
+.admin-login-panel-head p {
+  margin: 0;
+  color: var(--admin-text-soft);
+  line-height: 1.7;
+}
+
+.admin-login-feature-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.admin-login-feature {
+  padding: 18px;
+  border: 1px solid var(--admin-border);
+  border-radius: 18px;
+  background: rgba(255, 253, 250, 0.82);
+}
+
+.admin-login-feature h2 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.admin-login-feature p {
+  margin: 0;
+  color: var(--admin-text-soft);
+  line-height: 1.7;
 }
 
 .admin-header {
@@ -154,6 +219,63 @@ body.admin-body {
 .admin-card {
   padding: 24px;
   margin-bottom: 20px;
+}
+
+.admin-quick-links {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-link-card {
+  display: block;
+  padding: 18px;
+  border: 1px solid var(--admin-border);
+  border-radius: 18px;
+  background: rgba(255, 253, 250, 0.82);
+  color: var(--admin-text);
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.admin-link-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--admin-main);
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-link-card h3 {
+  margin: 0 0 6px;
+}
+
+.admin-link-card p {
+  margin: 0;
+  color: var(--admin-text-soft);
+}
+
+.admin-stat-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--admin-surface-soft);
+}
+
+.admin-stat-item span {
+  color: var(--admin-text-soft);
+  font-weight: 700;
+}
+
+.admin-stat-item strong {
+  font-family: "Quicksand", sans-serif;
+  font-size: 1.3rem;
+  color: var(--admin-main-deep);
 }
 
 .admin-two-column {
@@ -290,6 +412,10 @@ body.admin-body {
   background: var(--admin-surface-soft);
 }
 
+.admin-button--wide {
+  width: 100%;
+}
+
 .admin-form {
   display: grid;
   gap: 16px;
@@ -413,11 +539,30 @@ body.admin-body {
   color: var(--admin-text-soft);
 }
 
+.admin-login-note--accent {
+  margin-top: 28px;
+  border: 1px solid var(--admin-border);
+  background: rgba(255, 253, 250, 0.88);
+}
+
+.admin-login-note-title {
+  font-weight: 700;
+  color: var(--admin-text);
+}
+
 .admin-login-note p {
   margin: 4px 0;
 }
 
 @media (min-width: 768px) {
+  .admin-login-layout {
+    grid-template-columns: 1.15fr 0.95fr;
+  }
+
+  .admin-two-column--equal {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .admin-summary-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -438,12 +583,22 @@ body.admin-body {
     padding: 24px 0 40px;
   }
 
+  .admin-shell--narrow {
+    width: min(100% - 24px, 980px);
+  }
+
   .admin-login-card,
   .admin-card,
   .admin-summary-card {
     border-radius: 20px;
   }
 
+  .admin-login-card--wide {
+    padding: 0;
+  }
+
+  .admin-login-brand,
+  .admin-login-panel,
   .admin-login-card,
   .admin-card {
     padding: 20px;

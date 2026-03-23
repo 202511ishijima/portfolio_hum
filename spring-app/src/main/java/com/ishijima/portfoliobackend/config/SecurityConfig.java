@@ -25,7 +25,7 @@ public class SecurityConfig {
 				.frameOptions(frame -> frame.sameOrigin())
 			)
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/", "/error", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+				.requestMatchers("/", "/error", "/admin.css", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
 				.requestMatchers("/admin/login").permitAll()
 				.requestMatchers("/h2-console/**").permitAll()
 				.requestMatchers("/api/inquiries", "/api/members/register", "/api/members/points", "/api/members/status").permitAll()
@@ -35,7 +35,7 @@ public class SecurityConfig {
 			.formLogin(form -> form
 				.loginPage("/admin/login")
 				.loginProcessingUrl("/admin/login")
-				.defaultSuccessUrl("/admin/inquiries", true)
+				.defaultSuccessUrl("/admin/dashboard", true)
 				.failureUrl("/admin/login?error")
 				.permitAll()
 			)

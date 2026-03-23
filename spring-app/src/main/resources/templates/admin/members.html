@@ -15,7 +15,7 @@
 			<div>
 				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>会員管理</h1>
-				<p class="admin-lead">会員アカウントの作成、停止、ポイント調整をここでまとめて行えます。</p>
+				<p class="admin-lead">会員アカウントの作成、停止・再開、ポイント調整を行えます。</p>
 			</div>
 			<form th:action="@{/admin/logout}" method="post">
 				<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
@@ -24,8 +24,11 @@
 
 		<nav class="admin-nav" aria-label="管理メニュー">
 			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
+			   th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link"
 			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
-			   th:href="@{/admin/inquiries}">問い合わせ管理</a>
+			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
 			<a class="admin-nav-link"
 			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
 			   th:href="@{/admin/members}">会員管理</a>
@@ -36,7 +39,7 @@
 
 		<section class="admin-summary-grid admin-summary-grid--compact">
 			<article class="admin-summary-card">
-				<h2>総会員数</h2>
+				<h2>会員総数</h2>
 				<p class="admin-summary-number" th:text="${memberCount}">0</p>
 			</article>
 			<article class="admin-summary-card">
@@ -82,14 +85,14 @@
 				<div class="admin-card-header">
 					<div>
 						<h2>ポイント調整の考え方</h2>
-						<p>必要なときだけ手動調整できるようにしています。</p>
+						<p>必要なときだけ数値で調整できます。</p>
 					</div>
 				</div>
 
 				<div class="admin-message-box">
-					<p>正の数を入力するとポイント付与、負の数を入力するとポイント没収になります。</p>
+					<p>正の数を入れるとポイント付与、負の数を入れるとポイント没収になります。</p>
 					<p>ポイントは 0 未満にならないように自動調整されます。</p>
-					<p>会員停止中でも履歴確認やポイント調整は可能です。</p>
+					<p>停止中の会員でも、確認対応のためポイント調整は可能です。</p>
 				</div>
 			</section>
 		</div>
@@ -98,7 +101,7 @@
 			<div class="admin-card-header">
 				<div>
 					<h2>会員一覧</h2>
-					<p>会員の状態確認、停止、ポイント反映ができます。</p>
+					<p>状態の確認、停止・再開、ポイント調整ができます。</p>
 				</div>
 			</div>
 
@@ -111,7 +114,7 @@
 							<th>メールアドレス</th>
 							<th>現在ポイント</th>
 							<th>状態</th>
-							<th>作成日</th>
+							<th>作成日時</th>
 							<th>停止 / 再開</th>
 							<th>ポイント調整</th>
 						</tr>
@@ -124,8 +127,8 @@
 							<td th:text="${member.points}">0</td>
 							<td>
 								<span class="admin-status"
-								      th:classappend="${member.status == 'ACTIVE'} ? ' admin-status--done' : ' admin-status--progress'"
-								      th:text="${member.status == 'ACTIVE'} ? '利用中' : '停止中'">
+								      th:classappend="${member.status == 'ACTIVE' ? ' admin-status--done' : ' admin-status--progress'}"
+								      th:text="${member.status == 'ACTIVE' ? '利用中' : '停止中'}">
 									利用中
 								</span>
 							</td>
@@ -133,7 +136,7 @@
 							<td>
 								<form th:action="@{/admin/members/{id}/status(id=${member.id})}" method="post">
 									<button class="admin-button admin-button--ghost" type="submit"
-									        th:text="${member.status == 'ACTIVE'} ? '停止する' : '再開する'">停止する</button>
+									        th:text="${member.status == 'ACTIVE' ? '停止する' : '再開する'}">停止する</button>
 								</form>
 							</td>
 							<td>

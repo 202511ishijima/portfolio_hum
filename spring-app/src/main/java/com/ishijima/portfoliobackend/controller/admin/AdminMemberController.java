@@ -84,7 +84,7 @@ public class AdminMemberController {
 		RedirectAttributes redirectAttributes
 	) {
 		if (bindingResult.hasErrors()) {
-			redirectAttributes.addFlashAttribute("memberError", "ポイント数を入力してください。");
+			redirectAttributes.addFlashAttribute("memberError", "ポイント数を確認してください。");
 			return "redirect:/admin/members";
 		}
 
