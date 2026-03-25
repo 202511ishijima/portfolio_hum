@@ -79,7 +79,7 @@ window.ProductsPage = (function () {
 
   function featuredProductSlide(product) {
     return `
-      <article class="hamster-carousel__slide">
+      <article class="product-card">
         ${productMedia(product)}
         <div class="product-card__meta">
           <span class="chip">${categoryLabel(product.category)}</span>
@@ -95,6 +95,14 @@ window.ProductsPage = (function () {
         </div>
       </article>
     `;
+  }
+
+  function chunkItems(items, size) {
+    const chunks = [];
+    for (let index = 0; index < items.length; index += size) {
+      chunks.push(items.slice(index, index + size));
+    }
+    return chunks;
   }
 
   function refreshInlineCounts() {
@@ -176,13 +184,8 @@ window.ProductsPage = (function () {
     if (!track || !slides.length || !dotsWrap) return;
 
     let currentPage = 0;
-
-    function getSlidesPerView() {
-      return window.innerWidth >= 900 ? 3 : 1;
-    }
-
     function getPageCount() {
-      return Math.ceil(slides.length / getSlidesPerView());
+      return slides.length;
     }
 
     function renderDots() {
@@ -211,27 +214,29 @@ window.ProductsPage = (function () {
     prev?.addEventListener("click", () => updateCarousel(currentPage - 1));
     next?.addEventListener("click", () => updateCarousel(currentPage + 1));
 
-    window.addEventListener("resize", () => {
-      const pageCount = getPageCount();
-      if (currentPage >= pageCount) {
-        currentPage = Math.max(pageCount - 1, 0);
-      }
-      renderDots();
-      updateCarousel(currentPage);
-    });
-
     renderDots();
     updateCarousel(0);
   }
 
   function renderCarouselList(target, products) {
     if (!target) return;
+    const pages = chunkItems(products, 3);
 
     target.innerHTML = `
       <div class="hamster-carousel">
         <div class="hamster-carousel__viewport">
           <div class="hamster-carousel__track">
-            ${products.map(featuredProductSlide).join("")}
+            ${pages
+              .map(
+                (group) => `
+                  <div class="hamster-carousel__slide">
+                    <div class="hamster-carousel__page">
+                      ${group.map(featuredProductSlide).join("")}
+                    </div>
+                  </div>
+                `,
+              )
+              .join("")}
           </div>
         </div>
         <div class="hamster-carousel__controls">

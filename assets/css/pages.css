@@ -22,6 +22,19 @@
   gap: 24px;
 }
 
+.page-shell > section {
+  position: relative;
+  padding: 28px;
+  border: 1px solid rgba(234, 220, 207, 0.92);
+  border-radius: 32px;
+  background: rgba(255, 253, 249, 0.78);
+  box-shadow: 0 12px 30px rgba(109, 80, 57, 0.05);
+}
+
+.page-shell > section:nth-of-type(even) {
+  background: rgba(247, 239, 230, 0.68);
+}
+
 .detail-layout,
 .cart-layout,
 .visual-layout,
@@ -199,26 +212,82 @@
 .hamster-carousel__slide {
   flex: 0 0 100%;
   min-width: 100%;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  padding: 20px;
 }
 
-.hamster-carousel__slide .media-photo,
-.hamster-carousel__slide .product-card__meta,
-.hamster-carousel__slide h3,
-.hamster-carousel__slide .text-soft,
-.hamster-carousel__slide .price,
-.hamster-carousel__slide .button-row,
-.hamster-carousel__slide p:not(.eyebrow) {
+.hamster-carousel__page {
+  display: grid;
+  gap: 18px;
+}
+
+.hamster-card--featured {
+  height: 100%;
+}
+
+.card-grid--hamsters {
+  align-items: stretch;
+}
+
+.hamster-card > .media-photo,
+.hamster-card--featured > .media-photo {
+  display: block;
   width: 100%;
+  margin-bottom: 0;
 }
 
-.hamster-carousel__slide .media-photo {
-  margin-left: auto;
-  margin-right: auto;
+.hamster-card > .media-photo img,
+.hamster-card--featured > .media-photo img {
+  display: block;
+}
+
+.hamster-card__body {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.hamster-status-list {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text);
+}
+
+.hamster-status-list li {
+  margin: 0;
+  line-height: 1.75;
+}
+
+.hamster-status-list strong {
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+.hamster-card__comment,
+.detail-card__lead {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.hamster-card__note {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.hamster-note-box {
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(185, 144, 108, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 249, 241, 0.95);
+}
+
+.hamster-note-box p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.75;
 }
 
 .hamster-carousel__controls {
@@ -275,8 +344,7 @@
     align-items: center;
   }
 
-  .hamster-carousel__slide {
-    flex-basis: calc(100% / 3);
-    min-width: calc(100% / 3);
+  .hamster-carousel__page {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

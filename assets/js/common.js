@@ -67,6 +67,7 @@
   function setActiveNav() {
     const page = document.body.dataset.page;
     if (!page) return;
+
     document.querySelectorAll(`[data-nav="${page}"]`).forEach((link) => {
       link.classList.add("is-active");
     });
@@ -99,6 +100,26 @@
       document.head.appendChild(link);
     }
     link.href = href;
+  }
+
+  function setupPageTopButton() {
+    const button = document.querySelector("[data-page-top]");
+    if (!button) return;
+
+    function updateVisibility() {
+      const threshold = window.innerHeight / 2;
+      button.classList.toggle("is-visible", window.scrollY > threshold);
+    }
+
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+    button.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    });
+
+    updateVisibility();
   }
 
   async function fetchMemberStatus(email) {
@@ -147,6 +168,7 @@
     setupMenu();
     setupYear();
     setupFavicon();
+    setupPageTopButton();
     updateCartCount();
     updateMemberLink();
     document.addEventListener("cart:updated", updateCartCount);
