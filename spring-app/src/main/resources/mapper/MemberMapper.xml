@@ -92,4 +92,19 @@
 			updated_at = CURRENT_TIMESTAMP()
 		WHERE id = #{id}
 	</update>
+
+	<delete id="deleteById">
+		DELETE FROM members
+		WHERE id = #{id}
+	</delete>
+
+	<update id="updateMember" parameterType="com.ishijima.portfoliobackend.entity.Member">
+		UPDATE members
+		SET
+			name = #{name},
+			email = #{email},
+			password = #{password},
+			updated_at = #{updatedAt}
+		WHERE id = #{id}
+	</update>
 </mapper>

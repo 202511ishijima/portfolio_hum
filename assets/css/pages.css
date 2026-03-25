@@ -30,6 +30,35 @@
   gap: 18px;
 }
 
+.visual-layout {
+  align-items: start;
+}
+
+.visual-layout .spotlight-card.section-stack {
+  gap: 12px;
+}
+
+.visual-layout .spotlight-card .check-list {
+  gap: 8px;
+}
+
+.visual-layout .spotlight-card .button-row {
+  margin-top: 14px;
+}
+
+#concept .media-photo,
+#cafe .media-photo {
+  aspect-ratio: 5 / 4;
+}
+
+#hamsters .section-heading {
+  max-width: 100%;
+}
+
+#starter .section-heading {
+  max-width: 100%;
+}
+
 .detail-card__media {
   margin-bottom: 0;
 }
@@ -106,6 +135,15 @@
   font-weight: 700;
 }
 
+.page-shell .eyebrow {
+  margin: 0;
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .timeline-list {
   display: grid;
   gap: 12px;
@@ -159,12 +197,28 @@
 }
 
 .hamster-carousel__slide {
+  flex: 0 0 100%;
   min-width: 100%;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
   padding: 20px;
+}
+
+.hamster-carousel__slide .media-photo,
+.hamster-carousel__slide .product-card__meta,
+.hamster-carousel__slide h3,
+.hamster-carousel__slide .text-soft,
+.hamster-carousel__slide .price,
+.hamster-carousel__slide .button-row,
+.hamster-carousel__slide p:not(.eyebrow) {
+  width: 100%;
+}
+
+.hamster-carousel__slide .media-photo {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hamster-carousel__controls {
@@ -222,6 +276,7 @@
   }
 
   .hamster-carousel__slide {
+    flex-basis: calc(100% / 3);
     min-width: calc(100% / 3);
   }
 }

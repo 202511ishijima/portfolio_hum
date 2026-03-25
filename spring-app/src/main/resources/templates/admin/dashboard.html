@@ -113,7 +113,10 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr th:each="inquiry : ${recentInquiries}">
+							<tr th:each="inquiry : ${recentInquiries}"
+								class="admin-table-row-link"
+								th:data-href="@{/admin/inquiries/{id}(id=${inquiry.id})}"
+								tabindex="0">
 								<td th:text="${#temporals.format(inquiry.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/18 10:00</td>
 								<td th:text="${inquiry.name}">石島 智司</td>
 								<td th:text="${inquiry.subject}">お問い合わせ件名</td>
@@ -157,5 +160,19 @@
 			</section>
 		</div>
 	</div>
+	<script>
+		document.querySelectorAll('.admin-table-row-link[data-href]').forEach((row) => {
+			row.addEventListener('click', () => {
+				window.location.href = row.dataset.href;
+			});
+
+			row.addEventListener('keydown', (event) => {
+				if (event.key === 'Enter' || event.key === ' ') {
+					event.preventDefault();
+					window.location.href = row.dataset.href;
+				}
+			});
+		});
+	</script>
 </body>
 </html>

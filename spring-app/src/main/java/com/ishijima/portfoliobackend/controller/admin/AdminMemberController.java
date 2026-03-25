@@ -1,8 +1,8 @@
 package com.ishijima.portfoliobackend.controller.admin;
 
 import com.ishijima.portfoliobackend.entity.Member;
-import com.ishijima.portfoliobackend.form.MemberCreateForm;
 import com.ishijima.portfoliobackend.form.MemberPointAdjustForm;
+import com.ishijima.portfoliobackend.form.MemberUpdateForm;
 import com.ishijima.portfoliobackend.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +27,6 @@ public class AdminMemberController {
 
 	@GetMapping
 	public String memberList(Model model) {
-		if (!model.containsAttribute("memberForm")) {
-			model.addAttribute("memberForm", new MemberCreateForm("", "", ""));
-		}
 		if (!model.containsAttribute("pointForm")) {
 			model.addAttribute("pointForm", new MemberPointAdjustForm(0));
 		}
@@ -46,27 +43,20 @@ public class AdminMemberController {
 		return "admin/members";
 	}
 
-	@PostMapping
-	public String createMember(
-		@Valid @ModelAttribute("memberForm") MemberCreateForm form,
-		BindingResult bindingResult,
-		RedirectAttributes redirectAttributes
-	) {
-		if (bindingResult.hasErrors()) {
-			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.memberForm", bindingResult);
-			redirectAttributes.addFlashAttribute("memberForm", form);
-			redirectAttributes.addFlashAttribute("memberError", "入力内容を確認してください。");
-			return "redirect:/admin/members";
+	@GetMapping("/{id}/edit")
+	public String editMember(@PathVariable Long id, Model model) {
+		Member member = memberService.findById(id);
+		if (!model.containsAttribute("memberForm")) {
+			model.addAttribute("memberForm", new MemberUpdateForm(
+				member.getName(),
+				member.getEmail(),
+				""
+			));
 		}
 
-		try {
-			memberService.create(form);
-			redirectAttributes.addFlashAttribute("memberMessage", "会員アカウントを作成しました。");
-		} catch (IllegalArgumentException ex) {
-			redirectAttributes.addFlashAttribute("memberForm", form);
-			redirectAttributes.addFlashAttribute("memberError", ex.getMessage());
-		}
-		return "redirect:/admin/members";
+		model.addAttribute("member", member);
+		model.addAttribute("adminSection", "members");
+		return "admin/member-edit";
 	}
 
 	@PostMapping("/{id}/status")
@@ -95,5 +85,40 @@ public class AdminMemberController {
 			redirectAttributes.addFlashAttribute("memberMessage", "ポイントを調整しました。");
 		}
 		return "redirect:/admin/members";
+	}
+
+	@PostMapping("/{id}/delete")
+	public String deleteMember(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+		memberService.deleteById(id);
+		redirectAttributes.addFlashAttribute("memberMessage", "会員アカウントを削除しました。");
+		return "redirect:/admin/members";
+	}
+
+	@PostMapping("/{id}/edit")
+	public String updateMember(
+		@PathVariable Long id,
+		@Valid @ModelAttribute("memberForm") MemberUpdateForm form,
+		BindingResult bindingResult,
+		Model model,
+		RedirectAttributes redirectAttributes
+	) {
+		Member member = memberService.findById(id);
+
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("member", member);
+			model.addAttribute("adminSection", "members");
+			return "admin/member-edit";
+		}
+
+		try {
+			memberService.update(id, form);
+			redirectAttributes.addFlashAttribute("memberMessage", "会員情報を更新しました。");
+			return "redirect:/admin/members";
+		} catch (IllegalArgumentException ex) {
+			model.addAttribute("member", member);
+			model.addAttribute("adminSection", "members");
+			model.addAttribute("memberError", ex.getMessage());
+			return "admin/member-edit";
+		}
 	}
 }

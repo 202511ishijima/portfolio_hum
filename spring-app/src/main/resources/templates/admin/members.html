@@ -15,7 +15,7 @@
 			<div>
 				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>会員管理</h1>
-				<p class="admin-lead">会員アカウントの作成、停止・再開、ポイント調整を行えます。</p>
+				<p class="admin-lead">会員アカウントの確認と編集画面への移動ができます。</p>
 			</div>
 			<form th:action="@{/admin/logout}" method="post">
 				<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
@@ -52,56 +52,25 @@
 			</article>
 		</section>
 
-		<div class="admin-two-column">
-			<section class="admin-card">
-				<div class="admin-card-header">
-					<div>
-						<h2>新規アカウント作成</h2>
-						<p>管理画面から会員アカウントを追加できます。</p>
-					</div>
+		<section class="admin-card admin-card--info">
+			<div class="admin-card-header">
+				<div>
+					<h2>会員情報の管理方法</h2>
+					<p>各会員の操作は編集画面でまとめて行えます。</p>
 				</div>
+			</div>
 
-				<form class="admin-form" th:action="@{/admin/members}" th:object="${memberForm}" method="post">
-					<label class="admin-field">
-						<span>お名前</span>
-						<input th:field="*{name}" type="text" placeholder="例: 石島 智司">
-						<small class="admin-field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラー</small>
-					</label>
-					<label class="admin-field">
-						<span>メールアドレス</span>
-						<input th:field="*{email}" type="email" placeholder="sample@example.com">
-						<small class="admin-field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">エラー</small>
-					</label>
-					<label class="admin-field">
-						<span>パスワード</span>
-						<input th:field="*{password}" type="text" placeholder="8文字以上で入力">
-						<small class="admin-field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">エラー</small>
-					</label>
-					<button class="admin-button" type="submit">アカウントを作成する</button>
-				</form>
-			</section>
-
-			<section class="admin-card">
-				<div class="admin-card-header">
-					<div>
-						<h2>ポイント調整の考え方</h2>
-						<p>必要なときだけ数値で調整できます。</p>
-					</div>
-				</div>
-
-				<div class="admin-message-box">
-					<p>正の数を入れるとポイント付与、負の数を入れるとポイント没収になります。</p>
-					<p>ポイントは 0 未満にならないように自動調整されます。</p>
-					<p>停止中の会員でも、確認対応のためポイント調整は可能です。</p>
-				</div>
-			</section>
-		</div>
+			<div class="admin-message-box">
+				<p>一覧では会員情報の確認と編集画面への移動のみ行います。</p>
+				<p>停止・ポイント調整・削除は、各会員の編集画面から操作できます。</p>
+			</div>
+		</section>
 
 		<section class="admin-card">
 			<div class="admin-card-header">
 				<div>
 					<h2>会員一覧</h2>
-					<p>状態の確認、停止・再開、ポイント調整ができます。</p>
+					<p>基本情報の確認と編集画面への移動ができます。</p>
 				</div>
 			</div>
 
@@ -115,8 +84,7 @@
 							<th>現在ポイント</th>
 							<th>状態</th>
 							<th>作成日時</th>
-							<th>停止 / 再開</th>
-							<th>ポイント調整</th>
+							<th>編集</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -134,17 +102,7 @@
 							</td>
 							<td th:text="${#temporals.format(member.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/18 10:00</td>
 							<td>
-								<form th:action="@{/admin/members/{id}/status(id=${member.id})}" method="post">
-									<button class="admin-button admin-button--ghost" type="submit"
-									        th:text="${member.status == 'ACTIVE' ? '停止する' : '再開する'}">停止する</button>
-								</form>
-							</td>
-							<td>
-								<form class="admin-inline-form" th:action="@{/admin/members/{id}/points(id=${member.id})}" method="post">
-									<input type="number" name="delta" value="0" step="1" required>
-									<button class="admin-button" type="submit">反映</button>
-								</form>
-								<p class="admin-help-text">例: 100 で付与 / -50 で没収</p>
+								<a class="admin-link-button admin-button--ghost" th:href="@{/admin/members/{id}/edit(id=${member.id})}">編集する</a>
 							</td>
 						</tr>
 					</tbody>

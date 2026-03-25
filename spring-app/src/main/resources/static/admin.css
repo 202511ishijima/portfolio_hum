@@ -221,6 +221,28 @@ body.admin-body {
   margin-bottom: 20px;
 }
 
+.admin-card--info {
+  max-width: 720px;
+}
+
+.admin-card--info .admin-message-box p:first-child {
+  margin-top: 0;
+}
+
+.admin-card--info .admin-message-box {
+  display: grid;
+  gap: 8px;
+  line-height: 1.65;
+}
+
+.admin-card--info .admin-message-box p {
+  margin: 0;
+}
+
+.admin-card--info .admin-message-box p:last-child {
+  margin-bottom: 0;
+}
+
 .admin-quick-links {
   display: grid;
   gap: 14px;
@@ -426,6 +448,14 @@ body.admin-body {
   background: var(--admin-surface-soft);
 }
 
+.admin-button--danger {
+  background: var(--admin-danger);
+}
+
+.admin-button--danger:hover {
+  background: #9f5656;
+}
+
 .admin-button--wide {
   width: 100%;
 }
@@ -535,6 +565,16 @@ body.admin-body {
 .admin-card-section h3 {
   margin: 0 0 10px;
   font-size: 1rem;
+}
+
+.admin-history-list {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-history-item {
+  display: grid;
+  gap: 8px;
 }
 
 .admin-textarea {

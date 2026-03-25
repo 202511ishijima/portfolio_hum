@@ -57,9 +57,29 @@ window.ProductsPage = (function () {
     `;
   }
 
-  function cardTemplate(product) {
+  function cardTemplate(product, extraClass = "") {
     return `
-      <article class="product-card">
+      <article class="product-card${extraClass ? ` ${extraClass}` : ""}">
+        ${productMedia(product)}
+        <div class="product-card__meta">
+          <span class="chip">${categoryLabel(product.category)}</span>
+          ${product.badge ? `<span class="status-chip">${badgeLabel(product.badge)}</span>` : ""}
+        </div>
+        <h3>${product.name}</h3>
+        <p class="text-soft">${product.shortDescription}</p>
+        <p class="price">${SiteRouter.formatPrice(product.price)}</p>
+        <div class="button-row">
+          <a class="button button--ghost" href="${SiteRouter.getBasePath()}products/detail.html?id=${product.id}">詳細を見る</a>
+          <button class="button" type="button" data-add-product="${product.id}">カートに追加</button>
+          ${quantityBadge(product.id)}
+        </div>
+      </article>
+    `;
+  }
+
+  function featuredProductSlide(product) {
+    return `
+      <article class="hamster-carousel__slide">
         ${productMedia(product)}
         <div class="product-card__meta">
           <span class="chip">${categoryLabel(product.category)}</span>
@@ -147,10 +167,88 @@ window.ProductsPage = (function () {
     if (target) target.innerHTML = products.map(cardTemplate).join("");
   }
 
+  function setupHomeCarousel(target) {
+    const track = target.querySelector(".hamster-carousel__track");
+    const slides = Array.from(target.querySelectorAll(".hamster-carousel__slide"));
+    const prev = target.querySelector("[data-carousel-prev]");
+    const next = target.querySelector("[data-carousel-next]");
+    const dotsWrap = target.querySelector(".hamster-carousel__dots");
+    if (!track || !slides.length || !dotsWrap) return;
+
+    let currentPage = 0;
+
+    function getSlidesPerView() {
+      return window.innerWidth >= 900 ? 3 : 1;
+    }
+
+    function getPageCount() {
+      return Math.ceil(slides.length / getSlidesPerView());
+    }
+
+    function renderDots() {
+      const pageCount = getPageCount();
+      dotsWrap.innerHTML = Array.from({ length: pageCount }, (_, index) => {
+        return `<button type="button" class="hamster-carousel__dot" data-carousel-dot="${index}" aria-label="${index + 1}ページ目へ移動"></button>`;
+      }).join("");
+
+      Array.from(dotsWrap.querySelectorAll("[data-carousel-dot]")).forEach((dot) => {
+        dot.addEventListener("click", () => updateCarousel(Number(dot.dataset.carouselDot)));
+      });
+    }
+
+    function updateCarousel(page) {
+      const pageCount = getPageCount();
+      if (!pageCount) return;
+
+      currentPage = (page + pageCount) % pageCount;
+      track.style.transform = `translateX(-${currentPage * 100}%)`;
+
+      Array.from(dotsWrap.querySelectorAll("[data-carousel-dot]")).forEach((dot, index) => {
+        dot.classList.toggle("is-active", index === currentPage);
+      });
+    }
+
+    prev?.addEventListener("click", () => updateCarousel(currentPage - 1));
+    next?.addEventListener("click", () => updateCarousel(currentPage + 1));
+
+    window.addEventListener("resize", () => {
+      const pageCount = getPageCount();
+      if (currentPage >= pageCount) {
+        currentPage = Math.max(pageCount - 1, 0);
+      }
+      renderDots();
+      updateCarousel(currentPage);
+    });
+
+    renderDots();
+    updateCarousel(0);
+  }
+
+  function renderCarouselList(target, products) {
+    if (!target) return;
+
+    target.innerHTML = `
+      <div class="hamster-carousel">
+        <div class="hamster-carousel__viewport">
+          <div class="hamster-carousel__track">
+            ${products.map(featuredProductSlide).join("")}
+          </div>
+        </div>
+        <div class="hamster-carousel__controls">
+          <button class="button button--ghost" type="button" data-carousel-prev>前へ</button>
+          <div class="hamster-carousel__dots"></div>
+          <button class="button button--ghost" type="button" data-carousel-next>次へ</button>
+        </div>
+      </div>
+    `;
+
+    setupHomeCarousel(target);
+  }
+
   async function renderHomeSections() {
     const products = await getProducts();
-    renderList(document.getElementById("starter-products"), products.filter((item) => item.category === "starter"));
-    renderList(document.getElementById("popular-products"), products.filter((item) => item.popular).slice(0, 6));
+    renderCarouselList(document.getElementById("starter-products"), products.filter((item) => item.category === "starter"));
+    renderCarouselList(document.getElementById("popular-products"), products.filter((item) => item.popular).slice(0, 6));
     bindAddButtons(products);
     bindQuantityControls();
     refreshInlineCounts();

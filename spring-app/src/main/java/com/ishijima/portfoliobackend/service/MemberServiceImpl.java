@@ -2,6 +2,7 @@ package com.ishijima.portfoliobackend.service;
 
 import com.ishijima.portfoliobackend.entity.Member;
 import com.ishijima.portfoliobackend.form.MemberCreateForm;
+import com.ishijima.portfoliobackend.form.MemberUpdateForm;
 import com.ishijima.portfoliobackend.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -79,6 +80,35 @@ public class MemberServiceImpl implements MemberService {
 		int nextPoints = Math.max(0, currentPoints + delta);
 		memberMapper.updatePoints(member.getId(), nextPoints);
 		member.setPoints(nextPoints);
+		return member;
+	}
+
+	@Override
+	@Transactional
+	public void deleteById(Long id) {
+		findById(id);
+		memberMapper.deleteById(id);
+	}
+
+	@Override
+	@Transactional
+	public Member update(Long id, MemberUpdateForm form) {
+		Member member = findById(id);
+
+		memberMapper.findByEmail(form.email()).ifPresent(existingMember -> {
+			if (!existingMember.getId().equals(id)) {
+				throw new IllegalArgumentException("このメールアドレスはすでに登録されています。");
+			}
+		});
+
+		member.setName(form.name());
+		member.setEmail(form.email());
+		if (form.password() != null && !form.password().isBlank()) {
+			member.setPassword(form.password());
+		}
+		member.setUpdatedAt(LocalDateTime.now());
+
+		memberMapper.updateMember(member);
 		return member;
 	}
 }

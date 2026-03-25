@@ -1,8 +1,10 @@
 package com.ishijima.portfoliobackend.service;
 
 import com.ishijima.portfoliobackend.entity.Inquiry;
+import com.ishijima.portfoliobackend.entity.InquiryReply;
 import com.ishijima.portfoliobackend.form.InquiryForm;
 import com.ishijima.portfoliobackend.mapper.InquiryMapper;
+import com.ishijima.portfoliobackend.mapper.InquiryReplyMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,7 @@ import java.util.List;
 public class InquiryServiceImpl implements InquiryService {
 
 	private final InquiryMapper inquiryMapper;
+	private final InquiryReplyMapper inquiryReplyMapper;
 
 	@Override
 	@Transactional
@@ -53,8 +56,24 @@ public class InquiryServiceImpl implements InquiryService {
 
 	@Override
 	@Transactional
-	public void saveReply(Long id, String reply) {
-		findById(id);
-		inquiryMapper.updateReply(id, reply, LocalDateTime.now());
+	public void sendReply(Long id, String reply) {
+		Inquiry inquiry = findById(id);
+		LocalDateTime now = LocalDateTime.now();
+
+		InquiryReply inquiryReply = InquiryReply.builder()
+			.inquiryId(inquiry.getId())
+			.recipientEmail(inquiry.getEmail())
+			.reply(reply)
+			.sentAt(now)
+			.createdAt(now)
+			.build();
+
+		inquiryReplyMapper.insert(inquiryReply);
+		inquiryMapper.updateReply(id, reply, now);
+	}
+
+	@Override
+	public List<InquiryReply> findRepliesByInquiryId(Long inquiryId) {
+		return inquiryReplyMapper.findByInquiryId(inquiryId);
 	}
 }

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>会員情報の編集 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
+</head>
+<body class="admin-body">
+	<div class="admin-shell admin-shell--narrow">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1>会員情報の編集</h1>
+				<p class="admin-lead">基本情報の更新に加えて、停止・ポイント調整・削除もこの画面から行えます。</p>
+			</div>
+			<div class="admin-header-actions">
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/members}">会員一覧へ戻る</a>
+				<form th:action="@{/admin/logout}" method="post">
+					<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
+				</form>
+			</div>
+		</header>
+
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
+			   th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
+			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
+			   th:href="@{/admin/members}">会員管理</a>
+		</nav>
+
+		<p class="admin-alert admin-alert--error" th:if="${memberError}" th:text="${memberError}">入力内容を確認してください。</p>
+
+		<div class="admin-detail-grid">
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>編集フォーム</h2>
+						<p th:text="'対象会員ID: ' + ${member.id}">対象会員ID: 1</p>
+					</div>
+				</div>
+
+				<form class="admin-form" th:action="@{/admin/members/{id}/edit(id=${member.id})}" th:object="${memberForm}" method="post">
+					<label class="admin-field">
+						<span>お名前</span>
+						<input th:field="*{name}" type="text" placeholder="例: 石島 智司">
+						<small class="admin-field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラー</small>
+					</label>
+					<label class="admin-field">
+						<span>メールアドレス</span>
+						<input th:field="*{email}" type="email" placeholder="sample@example.com">
+						<small class="admin-field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">エラー</small>
+					</label>
+					<label class="admin-field">
+						<span>新しいパスワード</span>
+						<input th:field="*{password}" type="text" placeholder="変更しない場合は空欄">
+						<small class="admin-field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">エラー</small>
+					</label>
+					<div class="admin-header-actions">
+						<button class="admin-button" type="submit">更新する</button>
+						<a class="admin-link-button admin-button--ghost" th:href="@{/admin/members}">キャンセル</a>
+					</div>
+				</form>
+			</section>
+
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>現在の会員情報と管理操作</h2>
+						<p>現在の状態を確認しながら、そのまま管理操作ができます。</p>
+					</div>
+				</div>
+
+				<dl class="admin-detail-list">
+					<div>
+						<dt>ID</dt>
+						<dd th:text="${member.id}">1</dd>
+					</div>
+					<div>
+						<dt>お名前</dt>
+						<dd th:text="${member.name}">石島 智司</dd>
+					</div>
+					<div>
+						<dt>メールアドレス</dt>
+						<dd th:text="${member.email}">sample@example.com</dd>
+					</div>
+					<div>
+						<dt>状態</dt>
+						<dd th:text="${member.status == 'ACTIVE' ? '利用中' : '停止中'}">利用中</dd>
+					</div>
+					<div>
+						<dt>現在ポイント</dt>
+						<dd th:text="${member.points}">0</dd>
+					</div>
+				</dl>
+
+				<div class="admin-card-section">
+					<h3>停止 / 再開</h3>
+					<form th:action="@{/admin/members/{id}/status(id=${member.id})}" method="post">
+						<button class="admin-button admin-button--ghost"
+						        type="submit"
+						        th:text="${member.status == 'ACTIVE' ? 'この会員を停止する' : 'この会員を再開する'}">この会員を停止する</button>
+					</form>
+				</div>
+
+				<div class="admin-card-section">
+					<h3>ポイント調整</h3>
+					<form class="admin-inline-form" th:action="@{/admin/members/{id}/points(id=${member.id})}" method="post">
+						<input type="number" name="delta" value="0" step="1" required>
+						<button class="admin-button" type="submit">反映</button>
+					</form>
+					<p class="admin-help-text">例: 100 で付与 / -50 で没収</p>
+				</div>
+
+				<div class="admin-card-section">
+					<h3>アカウント削除</h3>
+					<form th:action="@{/admin/members/{id}/delete(id=${member.id})}" method="post">
+						<button class="admin-button admin-button--danger"
+						        type="submit"
+						        onclick="return confirm('この会員アカウントを削除しますか？');">この会員を削除する</button>
+					</form>
+				</div>
+			</section>
+		</div>
+	</div>
+</body>
+</html>

@@ -15,7 +15,7 @@
 			<div>
 				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>問い合わせ詳細</h1>
-				<p class="admin-lead">内容の確認と対応状況の更新ができます。</p>
+				<p class="admin-lead">内容の確認、対応状況の更新、返信送信と履歴確認ができます。</p>
 			</div>
 			<div class="admin-header-actions">
 				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/inquiries}">一覧へ戻る</a>
@@ -39,7 +39,7 @@
 
 		<p class="admin-alert admin-alert--success" th:if="${statusMessage}" th:text="${statusMessage}">対応状況を更新しました。</p>
 		<p class="admin-alert admin-alert--error" th:if="${statusError}" th:text="${statusError}">更新に失敗しました。</p>
-		<p class="admin-alert admin-alert--success" th:if="${replyMessage}" th:text="${replyMessage}">返信内容を保存しました。</p>
+		<p class="admin-alert admin-alert--success" th:if="${replyMessage}" th:text="${replyMessage}">返信を送信し、履歴に追加しました。</p>
 		<p class="admin-alert admin-alert--error" th:if="${replyError}" th:text="${replyError}">返信内容を確認してください。</p>
 
 		<div class="admin-detail-grid">
@@ -78,10 +78,14 @@
 					お問い合わせ本文
 				</section>
 
-				<section class="admin-card-section" th:if="${inquiry.adminReply}">
-					<h3>保存済みの返信内容</h3>
-					<p class="admin-help-text" th:if="${inquiry.repliedAt}" th:text="${'最終保存: ' + #temporals.format(inquiry.repliedAt, 'yyyy/MM/dd HH:mm')}">最終保存: 2026/03/18 10:00</p>
-					<div class="admin-message-box" th:text="${inquiry.adminReply}">返信内容</div>
+				<section class="admin-card-section" th:if="${!#lists.isEmpty(replyHistory)}">
+					<h3>返信履歴</h3>
+					<div class="admin-history-list">
+						<article class="admin-history-item" th:each="reply : ${replyHistory}">
+							<p class="admin-help-text" th:text="${#temporals.format(reply.sentAt, 'yyyy/MM/dd HH:mm') + ' に送信'}">2026/03/18 10:00 に送信</p>
+							<div class="admin-message-box" th:text="${reply.reply}">返信内容</div>
+						</article>
+					</div>
 				</section>
 			</section>
 
@@ -109,7 +113,7 @@
 					<div class="admin-card-header">
 						<div>
 							<h2>返信内容</h2>
-							<p>管理画面上で返信文面を作成・保存できます。</p>
+							<p>返信を送信すると、下の履歴に追加されます。</p>
 						</div>
 					</div>
 					<form class="admin-form" th:action="@{/admin/inquiries/{id}/reply(id=${inquiry.id})}" th:object="${replyForm}" method="post">
@@ -117,7 +121,7 @@
 							<span>返信文面</span>
 							<textarea class="admin-textarea" th:field="*{reply}" rows="10" placeholder="お問い合わせへの返信内容を入力してください。"></textarea>
 						</label>
-						<button class="admin-button" type="submit">返信内容を保存する</button>
+						<button class="admin-button" type="submit">返信を送信する</button>
 					</form>
 				</section>
 			</section>

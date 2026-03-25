@@ -1,6 +1,7 @@
 package com.ishijima.portfoliobackend.controller.admin;
 
 import com.ishijima.portfoliobackend.entity.Inquiry;
+import com.ishijima.portfoliobackend.entity.InquiryReply;
 import com.ishijima.portfoliobackend.form.InquiryStatusUpdateForm;
 import com.ishijima.portfoliobackend.form.InquiryReplyForm;
 import com.ishijima.portfoliobackend.service.InquiryService;
@@ -52,9 +53,11 @@ public class AdminInquiryController {
 	@GetMapping("/inquiries/{id}")
 	public String inquiryDetail(@PathVariable Long id, Model model) {
 		Inquiry inquiry = inquiryService.findById(id);
+		List<InquiryReply> replyHistory = inquiryService.findRepliesByInquiryId(id);
 		model.addAttribute("inquiry", inquiry);
+		model.addAttribute("replyHistory", replyHistory);
 		model.addAttribute("statusForm", new InquiryStatusUpdateForm(inquiry.getStatus()));
-		model.addAttribute("replyForm", new InquiryReplyForm(inquiry.getAdminReply() == null ? "" : inquiry.getAdminReply()));
+		model.addAttribute("replyForm", new InquiryReplyForm(""));
 		model.addAttribute("adminSection", "inquiries");
 		return "admin/inquiry-detail";
 	}
@@ -77,7 +80,7 @@ public class AdminInquiryController {
 	}
 
 	@PostMapping("/inquiries/{id}/reply")
-	public String saveReply(
+	public String sendReply(
 		@PathVariable Long id,
 		@Valid @ModelAttribute("replyForm") InquiryReplyForm form,
 		BindingResult bindingResult,
@@ -88,8 +91,8 @@ public class AdminInquiryController {
 			return "redirect:/admin/inquiries/" + id;
 		}
 
-		inquiryService.saveReply(id, form.reply());
-		redirectAttributes.addFlashAttribute("replyMessage", "返信内容を保存しました。");
+		inquiryService.sendReply(id, form.reply());
+		redirectAttributes.addFlashAttribute("replyMessage", "返信を送信し、履歴に追加しました。");
 		return "redirect:/admin/inquiries/" + id;
 	}
 
