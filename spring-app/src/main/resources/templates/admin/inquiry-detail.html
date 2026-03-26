@@ -18,6 +18,7 @@
 				<p class="admin-lead">内容の確認、対応状況の更新、返信送信と履歴確認ができます。</p>
 			</div>
 			<div class="admin-header-actions">
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/dashboard}">ダッシュボード</a>
 				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/inquiries}">一覧へ戻る</a>
 				<form th:action="@{/admin/logout}" method="post">
 					<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
@@ -35,6 +36,9 @@
 			<a class="admin-nav-link"
 			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
 			   th:href="@{/admin/members}">会員管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
+			   th:href="@{/admin/hamsters}">ハムスター管理</a>
 		</nav>
 
 		<p class="admin-alert admin-alert--success" th:if="${statusMessage}" th:text="${statusMessage}">対応状況を更新しました。</p>

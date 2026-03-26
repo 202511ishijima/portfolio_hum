@@ -1,4 +1,6 @@
-async function getHamsters() {
+const HAMSTER_SUMMARY_API = "http://localhost:8080/api/hamsters/summary";
+
+async function getHamsterMetadata() {
   const basePath =
     window.SiteRouter && typeof window.SiteRouter.getBasePath === "function"
       ? window.SiteRouter.getBasePath()
@@ -6,10 +8,60 @@ async function getHamsters() {
   const response = await fetch(`${basePath}assets/data/hamsters.json`);
   if (!response.ok) throw new Error("Failed to fetch hamsters");
   const hamsters = await response.json();
-  return hamsters.map((hamster) => ({
-    ...hamster,
-    image: hamster.image.replace("../", basePath),
-  }));
+  return {
+    basePath,
+    items: hamsters.map((hamster) => ({
+      ...hamster,
+      image: hamster.image.replace("../", basePath),
+    })),
+  };
+}
+
+async function getHamsterSummaries() {
+  const response = await fetch(HAMSTER_SUMMARY_API);
+  if (!response.ok) {
+    throw new Error("Failed to fetch hamster summary");
+  }
+  return response.json();
+}
+
+function mergeHamsterData(metadataItems, summaries) {
+  const metadataMap = new Map(
+    metadataItems.map((hamster) => [hamster.species, hamster]),
+  );
+
+  return summaries.map((summary) => {
+    const meta = metadataMap.get(summary.species) || {};
+    return {
+      species: summary.species,
+      count: summary.count,
+      maleCount: summary.maleCount,
+      femaleCount: summary.femaleCount,
+      ageRange: summary.ageRange,
+      personalityTrend:
+        meta.personalityTrend ||
+        "それぞれの個性を見比べながら、やさしくご案内しています。",
+      comment:
+        meta.comment ||
+        "気になる子がいましたら、店頭またはお問い合わせにてご案内いたします。",
+      image: meta.image || "",
+    };
+  });
+}
+
+async function getHamsters() {
+  const metadata = await getHamsterMetadata();
+
+  try {
+    const summaries = await getHamsterSummaries();
+    if (Array.isArray(summaries) && summaries.length > 0) {
+      return mergeHamsterData(metadata.items, summaries);
+    }
+  } catch (error) {
+    console.warn("Hamster summary API unavailable, fallback to static data.", error);
+  }
+
+  return metadata.items;
 }
 
 function imageHtml(src, alt) {
@@ -20,10 +72,10 @@ function imageHtml(src, alt) {
 function statusList(hamster) {
   return `
     <ul class="hamster-status-list">
-      <li><strong>\u73fe\u5728\uff1a</strong>${hamster.count}\u5339\u5728\u7c4d\u4e2d</li>
-      <li><strong>\u6027\u5225\uff1a</strong>\u30aa\u30b9${hamster.maleCount}\u5339\u30fb\u30e1\u30b9${hamster.femaleCount}\u5339</li>
-      <li><strong>\u6708\u9f62\uff1a</strong>${hamster.ageRange}</li>
-      <li><strong>\u6027\u683c\uff1a</strong>${hamster.personalityTrend}</li>
+      <li><strong>現在：</strong>${hamster.count}匹在籍中</li>
+      <li><strong>性別：</strong>オス${hamster.maleCount}匹・メス${hamster.femaleCount}匹</li>
+      <li><strong>月齢：</strong>${hamster.ageRange}</li>
+      <li><strong>性格：</strong>${hamster.personalityTrend}</li>
     </ul>
   `;
 }
@@ -89,7 +141,7 @@ function setupCarousel(container) {
   dotsWrap.innerHTML = slides
     .map(
       (_, dotIndex) =>
-        `<button type="button" class="hamster-carousel__dot${dotIndex === 0 ? " is-active" : ""}" data-carousel-dot="${dotIndex}" aria-label="${dotIndex + 1}\u30da\u30fc\u30b8\u76ee\u3078\u79fb\u52d5"></button>`,
+        `<button type="button" class="hamster-carousel__dot${dotIndex === 0 ? " is-active" : ""}" data-carousel-dot="${dotIndex}" aria-label="${dotIndex + 1}ページ目へ移動"></button>`,
     )
     .join("");
 
@@ -130,15 +182,15 @@ async function renderFeatured() {
           </div>
         </div>
         <div class="hamster-carousel__controls">
-          <button class="button button--ghost" type="button" data-carousel-prev>\u524d\u3078</button>
+          <button class="button button--ghost" type="button" data-carousel-prev>前へ</button>
           <div class="hamster-carousel__dots" data-carousel-dots></div>
-          <button class="button button--ghost" type="button" data-carousel-next>\u6b21\u3078</button>
+          <button class="button button--ghost" type="button" data-carousel-next>次へ</button>
         </div>
       </div>
     `;
     setupCarousel(section.querySelector(".hamster-carousel"));
   } catch (error) {
-    section.innerHTML = `<p class="text-soft">\u30cf\u30e0\u30b9\u30bf\u30fc\u60c5\u5831\u306e\u8aad\u307f\u8fbc\u307f\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002</p>`;
+    section.innerHTML = `<p class="text-soft">ハムスター情報の読み込みに失敗しました。</p>`;
   }
 }
 
@@ -150,7 +202,7 @@ async function renderIndex() {
     const hamsters = await getHamsters();
     list.innerHTML = hamsters.map(hamsterCard).join("");
   } catch (error) {
-    list.innerHTML = `<p class="text-soft">\u30cf\u30e0\u30b9\u30bf\u30fc\u60c5\u5831\u3092\u8868\u793a\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002</p>`;
+    list.innerHTML = `<p class="text-soft">ハムスター情報を表示できませんでした。</p>`;
   }
 }
 

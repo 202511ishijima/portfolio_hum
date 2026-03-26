@@ -337,6 +337,10 @@ body.admin-body {
   min-width: 1020px;
 }
 
+.admin-table--hamsters {
+  min-width: 980px;
+}
+
 .admin-table th,
 .admin-table td {
   padding: 14px 12px;
@@ -480,6 +484,18 @@ body.admin-body {
   background: #fff;
   color: var(--admin-text);
   font: inherit;
+}
+
+.admin-filter-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-filter-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .admin-field {
@@ -649,6 +665,11 @@ body.admin-body {
   .admin-detail-grid,
   .admin-two-column {
     grid-template-columns: 1.5fr 1fr;
+  }
+
+  .admin-filter-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    align-items: end;
   }
 }
 

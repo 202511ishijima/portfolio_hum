@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.HamsterMapper">
+
+	<resultMap id="HamsterResultMap" type="com.ishijima.portfoliobackend.entity.Hamster">
+		<id property="id" column="id"/>
+		<result property="species" column="species"/>
+		<result property="sex" column="sex" typeHandler="com.ishijima.portfoliobackend.typehandler.HamsterSexTypeHandler"/>
+		<result property="birthDate" column="birth_date"/>
+		<result property="healthCondition" column="health_condition"/>
+		<result property="arrivalDate" column="arrival_date"/>
+		<result property="status" column="status" typeHandler="com.ishijima.portfoliobackend.typehandler.HamsterStatusTypeHandler"/>
+		<result property="notes" column="notes"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<select id="findAll" resultMap="HamsterResultMap">
+		SELECT
+			id,
+			species,
+			sex,
+			birth_date,
+			health_condition,
+			arrival_date,
+			status,
+			notes,
+			created_at,
+			updated_at
+		FROM hamsters
+		<where>
+			<if test="species != null and species != ''">
+				AND species = #{species}
+			</if>
+			<if test="sex != null">
+				AND sex = #{sex, typeHandler=com.ishijima.portfoliobackend.typehandler.HamsterSexTypeHandler}
+			</if>
+			<if test="status != null">
+				AND status = #{status, typeHandler=com.ishijima.portfoliobackend.typehandler.HamsterStatusTypeHandler}
+			</if>
+		</where>
+		ORDER BY arrival_date DESC, id DESC
+	</select>
+
+	<select id="findById" resultMap="HamsterResultMap">
+		SELECT
+			id,
+			species,
+			sex,
+			birth_date,
+			health_condition,
+			arrival_date,
+			status,
+			notes,
+			created_at,
+			updated_at
+		FROM hamsters
+		WHERE id = #{id}
+	</select>
+
+	<select id="findSpeciesOptions" resultType="string">
+		SELECT DISTINCT species
+		FROM hamsters
+		WHERE species IS NOT NULL
+		  AND species != ''
+		ORDER BY species ASC
+	</select>
+
+	<insert id="insert" parameterType="com.ishijima.portfoliobackend.entity.Hamster" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO hamsters (
+			species,
+			sex,
+			birth_date,
+			health_condition,
+			arrival_date,
+			status,
+			notes,
+			created_at,
+			updated_at
+		) VALUES (
+			#{species},
+			#{sex, typeHandler=com.ishijima.portfoliobackend.typehandler.HamsterSexTypeHandler},
+			#{birthDate},
+			#{healthCondition},
+			#{arrivalDate},
+			#{status, typeHandler=com.ishijima.portfoliobackend.typehandler.HamsterStatusTypeHandler},
+			#{notes},
+			#{createdAt},
+			#{updatedAt}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.ishijima.portfoliobackend.entity.Hamster">
+		UPDATE hamsters
+		SET
+			species = #{species},
+			sex = #{sex, typeHandler=com.ishijima.portfoliobackend.typehandler.HamsterSexTypeHandler},
+			birth_date = #{birthDate},
+			health_condition = #{healthCondition},
+			arrival_date = #{arrivalDate},
+			status = #{status, typeHandler=com.ishijima.portfoliobackend.typehandler.HamsterStatusTypeHandler},
+			notes = #{notes},
+			updated_at = #{updatedAt}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="deleteById">
+		DELETE FROM hamsters
+		WHERE id = #{id}
+	</delete>
+</mapper>

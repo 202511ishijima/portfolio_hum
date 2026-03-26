@@ -19,6 +19,7 @@ spring:
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml
   type-aliases-package: com.ishijima.portfoliobackend.entity
+  type-handlers-package: com.ishijima.portfoliobackend.typehandler
   configuration:
     map-underscore-to-camel-case: true
 

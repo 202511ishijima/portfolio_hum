@@ -2,6 +2,7 @@ package com.ishijima.portfoliobackend;
 
 import com.ishijima.portfoliobackend.mapper.InquiryMapper;
 import com.ishijima.portfoliobackend.mapper.InquiryReplyMapper;
+import com.ishijima.portfoliobackend.mapper.HamsterMapper;
 import com.ishijima.portfoliobackend.mapper.MemberMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,9 @@ class PortfolioBackendApplicationTests {
 
 	@MockBean
 	private InquiryReplyMapper inquiryReplyMapper;
+
+	@MockBean
+	private HamsterMapper hamsterMapper;
 
 	@Test
 	void contextLoads() {

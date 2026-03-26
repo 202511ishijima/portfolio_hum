@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle} + ' | はむのくらし'">新規ハムスター登録 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
+</head>
+<body class="admin-body">
+	<div class="admin-shell admin-shell--narrow">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1 th:text="${pageTitle}">新規ハムスター登録</h1>
+				<p class="admin-lead">管理画面でハムスター情報を登録・更新します。</p>
+			</div>
+			<div class="admin-header-actions">
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/hamsters}">一覧へ戻る</a>
+				<a class="admin-link-button admin-button--ghost"
+				   th:if="${!createMode}"
+				   th:href="@{/admin/hamsters/{id}(id=${hamster.id})}">詳細を見る</a>
+			</div>
+		</header>
+
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
+			   th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
+			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
+			   th:href="@{/admin/members}">会員管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
+			   th:href="@{/admin/hamsters}">ハムスター管理</a>
+		</nav>
+
+		<section class="admin-card">
+			<form class="admin-form" th:action="${submitPath}" th:object="${hamsterForm}" method="post">
+				<label class="admin-field">
+					<span>種類</span>
+					<select th:field="*{species}">
+						<option value="">選択してください</option>
+						<option th:each="speciesOption : ${speciesMasterOptions}"
+						        th:value="${speciesOption}"
+						        th:text="${speciesOption}">ジャンガリアンハムスター</option>
+					</select>
+					<small class="admin-field-error" th:if="${#fields.hasErrors('species')}" th:errors="*{species}">種類エラー</small>
+				</label>
+
+				<label class="admin-field">
+					<span>性別</span>
+					<select th:field="*{sex}">
+						<option value="">選択してください</option>
+						<option th:each="sexOption : ${hamsterSexes}"
+						        th:value="${sexOption.name()}"
+						        th:text="${sexOption.label}">オス</option>
+					</select>
+					<small class="admin-field-error" th:if="${#fields.hasErrors('sex')}" th:errors="*{sex}">性別エラー</small>
+				</label>
+
+				<label class="admin-field">
+					<span>生年月日</span>
+					<input th:field="*{birthDate}" type="date">
+					<small class="admin-field-error" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}">生年月日エラー</small>
+				</label>
+
+				<label class="admin-field">
+					<span>入荷日</span>
+					<input th:field="*{arrivalDate}" type="date">
+					<small class="admin-field-error" th:if="${#fields.hasErrors('arrivalDate')}" th:errors="*{arrivalDate}">入荷日エラー</small>
+				</label>
+
+				<label class="admin-field" th:if="${createMode}">
+					<span>登録匹数</span>
+					<input th:field="*{quantity}" type="number" min="1" max="50" step="1">
+					<small class="admin-help-text">同じ条件で入荷したハムスターをまとめて登録できます。</small>
+					<small class="admin-field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">登録匹数エラー</small>
+				</label>
+
+				<input th:if="${!createMode}" th:field="*{quantity}" type="hidden">
+
+				<label class="admin-field">
+					<span>在籍状況</span>
+					<select th:field="*{status}">
+						<option value="">選択してください</option>
+						<option th:each="statusOption : ${hamsterStatuses}"
+						        th:value="${statusOption.name()}"
+						        th:text="${statusOption.label}">在籍中</option>
+					</select>
+					<small class="admin-field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">在籍状況エラー</small>
+				</label>
+
+				<label class="admin-field">
+					<span>備考</span>
+					<textarea class="admin-textarea"
+					          th:field="*{notes}"
+					          placeholder="問い合わせ対応時に共有したい内容があれば入力してください。"></textarea>
+					<small class="admin-field-error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}">備考エラー</small>
+				</label>
+
+				<div class="admin-header-actions">
+					<button class="admin-button" type="submit" th:text="${createMode ? '登録する' : '更新する'}">登録する</button>
+					<a class="admin-link-button admin-button--ghost" th:href="@{/admin/hamsters}">キャンセル</a>
+				</div>
+			</form>
+		</section>
+	</div>
+</body>
+</html>

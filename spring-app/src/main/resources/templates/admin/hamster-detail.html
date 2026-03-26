@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>詳細 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
+</head>
+<body class="admin-body">
+	<div class="admin-shell admin-shell--narrow">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1>ハムスター詳細</h1>
+				<p class="admin-lead">お問い合わせ対応のために参照する個体情報です。編集や削除もここから行えます。</p>
+			</div>
+			<div class="admin-header-actions">
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/dashboard}">ダッシュボード</a>
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/hamsters}">一覧へ戻る</a>
+				<a class="admin-link-button" th:href="@{/admin/hamsters/{id}/edit(id=${hamster.id})}">編集する</a>
+			</div>
+		</header>
+
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
+			   th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
+			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
+			   th:href="@{/admin/members}">会員管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
+			   th:href="@{/admin/hamsters}">ハムスター管理</a>
+		</nav>
+
+		<p class="admin-alert admin-alert--success" th:if="${hamsterMessage}" th:text="${hamsterMessage}">ハムスター情報を更新しました。</p>
+
+		<div class="admin-detail-grid">
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>ハムスター情報</h2>
+						<p th:text="'ハムスターID: ' + ${hamster.id}">ハムスターID: 1</p>
+					</div>
+				</div>
+
+				<dl class="admin-detail-list">
+					<div>
+						<dt>種類</dt>
+						<dd th:text="${hamster.species}">ジャンガリアンハムスター</dd>
+					</div>
+					<div>
+						<dt>性別</dt>
+						<dd th:text="${hamster.sex.label}">オス</dd>
+					</div>
+					<div>
+						<dt>生年月日</dt>
+						<dd th:text="${hamster.birthDate != null ? #temporals.format(hamster.birthDate, 'yyyy/MM/dd') : '-'}">2026/01/25</dd>
+					</div>
+					<div>
+						<dt>入荷日</dt>
+						<dd th:text="${#temporals.format(hamster.arrivalDate, 'yyyy/MM/dd')}">2026/03/25</dd>
+					</div>
+					<div>
+						<dt>在籍状況</dt>
+						<dd th:text="${hamster.status.label}">在籍中</dd>
+					</div>
+					<div>
+						<dt>備考</dt>
+						<dd th:text="${hamster.notes != null && !hamster.notes.isBlank() ? hamster.notes : '特記事項はありません。'}">特記事項はありません。</dd>
+					</div>
+				</dl>
+			</section>
+
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>操作</h2>
+						<p>管理画面からハムスター情報を更新できます。</p>
+					</div>
+				</div>
+
+				<div class="admin-card-section">
+					<h3>ハムスター情報の編集</h3>
+					<p class="admin-help-text">種類、生年月日、在籍状況などを編集できます。</p>
+					<a class="admin-link-button" th:href="@{/admin/hamsters/{id}/edit(id=${hamster.id})}">編集画面へ</a>
+				</div>
+
+				<div class="admin-card-section">
+					<h3>ハムスター情報の削除</h3>
+					<p class="admin-help-text">誤登録の修正などで不要になった場合に削除してください。</p>
+					<form th:action="@{/admin/hamsters/{id}/delete(id=${hamster.id})}" method="post">
+						<button class="admin-button admin-button--danger"
+						        type="submit"
+						        onclick="return confirm('このハムスター情報を削除しますか？');">ハムスター情報を削除する</button>
+					</form>
+				</div>
+			</section>
+		</div>
+	</div>
+</body>
+</html>

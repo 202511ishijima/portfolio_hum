@@ -33,3 +33,22 @@ CREATE TABLE IF NOT EXISTS members (
 	created_at DATETIME NOT NULL,
 	updated_at DATETIME NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS hamsters (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	species VARCHAR(100) NOT NULL,
+	sex VARCHAR(20) NOT NULL,
+	birth_date DATE NOT NULL,
+	health_condition VARCHAR(255) NOT NULL,
+	arrival_date DATE NOT NULL,
+	status VARCHAR(20) NOT NULL,
+	notes TEXT,
+	created_at DATETIME NOT NULL,
+	updated_at DATETIME NOT NULL
+);
+
+ALTER TABLE hamsters ADD COLUMN IF NOT EXISTS birth_date DATE;
+ALTER TABLE hamsters ADD COLUMN IF NOT EXISTS health_condition VARCHAR(255) DEFAULT '店頭で個別管理';
+UPDATE hamsters SET birth_date = COALESCE(birth_date, arrival_date);
+UPDATE hamsters SET health_condition = COALESCE(health_condition, '店頭で個別管理');
+ALTER TABLE hamsters DROP COLUMN IF EXISTS age_description;
