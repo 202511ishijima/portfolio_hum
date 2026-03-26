@@ -15,7 +15,7 @@
 			<div>
 				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>ハムスター管理</h1>
-				<p class="admin-lead">店頭にいるハムスター情報を、お問い合わせ対応のために確認・更新する管理画面です。</p>
+				<p class="admin-lead">店頭にいるハムスター情報を、一覧確認と編集画面への移動で管理できます。</p>
 			</div>
 			<div class="admin-header-actions"></div>
 		</header>
@@ -108,7 +108,7 @@
 			<div class="admin-card-header">
 				<div>
 					<h2>ハムスター一覧</h2>
-					<p>行を押すと詳細画面へ移動します。</p>
+					<p>行を押すと編集画面へ移動します。</p>
 				</div>
 				<div class="admin-header-actions">
 					<a class="admin-link-button admin-button--ghost" th:href="@{/admin/hamsters/analytics}">月別推移を見る</a>
@@ -131,7 +131,7 @@
 					<tbody>
 						<tr th:each="hamster : ${hamsters}"
 						    class="admin-table-row-link"
-						    th:data-href="@{/admin/hamsters/{id}(id=${hamster.id})}"
+						    th:data-href="@{/admin/hamsters/{id}/edit(id=${hamster.id})}"
 						    tabindex="0">
 							<td th:text="${hamster.id}">1</td>
 							<td th:text="${hamster.species != null && !hamster.species.isBlank() ? hamster.species : '-'}">ゴールデンハムスター</td>
@@ -148,7 +148,7 @@
 				</table>
 			</div>
 
-			<p class="admin-empty" th:if="${#lists.isEmpty(hamsters)}">該当するハムスターがいません。</p>
+			<p class="admin-empty" th:if="${#lists.isEmpty(hamsters)}">該当するハムスターはいません。</p>
 		</section>
 	</div>
 

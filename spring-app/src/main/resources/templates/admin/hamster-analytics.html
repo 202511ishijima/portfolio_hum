@@ -15,7 +15,7 @@
 			<div>
 				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>ハムスター月別推移</h1>
-				<p class="admin-lead">直近12か月の入荷数を全体と種類別で確認できます。</p>
+				<p class="admin-lead">直近12か月の入荷数と在籍状況の推移を、全体または種類別で確認できます。</p>
 			</div>
 			<div class="admin-header-actions">
 				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/hamsters}">一覧へ戻る</a>
@@ -40,8 +40,8 @@
 		<section class="admin-card">
 			<div class="admin-card-header">
 				<div>
-					<h2>表示対象</h2>
-					<p>全体推移と、種類ごとの推移を切り替えて確認できます。</p>
+					<h2>表示条件</h2>
+					<p>全体表示と、種類を絞った表示を切り替えられます。</p>
 				</div>
 			</div>
 
@@ -86,12 +86,18 @@
 			<section class="admin-card">
 				<div class="admin-card-header">
 					<div>
-						<h2>月別入荷数</h2>
-						<p th:text="${selectedSpecies != null ? selectedSpecies + ' の入荷推移です。' : 'ハムスター全体の入荷推移です。'}">ハムスター全体の入荷推移です。</p>
+						<h2>月別推移グラフ</h2>
+						<p>見たい指標に切り替えて、月ごとの流れを確認できます。</p>
 					</div>
 				</div>
+				<div class="admin-toggle-row" aria-label="月別推移の表示切り替え">
+					<button class="admin-chip-button is-active" type="button" data-metric="total">入荷数</button>
+					<button class="admin-chip-button" type="button" data-metric="available">在籍中</button>
+					<button class="admin-chip-button" type="button" data-metric="negotiating">商談中</button>
+					<button class="admin-chip-button" type="button" data-metric="adopted">お迎え済み</button>
+				</div>
 				<div class="admin-chart-wrap">
-					<canvas id="hamsterMonthlyChart"></canvas>
+					<canvas id="hamsterMonthlyMetricChart"></canvas>
 				</div>
 			</section>
 
@@ -99,7 +105,7 @@
 				<div class="admin-card-header">
 					<div>
 						<h2>在籍状況の月別内訳</h2>
-						<p>その月に登録されたハムスターの現在の在籍状況です。</p>
+						<p>その月に登録されたハムスターの在籍状況を積み上げで表示します。</p>
 					</div>
 				</div>
 				<div class="admin-chart-wrap">
@@ -112,7 +118,7 @@
 			<div class="admin-card-header">
 				<div>
 					<h2>月別データ表</h2>
-					<p>グラフの件数を表でも確認できます。</p>
+					<p>グラフで見ている数値を表でも確認できます。</p>
 				</div>
 			</div>
 
@@ -144,20 +150,42 @@
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script th:inline="javascript">
 		const monthlyLabels = /*[[${chartLabels}]]*/ [];
-		const totalData = /*[[${chartTotals}]]*/ [];
-		const availableData = /*[[${chartAvailable}]]*/ [];
-		const negotiatingData = /*[[${chartNegotiating}]]*/ [];
-		const adoptedData = /*[[${chartAdopted}]]*/ [];
+		const metricDataMap = {
+			total: {
+				label: '入荷数',
+				data: /*[[${chartTotals}]]*/ [],
+				borderColor: '#b98b66',
+				backgroundColor: 'rgba(185, 139, 102, 0.18)'
+			},
+			available: {
+				label: '在籍中',
+				data: /*[[${chartAvailable}]]*/ [],
+				borderColor: '#93b07a',
+				backgroundColor: 'rgba(147, 176, 122, 0.18)'
+			},
+			negotiating: {
+				label: '商談中',
+				data: /*[[${chartNegotiating}]]*/ [],
+				borderColor: '#d0a0a6',
+				backgroundColor: 'rgba(208, 160, 166, 0.18)'
+			},
+			adopted: {
+				label: 'お迎え済み',
+				data: /*[[${chartAdopted}]]*/ [],
+				borderColor: '#d7c0a6',
+				backgroundColor: 'rgba(215, 192, 166, 0.18)'
+			}
+		};
 
-		new Chart(document.getElementById('hamsterMonthlyChart'), {
+		const metricChart = new Chart(document.getElementById('hamsterMonthlyMetricChart'), {
 			type: 'line',
 			data: {
 				labels: monthlyLabels,
 				datasets: [{
-					label: '入荷数',
-					data: totalData,
-					borderColor: '#b98b66',
-					backgroundColor: 'rgba(185, 139, 102, 0.18)',
+					label: metricDataMap.total.label,
+					data: metricDataMap.total.data,
+					borderColor: metricDataMap.total.borderColor,
+					backgroundColor: metricDataMap.total.backgroundColor,
 					fill: true,
 					tension: 0.25
 				}]
@@ -179,9 +207,9 @@
 			data: {
 				labels: monthlyLabels,
 				datasets: [
-					{ label: '在籍中', data: availableData, backgroundColor: '#93b07a' },
-					{ label: '商談中', data: negotiatingData, backgroundColor: '#d0a0a6' },
-					{ label: 'お迎え済み', data: adoptedData, backgroundColor: '#d7c0a6' }
+					{ label: '在籍中', data: metricDataMap.available.data, backgroundColor: '#93b07a' },
+					{ label: '商談中', data: metricDataMap.negotiating.data, backgroundColor: '#d0a0a6' },
+					{ label: 'お迎え済み', data: metricDataMap.adopted.data, backgroundColor: '#d7c0a6' }
 				]
 			},
 			options: {
@@ -196,6 +224,21 @@
 					}
 				}
 			}
+		});
+
+		document.querySelectorAll('[data-metric]').forEach((button) => {
+			button.addEventListener('click', () => {
+				const metric = metricDataMap[button.dataset.metric];
+				metricChart.data.datasets[0].label = metric.label;
+				metricChart.data.datasets[0].data = metric.data;
+				metricChart.data.datasets[0].borderColor = metric.borderColor;
+				metricChart.data.datasets[0].backgroundColor = metric.backgroundColor;
+				metricChart.update();
+
+				document.querySelectorAll('[data-metric]').forEach((item) => {
+					item.classList.toggle('is-active', item === button);
+				});
+			});
 		});
 	</script>
 </body>

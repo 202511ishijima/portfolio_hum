@@ -41,4 +41,17 @@
 		WHERE inquiry_id = #{inquiryId}
 		ORDER BY sent_at DESC, id DESC
 	</select>
+
+	<select id="findByRecipientEmail" resultMap="InquiryReplyResultMap">
+		SELECT
+			id,
+			inquiry_id,
+			recipient_email,
+			reply,
+			sent_at,
+			created_at
+		FROM inquiry_replies
+		WHERE recipient_email = #{recipientEmail}
+		ORDER BY sent_at DESC, id DESC
+	</select>
 </mapper>

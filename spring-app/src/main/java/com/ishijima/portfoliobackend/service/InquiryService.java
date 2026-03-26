@@ -19,4 +19,6 @@ public interface InquiryService {
 	void sendReply(Long id, String reply);
 
 	List<InquiryReply> findRepliesByInquiryId(Long inquiryId);
+
+	List<InquiryReply> findRepliesByRecipientEmail(String recipientEmail);
 }

@@ -332,6 +332,35 @@ body.admin-body {
   min-height: 320px;
 }
 
+.admin-toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.admin-chip-button {
+  border: 1px solid rgba(146, 96, 58, 0.2);
+  border-radius: 999px;
+  background: #fff;
+  color: #6f4a2f;
+  cursor: pointer;
+  font: inherit;
+  padding: 10px 16px;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.admin-chip-button:hover {
+  border-color: rgba(146, 96, 58, 0.45);
+  transform: translateY(-1px);
+}
+
+.admin-chip-button.is-active {
+  background: #b98b66;
+  border-color: #b98b66;
+  color: #fff;
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;

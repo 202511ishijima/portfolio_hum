@@ -76,4 +76,12 @@ public class InquiryServiceImpl implements InquiryService {
 	public List<InquiryReply> findRepliesByInquiryId(Long inquiryId) {
 		return inquiryReplyMapper.findByInquiryId(inquiryId);
 	}
+
+	@Override
+	public List<InquiryReply> findRepliesByRecipientEmail(String recipientEmail) {
+		if (recipientEmail == null || recipientEmail.isBlank()) {
+			return List.of();
+		}
+		return inquiryReplyMapper.findByRecipientEmail(recipientEmail.trim());
+	}
 }

@@ -12,4 +12,6 @@ public interface InquiryReplyMapper {
 	void insert(InquiryReply inquiryReply);
 
 	List<InquiryReply> findByInquiryId(@Param("inquiryId") Long inquiryId);
+
+	List<InquiryReply> findByRecipientEmail(@Param("recipientEmail") String recipientEmail);
 }

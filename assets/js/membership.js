@@ -43,6 +43,18 @@ window.MembershipPage = (function () {
     }
   }
 
+  async function fetchInquiryReplies(email) {
+    if (!email) return [];
+    try {
+      const response = await fetch(`${backendBaseUrl}/api/inquiries/replies?email=${encodeURIComponent(email)}`);
+      if (!response.ok) return [];
+      const replies = await response.json();
+      return Array.isArray(replies) ? replies : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
   async function renderNews() {
     const target = document.getElementById("home-news");
     const listPage = document.getElementById("news-list");
@@ -147,6 +159,61 @@ window.MembershipPage = (function () {
         </div>
         ${member.loggedIn ? '<div class="button-row"><button class="button button--ghost" type="button" id="logout-button">ログアウト</button></div>' : ""}
       </div>
+    `;
+  }
+
+  function formatReplyDate(value) {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleString("ja-JP", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  async function renderMemberInquiryReplies() {
+    const target = document.getElementById("member-inquiry-replies");
+    if (!target) return;
+
+    const member = getMember();
+    if (!member.loggedIn || !member.email) {
+      target.innerHTML = `
+        <article class="panel">
+          <h2>お問い合わせへの返信</h2>
+          <p>ログインすると、管理者からの返信を確認できます。</p>
+        </article>
+      `;
+      return;
+    }
+
+    const replies = await fetchInquiryReplies(member.email);
+    if (replies.length === 0) {
+      target.innerHTML = `
+        <article class="panel">
+          <h2>お問い合わせへの返信</h2>
+          <p>まだ返信は届いていません。返信があるとここに表示されます。</p>
+        </article>
+      `;
+      return;
+    }
+
+    target.innerHTML = `
+      <article class="panel">
+        <h2>お問い合わせへの返信</h2>
+        <div class="news-list">
+          ${replies.map((item) => `
+            <article class="news-card">
+              <p class="eyebrow">お問い合わせ #${item.inquiryId}</p>
+              <h3>${formatReplyDate(item.sentAt)}</h3>
+              <p>${item.reply}</p>
+            </article>
+          `).join("")}
+        </div>
+      </article>
     `;
   }
 
@@ -284,6 +351,7 @@ window.MembershipPage = (function () {
     renderRewards();
     renderCafeMenus();
     renderMemberSummary();
+    renderMemberInquiryReplies();
     renderMembershipActions();
     bindAuthForms();
     bindLogoutButton();

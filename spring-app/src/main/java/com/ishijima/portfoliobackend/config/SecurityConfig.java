@@ -29,7 +29,7 @@ public class SecurityConfig {
 				.requestMatchers("/admin/login").permitAll()
 				.requestMatchers("/h2-console/**").permitAll()
 				.requestMatchers("/api/hamsters/summary").permitAll()
-				.requestMatchers("/api/inquiries", "/api/members/register", "/api/members/points", "/api/members/status").permitAll()
+				.requestMatchers("/api/inquiries", "/api/inquiries/replies", "/api/members/register", "/api/members/points", "/api/members/status").permitAll()
 				.requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated()
 			)

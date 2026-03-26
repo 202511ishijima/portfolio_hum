@@ -55,25 +55,14 @@
 			</article>
 		</section>
 
-		<section class="admin-card admin-card--info">
-			<div class="admin-card-header">
-				<div>
-					<h2>会員情報の管理方法</h2>
-					<p>各会員の操作は編集画面でまとめて行えます。</p>
-				</div>
-			</div>
-
-			<div class="admin-message-box">
-				<p>一覧では会員情報の確認と編集画面への移動のみ行います。</p>
-				<p>停止・ポイント調整・削除は、各会員の編集画面から操作できます。</p>
-			</div>
-		</section>
-
 		<section class="admin-card">
 			<div class="admin-card-header">
 				<div>
 					<h2>会員一覧</h2>
-					<p>基本情報の確認と編集画面への移動ができます。</p>
+					<p>登録済み会員の確認と編集画面への移動ができます。</p>
+				</div>
+				<div class="admin-card-actions">
+					<a class="admin-link-button admin-button--ghost" th:href="@{/admin/members/analytics}">会員数の推移を見る</a>
 				</div>
 			</div>
 
@@ -86,14 +75,14 @@
 							<th>メールアドレス</th>
 							<th>現在ポイント</th>
 							<th>状態</th>
-							<th>作成日時</th>
-							<th>編集</th>
+							<th>登録日時</th>
+							<th>操作</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr th:each="member : ${members}">
 							<td th:text="${member.id}">1</td>
-							<td th:text="${member.name}">石島 智司</td>
+							<td th:text="${member.name}">山田 花子</td>
 							<td th:text="${member.email}">sample@example.com</td>
 							<td th:text="${member.points}">0</td>
 							<td>
@@ -103,7 +92,7 @@
 									利用中
 								</span>
 							</td>
-							<td th:text="${#temporals.format(member.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/18 10:00</td>
+							<td th:text="${member.createdAt != null ? #temporals.format(member.createdAt, 'yyyy/MM/dd HH:mm') : '-'}">2026/03/18 10:00</td>
 							<td>
 								<a class="admin-link-button admin-button--ghost" th:href="@{/admin/members/{id}/edit(id=${member.id})}">編集する</a>
 							</td>
