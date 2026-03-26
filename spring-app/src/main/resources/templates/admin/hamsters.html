@@ -84,7 +84,7 @@
 						<option th:each="sexOption : ${hamsterSexes}"
 						        th:value="${sexOption.name()}"
 						        th:selected="${sexOption == selectedSex}"
-						        th:text="${sexOption.label}">オス</option>
+						        th:text="${sexOption.name() == 'MALE' ? 'オス' : 'メス'}">オス</option>
 					</select>
 				</label>
 				<label class="admin-field">
@@ -94,7 +94,7 @@
 						<option th:each="statusOption : ${hamsterStatuses}"
 						        th:value="${statusOption.name()}"
 						        th:selected="${statusOption == selectedStatus}"
-						        th:text="${statusOption.label}">在籍中</option>
+						        th:text="${statusOption.name() == 'AVAILABLE' ? '在籍中' : (statusOption.name() == 'NEGOTIATING' ? '商談中' : 'お迎え済み')}">在籍中</option>
 					</select>
 				</label>
 				<div class="admin-filter-actions">
@@ -111,6 +111,7 @@
 					<p>行を押すと詳細画面へ移動します。</p>
 				</div>
 				<div class="admin-header-actions">
+					<a class="admin-link-button admin-button--ghost" th:href="@{/admin/hamsters/analytics}">月別推移を見る</a>
 					<a class="admin-link-button" th:href="@{/admin/hamsters/new}">新規ハムスターを登録</a>
 				</div>
 			</div>
@@ -134,13 +135,13 @@
 						    tabindex="0">
 							<td th:text="${hamster.id}">1</td>
 							<td th:text="${hamster.species != null && !hamster.species.isBlank() ? hamster.species : '-'}">ゴールデンハムスター</td>
-							<td th:text="${hamster.sex != null ? hamster.sex.label : '-'}">オス</td>
+							<td th:text="${hamster.sex != null ? (hamster.sex.name() == 'MALE' ? 'オス' : 'メス') : '-'}">オス</td>
 							<td th:text="${hamster.birthDate != null ? #temporals.format(hamster.birthDate, 'yyyy/MM/dd') : '-'}">2026/03/20</td>
 							<td th:text="${hamster.arrivalDate != null ? #temporals.format(hamster.arrivalDate, 'yyyy/MM/dd') : '-'}">2026/03/27</td>
 							<td>
 								<span class="admin-status"
-								      th:classappend="${hamster.status == T(com.ishijima.portfoliobackend.entity.HamsterStatus).AVAILABLE ? ' admin-status--done' : (hamster.status == T(com.ishijima.portfoliobackend.entity.HamsterStatus).NEGOTIATING ? ' admin-status--progress' : ' admin-status--new')}"
-								      th:text="${hamster.status != null ? hamster.status.label : '-'}">在籍中</span>
+								      th:classappend="${hamster.status != null && hamster.status.name() == 'AVAILABLE' ? ' admin-status--done' : (hamster.status != null && hamster.status.name() == 'NEGOTIATING' ? ' admin-status--progress' : ' admin-status--new')}"
+								      th:text="${hamster.status != null ? (hamster.status.name() == 'AVAILABLE' ? '在籍中' : (hamster.status.name() == 'NEGOTIATING' ? '商談中' : 'お迎え済み')) : '-'}">在籍中</span>
 							</td>
 						</tr>
 					</tbody>

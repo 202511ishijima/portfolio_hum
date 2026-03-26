@@ -327,6 +327,11 @@ body.admin-body {
   overflow-x: auto;
 }
 
+.admin-chart-wrap {
+  position: relative;
+  min-height: 320px;
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;

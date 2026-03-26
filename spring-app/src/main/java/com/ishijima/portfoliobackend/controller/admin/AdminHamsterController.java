@@ -1,5 +1,6 @@
 package com.ishijima.portfoliobackend.controller.admin;
 
+import com.ishijima.portfoliobackend.dto.HamsterMonthlyAnalyticsPoint;
 import com.ishijima.portfoliobackend.entity.Hamster;
 import com.ishijima.portfoliobackend.entity.HamsterSex;
 import com.ishijima.portfoliobackend.entity.HamsterStatus;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -25,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminHamsterController {
 
+	private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 	private static final List<String> SPECIES_OPTIONS = List.of(
 		"ゴールデンハムスター",
 		"ジャンガリアンハムスター",
@@ -66,7 +71,7 @@ public class AdminHamsterController {
 
 		model.addAttribute("hamsters", hamsters);
 		model.addAttribute("speciesOptions", hamsterService.findSpeciesOptions());
-		model.addAttribute("selectedSpecies", species);
+		model.addAttribute("selectedSpecies", normalize(species));
 		model.addAttribute("selectedSex", sex);
 		model.addAttribute("selectedStatus", status);
 		model.addAttribute("hamsterCount", hamsters.size());
@@ -75,6 +80,27 @@ public class AdminHamsterController {
 		model.addAttribute("adoptedCount", adoptedCount);
 		model.addAttribute("adminSection", "hamsters");
 		return "admin/hamsters";
+	}
+
+	@GetMapping("/analytics")
+	public String analytics(@RequestParam(required = false) String species, Model model) {
+		List<Hamster> hamsters = hamsterService.findAll(normalize(species), null, null);
+		List<HamsterMonthlyAnalyticsPoint> monthlyPoints = buildMonthlyPoints(hamsters);
+
+		model.addAttribute("speciesOptions", hamsterService.findSpeciesOptions());
+		model.addAttribute("selectedSpecies", normalize(species));
+		model.addAttribute("monthlyPoints", monthlyPoints);
+		model.addAttribute("chartLabels", monthlyPoints.stream().map(HamsterMonthlyAnalyticsPoint::getMonthLabel).toList());
+		model.addAttribute("chartTotals", monthlyPoints.stream().map(HamsterMonthlyAnalyticsPoint::getTotalCount).toList());
+		model.addAttribute("chartAvailable", monthlyPoints.stream().map(HamsterMonthlyAnalyticsPoint::getAvailableCount).toList());
+		model.addAttribute("chartNegotiating", monthlyPoints.stream().map(HamsterMonthlyAnalyticsPoint::getNegotiatingCount).toList());
+		model.addAttribute("chartAdopted", monthlyPoints.stream().map(HamsterMonthlyAnalyticsPoint::getAdoptedCount).toList());
+		model.addAttribute("totalCount", hamsters.size());
+		model.addAttribute("availableCount", hamsters.stream().filter(hamster -> hamster.getStatus() == HamsterStatus.AVAILABLE).count());
+		model.addAttribute("negotiatingCount", hamsters.stream().filter(hamster -> hamster.getStatus() == HamsterStatus.NEGOTIATING).count());
+		model.addAttribute("adoptedCount", hamsters.stream().filter(hamster -> hamster.getStatus() == HamsterStatus.ADOPTED).count());
+		model.addAttribute("adminSection", "hamsters");
+		return "admin/hamster-analytics";
 	}
 
 	@GetMapping("/new")
@@ -161,5 +187,33 @@ public class AdminHamsterController {
 		model.addAttribute("createMode", createMode);
 		model.addAttribute("hamster", hamster);
 		model.addAttribute("adminSection", "hamsters");
+	}
+
+	private List<HamsterMonthlyAnalyticsPoint> buildMonthlyPoints(List<Hamster> hamsters) {
+		List<HamsterMonthlyAnalyticsPoint> points = new ArrayList<>();
+		YearMonth current = YearMonth.now();
+		for (int i = 11; i >= 0; i--) {
+			YearMonth targetMonth = current.minusMonths(i);
+			List<Hamster> monthlyHamsters = hamsters.stream()
+				.filter(hamster -> hamster.getArrivalDate() != null)
+				.filter(hamster -> YearMonth.from(hamster.getArrivalDate()).equals(targetMonth))
+				.toList();
+
+			points.add(new HamsterMonthlyAnalyticsPoint(
+				targetMonth.format(MONTH_FORMATTER),
+				monthlyHamsters.size(),
+				(int) monthlyHamsters.stream().filter(hamster -> hamster.getStatus() == HamsterStatus.AVAILABLE).count(),
+				(int) monthlyHamsters.stream().filter(hamster -> hamster.getStatus() == HamsterStatus.NEGOTIATING).count(),
+				(int) monthlyHamsters.stream().filter(hamster -> hamster.getStatus() == HamsterStatus.ADOPTED).count()
+			));
+		}
+		return points;
+	}
+
+	private String normalize(String value) {
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+		return value.trim();
 	}
 }

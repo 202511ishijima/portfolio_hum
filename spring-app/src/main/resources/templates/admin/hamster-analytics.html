@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ハムスター月別推移 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
+</head>
+<body class="admin-body">
+	<div class="admin-shell">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1>ハムスター月別推移</h1>
+				<p class="admin-lead">直近12か月の入荷数を全体と種類別で確認できます。</p>
+			</div>
+			<div class="admin-header-actions">
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/hamsters}">一覧へ戻る</a>
+			</div>
+		</header>
+
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
+			   th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
+			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
+			   th:href="@{/admin/members}">会員管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
+			   th:href="@{/admin/hamsters}">ハムスター管理</a>
+		</nav>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>表示対象</h2>
+					<p>全体推移と、種類ごとの推移を切り替えて確認できます。</p>
+				</div>
+			</div>
+
+			<form class="admin-filter-grid" th:action="@{/admin/hamsters/analytics}" method="get">
+				<label class="admin-field">
+					<span>種類</span>
+					<select name="species">
+						<option value="">全体</option>
+						<option th:each="speciesOption : ${speciesOptions}"
+						        th:value="${speciesOption}"
+						        th:selected="${speciesOption == selectedSpecies}"
+						        th:text="${speciesOption}">ゴールデンハムスター</option>
+					</select>
+				</label>
+				<div class="admin-filter-actions">
+					<button class="admin-button" type="submit">表示を更新</button>
+					<a class="admin-link-button admin-button--ghost" th:href="@{/admin/hamsters/analytics}">全体へ戻す</a>
+				</div>
+			</form>
+		</section>
+
+		<section class="admin-summary-grid admin-summary-grid--compact">
+			<article class="admin-summary-card">
+				<h2 th:text="${selectedSpecies != null ? selectedSpecies : '全体'}">全体</h2>
+				<p class="admin-summary-number" th:text="${totalCount}">0</p>
+			</article>
+			<article class="admin-summary-card">
+				<h2>在籍中</h2>
+				<p class="admin-summary-number" th:text="${availableCount}">0</p>
+			</article>
+			<article class="admin-summary-card">
+				<h2>商談中</h2>
+				<p class="admin-summary-number" th:text="${negotiatingCount}">0</p>
+			</article>
+			<article class="admin-summary-card">
+				<h2>お迎え済み</h2>
+				<p class="admin-summary-number" th:text="${adoptedCount}">0</p>
+			</article>
+		</section>
+
+		<div class="admin-two-column admin-two-column--equal">
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>月別入荷数</h2>
+						<p th:text="${selectedSpecies != null ? selectedSpecies + ' の入荷推移です。' : 'ハムスター全体の入荷推移です。'}">ハムスター全体の入荷推移です。</p>
+					</div>
+				</div>
+				<div class="admin-chart-wrap">
+					<canvas id="hamsterMonthlyChart"></canvas>
+				</div>
+			</section>
+
+			<section class="admin-card">
+				<div class="admin-card-header">
+					<div>
+						<h2>在籍状況の月別内訳</h2>
+						<p>その月に登録されたハムスターの現在の在籍状況です。</p>
+					</div>
+				</div>
+				<div class="admin-chart-wrap">
+					<canvas id="hamsterStatusChart"></canvas>
+				</div>
+			</section>
+		</div>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>月別データ表</h2>
+					<p>グラフの件数を表でも確認できます。</p>
+				</div>
+			</div>
+
+			<div class="admin-table-wrap">
+				<table class="admin-table">
+					<thead>
+						<tr>
+							<th>月</th>
+							<th>入荷数</th>
+							<th>在籍中</th>
+							<th>商談中</th>
+							<th>お迎え済み</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="point : ${monthlyPoints}">
+							<td th:text="${point.monthLabel}">2026-03</td>
+							<td th:text="${point.totalCount}">0</td>
+							<td th:text="${point.availableCount}">0</td>
+							<td th:text="${point.negotiatingCount}">0</td>
+							<td th:text="${point.adoptedCount}">0</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script th:inline="javascript">
+		const monthlyLabels = /*[[${chartLabels}]]*/ [];
+		const totalData = /*[[${chartTotals}]]*/ [];
+		const availableData = /*[[${chartAvailable}]]*/ [];
+		const negotiatingData = /*[[${chartNegotiating}]]*/ [];
+		const adoptedData = /*[[${chartAdopted}]]*/ [];
+
+		new Chart(document.getElementById('hamsterMonthlyChart'), {
+			type: 'line',
+			data: {
+				labels: monthlyLabels,
+				datasets: [{
+					label: '入荷数',
+					data: totalData,
+					borderColor: '#b98b66',
+					backgroundColor: 'rgba(185, 139, 102, 0.18)',
+					fill: true,
+					tension: 0.25
+				}]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				scales: {
+					y: {
+						beginAtZero: true,
+						ticks: { precision: 0 }
+					}
+				}
+			}
+		});
+
+		new Chart(document.getElementById('hamsterStatusChart'), {
+			type: 'bar',
+			data: {
+				labels: monthlyLabels,
+				datasets: [
+					{ label: '在籍中', data: availableData, backgroundColor: '#93b07a' },
+					{ label: '商談中', data: negotiatingData, backgroundColor: '#d0a0a6' },
+					{ label: 'お迎え済み', data: adoptedData, backgroundColor: '#d7c0a6' }
+				]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				scales: {
+					x: { stacked: true },
+					y: {
+						stacked: true,
+						beginAtZero: true,
+						ticks: { precision: 0 }
+					}
+				}
+			}
+		});
+	</script>
+</body>
+</html>
