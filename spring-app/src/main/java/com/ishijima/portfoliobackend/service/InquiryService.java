@@ -14,6 +14,8 @@ public interface InquiryService {
 
 	Inquiry findById(Long id);
 
+	List<Inquiry> findByEmail(String email);
+
 	void updateStatus(Long id, String status);
 
 	void sendReply(Long id, String reply);

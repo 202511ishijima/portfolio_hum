@@ -19,75 +19,61 @@
       <div class="breadcrumb"><a href="../index.html">TOP</a><span>></span><span>お問い合わせ</span></div>
       <p class="eyebrow">CONTACT</p>
       <h1>お問い合わせ</h1>
-      <p>カフェのご利用、お迎えのご相談、商品についてのご質問などがありましたら、こちらのフォームからお気軽にお問い合わせください。通常は2営業日以内を目安にご返信します。</p>
+      <p>カフェのご利用、お迎えのご相談、飼育に関するご質問など、気になることがあればお気軽にご連絡ください。通常は2営業日以内に返信いたします。</p>
     </section>
 
-    <section class="contact-layout">
-      <article class="section-stack">
-        <div class="visual-card section-stack">
-          <h2>お問い合わせ前のご案内</h2>
-          <p>会員登録済みの場合は、お名前とメールアドレスが自動で反映されます。入力の手間を減らしながら、スムーズにご相談いただけます。</p>
-          <figure class="media-photo">
-            <img src="../image/お問い合わせ導線用イメージ.png" alt="お問い合わせ案内イメージ">
-          </figure>
-        </div>
+    <section class="section-stack">
+      <details class="contact-chat-accordion" open>
+        <summary>お問い合わせチャット（ログイン中の方）</summary>
+        <p class="contact-chat-accordion__lead">管理側からの返信と、あなたの送信内容を時系列で確認できます。</p>
+        <section id="member-inquiry-replies"></section>
+      </details>
 
-        <div class="summary-card">
-          <h2>よくあるお問い合わせ</h2>
-          <div class="grid-three">
-            <article class="info-card">
-              <h3>カフェ利用について</h3>
-              <p>営業時間、混雑状況、親子でのご利用、体験用えさについてのご質問など。</p>
-            </article>
-            <article class="info-card">
-              <h3>お迎えについて</h3>
-              <p>飼育の準備や種類の違い、対面説明の流れ、お迎え前のご相談など。</p>
-            </article>
-            <article class="info-card">
-              <h3>商品について</h3>
-              <p>スターターセットや飼育用品の選び方、在庫や使い方についてのご案内など。</p>
-            </article>
-          </div>
-          <div class="button-row">
-            <a class="button button--secondary" href="register.html">アカウントを作成する</a>
-            <a class="button button--ghost" href="access.html">アクセスを見る</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="section-stack">
+      <details class="contact-chat-accordion" open>
+        <summary>お問い合わせフォーム</summary>
+        <p class="contact-chat-accordion__lead">フォームからもお問い合わせできます。メールアドレスはログイン中アカウントのものを自動で利用します。</p>
         <article class="form-card">
-          <h2>お問い合わせフォーム</h2>
           <form class="form-grid" data-contact-form data-endpoint="http://localhost:8080/api/inquiries">
             <label class="form-row">お名前
               <input name="name" type="text" placeholder="はむの くらし" maxlength="100" required>
-            </label>
-            <label class="form-row">メールアドレス
-              <input name="email" type="email" placeholder="hamu@example.com" maxlength="255" required>
             </label>
             <label class="form-row">件名
               <select name="subject" required>
                 <option value="">選択してください</option>
                 <option>カフェ利用について</option>
                 <option>お迎えについて</option>
-                <option>商品について</option>
+                <option>飼育について</option>
                 <option>その他</option>
               </select>
             </label>
             <label class="form-row">お問い合わせ内容
-              <textarea name="message" placeholder="ご相談内容をご入力ください" maxlength="1000" required></textarea>
+              <textarea name="message" placeholder="ご相談内容を入力してください" maxlength="1000" required></textarea>
             </label>
             <p class="form-status" data-contact-status aria-live="polite"></p>
             <button class="button" type="submit">送信する</button>
           </form>
         </article>
+      </details>
+    </section>
 
+    <section class="contact-layout">
+      <article class="section-stack">
+        <div class="visual-card section-stack">
+          <h2>お問い合わせ前のご案内</h2>
+          <p>会員登録済みの場合は、お名前が自動で入力されます。送信後は管理画面で確認できる状態になり、返信はチャット欄で確認できます。</p>
+          <figure class="media-photo">
+            <img src="../image/お問い合わせ導線用イメージ.png" alt="お問い合わせ前のご案内イメージ">
+          </figure>
+        </div>
+      </article>
+
+      <article class="section-stack">
         <article class="summary-card">
           <h2>送信前にご確認ください</h2>
           <ul class="check-list">
-            <li>通常は2営業日以内を目安にご返信します。</li>
-            <li>お迎えに関するご相談は、対面でのご案内が必要になる場合があります。</li>
-            <li>SNSのDMではなく、このフォームからご連絡いただくと確認がスムーズです。</li>
+            <li>通常は2営業日以内を目安に返信します。</li>
+            <li>お迎えに関するご質問は、状況により回答が前後する場合があります。</li>
+            <li>SNSのDMより、このページから送信いただくと確認がスムーズです。</li>
           </ul>
         </article>
       </article>
@@ -96,5 +82,6 @@
   <div id="site-footer"></div>
   <script src="../assets/js/common.js"></script>
   <script src="../assets/js/contact.js"></script>
+  <script src="../assets/js/membership.js"></script>
 </body>
 </html>

@@ -1,0 +1,7 @@
+package com.ishijima.portfoliobackend.dto;
+
+public record ProductCatalogItem(
+	String id,
+	String name
+) {
+}

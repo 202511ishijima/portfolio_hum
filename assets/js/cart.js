@@ -104,6 +104,28 @@ window.Cart = (function () {
     return result;
   }
 
+  async function purchaseStock(items) {
+    const response = await fetch(`${backendBaseUrl}/api/products/purchase`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8"
+      },
+      body: JSON.stringify({
+        items: items.map((item) => ({
+          productId: item.id,
+          quantity: Number(item.quantity || 0)
+        }))
+      })
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.message || "在庫更新に失敗しました。");
+    }
+
+    return result;
+  }
+
   async function awardPoints(total) {
     const member = getMember();
     if (!member?.loggedIn) {
@@ -355,7 +377,15 @@ window.Cart = (function () {
       try {
         saveCheckoutProfile(collectCheckoutProfile());
         localStorage.setItem(lastOrderTotalKey, String(data.total));
-        await awardPoints(data.total);
+
+        await purchaseStock(data.items);
+
+        try {
+          await awardPoints(data.total);
+        } catch (pointError) {
+          localStorage.setItem(lastOrderPointsKey, "0");
+        }
+
         clear();
         const completePath = document.body.dataset.completePath || "complete.html";
         window.location.href = completePath;

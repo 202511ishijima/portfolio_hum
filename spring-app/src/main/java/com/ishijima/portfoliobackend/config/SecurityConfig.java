@@ -4,12 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -29,14 +26,20 @@ public class SecurityConfig {
 				.requestMatchers("/admin/login").permitAll()
 				.requestMatchers("/h2-console/**").permitAll()
 				.requestMatchers("/api/hamsters/summary").permitAll()
-				.requestMatchers("/api/inquiries", "/api/inquiries/replies", "/api/members/register", "/api/members/points", "/api/members/status").permitAll()
-				.requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
+				.requestMatchers("/api/products/stocks", "/api/products/purchase").permitAll()
+				.requestMatchers("/api/inquiries", "/api/inquiries/replies", "/api/inquiries/thread", "/api/members/register", "/api/members/points", "/api/members/status").permitAll()
+				.requestMatchers("/admin/employees/new").hasRole("ADMIN")
+				.requestMatchers("/admin/shifts/new").hasAnyRole("ADMIN", "STAFF_MANAGER")
+				.requestMatchers("/admin/hamsters/new").hasAnyRole("ADMIN", "STAFF_MANAGER")
+				.requestMatchers("/admin/products/orders/new", "/admin/products/inventory/**").hasAnyRole("ADMIN", "STAFF_MANAGER")
+				.requestMatchers("/admin/**", "/api/admin/**").hasAnyRole("ADMIN", "STAFF_MANAGER", "STAFF", "VIEWER")
+				.requestMatchers("/staff/**").hasAnyRole("ADMIN", "STAFF_MANAGER", "STAFF", "VIEWER")
 				.anyRequest().authenticated()
 			)
 			.formLogin(form -> form
 				.loginPage("/admin/login")
 				.loginProcessingUrl("/admin/login")
-				.defaultSuccessUrl("/admin/dashboard", true)
+				.successHandler(this::loginSuccessHandler)
 				.failureUrl("/admin/login?error")
 				.permitAll()
 			)
@@ -49,15 +52,20 @@ public class SecurityConfig {
 		return http.build();
 	}
 
-	@Bean
-	public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-		UserDetails adminUser = User.builder()
-			.username("admin")
-			.password(passwordEncoder.encode("admin1234"))
-			.roles("ADMIN")
-			.build();
+	private void loginSuccessHandler(
+		jakarta.servlet.http.HttpServletRequest request,
+		jakarta.servlet.http.HttpServletResponse response,
+		Authentication authentication
+	) throws java.io.IOException {
+		boolean isStaffOnly = authentication.getAuthorities().stream()
+			.map(authority -> authority.getAuthority())
+			.anyMatch("ROLE_STAFF"::equals);
 
-		return new InMemoryUserDetailsManager(adminUser);
+		if (isStaffOnly) {
+			response.sendRedirect("/staff/shifts/mine");
+			return;
+		}
+		response.sendRedirect("/admin/dashboard");
 	}
 
 	@Bean

@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +33,7 @@ public class InquiryApiController {
 		Inquiry inquiry = inquiryService.create(form);
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
 			"id", inquiry.getId(),
-			"message", "お問い合わせを受け付けました。"
+			"message", "\u304A\u554F\u3044\u5408\u308F\u305B\u3092\u53D7\u3051\u4ED8\u3051\u307E\u3057\u305F\u3002"
 		));
 	}
 
@@ -42,6 +45,44 @@ public class InquiryApiController {
 		return ResponseEntity.ok(responses);
 	}
 
+	@GetMapping("/thread")
+	public ResponseEntity<List<InquiryThreadMessageResponse>> findThreadByEmail(@RequestParam String email) {
+		String normalizedEmail = email == null ? "" : email.trim();
+		if (normalizedEmail.isEmpty()) {
+			return ResponseEntity.ok(List.of());
+		}
+
+		List<InquiryThreadMessageResponse> thread = new ArrayList<>();
+		inquiryService.findByEmail(normalizedEmail).forEach(inquiry -> thread.add(
+			new InquiryThreadMessageResponse(
+				"member",
+				inquiry.getId(),
+				null,
+				inquiry.getSubject(),
+				inquiry.getMessage(),
+				inquiry.getCreatedAt()
+			)
+		));
+
+		inquiryService.findRepliesByRecipientEmail(normalizedEmail).forEach(reply -> thread.add(
+			new InquiryThreadMessageResponse(
+				"admin",
+				reply.getInquiryId(),
+				reply.getId(),
+				null,
+				reply.getReply(),
+				reply.getSentAt()
+			)
+		));
+
+		thread.sort(Comparator
+			.comparing(InquiryThreadMessageResponse::sentAt, Comparator.nullsLast(LocalDateTime::compareTo))
+			.thenComparing(InquiryThreadMessageResponse::inquiryId, Comparator.nullsLast(Long::compareTo))
+			.thenComparing(InquiryThreadMessageResponse::replyId, Comparator.nullsLast(Long::compareTo)));
+
+		return ResponseEntity.ok(thread);
+	}
+
 	private Map<String, Object> toReplyResponse(InquiryReply reply) {
 		return Map.of(
 			"id", reply.getId(),
@@ -50,5 +91,15 @@ public class InquiryApiController {
 			"reply", reply.getReply(),
 			"sentAt", reply.getSentAt()
 		);
+	}
+
+	public record InquiryThreadMessageResponse(
+		String sender,
+		Long inquiryId,
+		Long replyId,
+		String subject,
+		String body,
+		LocalDateTime sentAt
+	) {
 	}
 }

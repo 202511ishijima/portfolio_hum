@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${mode == 'create'} ? 'シフト登録 | はむのくらし' : 'シフト編集 | はむのくらし'">シフト編集 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
+</head>
+<body class="admin-body">
+	<div class="admin-shell admin-shell--narrow">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1 th:text="${mode == 'create'} ? 'シフト登録' : 'シフト編集'">シフト編集</h1>
+			</div>
+			<div class="admin-header-actions">
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/shifts}">一覧へ戻る</a>
+				<form th:action="@{/admin/logout}" method="post">
+					<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
+				</form>
+			</div>
+		</header>
+
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
+			   th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
+			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
+			   th:href="@{/admin/members}">会員管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'employees'} ? ' is-active' : ''"
+			   th:href="@{/admin/employees}">従業員管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'shifts'} ? ' is-active' : ''"
+			   th:href="@{/admin/shifts}">シフト管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
+			   th:href="@{/admin/hamsters}">ハムスター管理</a>
+		</nav>
+
+		<p class="admin-alert admin-alert--error" th:if="${shiftError}" th:text="${shiftError}">エラーがあります。</p>
+
+		<section class="admin-card">
+			<form class="admin-form"
+			      th:object="${shiftForm}"
+			      th:action="${mode == 'create'} ? @{/admin/shifts/new} : @{/admin/shifts/{id}/edit(id=${shift.id})}"
+			      method="post">
+
+				<label class="admin-field">
+					<span>従業員</span>
+					<select th:field="*{employeeId}">
+						<option value="">選択してください</option>
+						<option th:each="employee : ${employeeOptions}"
+						        th:value="${employee.id}"
+						        th:text="${employee.name + ' (' + employee.role + ')'}">山田 花子</option>
+					</select>
+					<small class="admin-field-error" th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}">Error</small>
+				</label>
+
+				<label class="admin-field">
+					<span>勤務日</span>
+					<input th:field="*{workDate}" type="date">
+					<small class="admin-field-error" th:if="${#fields.hasErrors('workDate')}" th:errors="*{workDate}">Error</small>
+				</label>
+
+				<label class="admin-field">
+					<span>開始時刻</span>
+					<input th:field="*{startTime}" type="time">
+					<small class="admin-field-error" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}">Error</small>
+				</label>
+
+				<label class="admin-field">
+					<span>終了時刻</span>
+					<input th:field="*{endTime}" type="time">
+					<small class="admin-field-error" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}">Error</small>
+				</label>
+
+				<label class="admin-field">
+					<span>メモ</span>
+					<input th:field="*{note}" type="text" placeholder="任意">
+					<small class="admin-field-error" th:if="${#fields.hasErrors('note')}" th:errors="*{note}">Error</small>
+				</label>
+
+				<div class="admin-header-actions">
+					<button class="admin-button" type="submit" th:text="${mode == 'create'} ? '登録する' : '更新する'">保存する</button>
+					<a class="admin-link-button admin-button--ghost" th:href="@{/admin/shifts}">キャンセル</a>
+				</div>
+			</form>
+		</section>
+	</div>
+</body>
+</html>

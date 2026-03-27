@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.ChatRoomMapper">
+
+	<resultMap id="ChatRoomResultMap" type="com.ishijima.portfoliobackend.entity.ChatRoom">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="roomType" column="room_type"/>
+		<result property="createdAt" column="created_at"/>
+	</resultMap>
+
+	<select id="findGeneralRoom" resultMap="ChatRoomResultMap">
+		SELECT
+			id,
+			name,
+			room_type,
+			created_at
+		FROM chat_rooms
+		WHERE room_type = 'GENERAL'
+		ORDER BY id ASC
+		LIMIT 1
+	</select>
+
+	<insert id="insert" parameterType="com.ishijima.portfoliobackend.entity.ChatRoom" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO chat_rooms (
+			name,
+			room_type,
+			created_at
+		) VALUES (
+			#{name},
+			#{roomType},
+			#{createdAt}
+		)
+	</insert>
+</mapper>

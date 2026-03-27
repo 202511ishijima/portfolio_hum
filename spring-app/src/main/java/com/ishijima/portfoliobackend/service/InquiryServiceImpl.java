@@ -44,7 +44,15 @@ public class InquiryServiceImpl implements InquiryService {
 	@Override
 	public Inquiry findById(Long id) {
 		return inquiryMapper.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("問い合わせが見つかりません。id=" + id));
+			.orElseThrow(() -> new IllegalArgumentException("Inquiry not found. id=" + id));
+	}
+
+	@Override
+	public List<Inquiry> findByEmail(String email) {
+		if (email == null || email.isBlank()) {
+			return List.of();
+		}
+		return inquiryMapper.findByEmail(email.trim());
 	}
 
 	@Override

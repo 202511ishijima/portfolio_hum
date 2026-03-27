@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>シフト管理 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
+</head>
+<body class="admin-body">
+	<div class="admin-shell">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1>シフト管理</h1>
+				<p class="admin-lead">従業員シフトの登録・編集を行います。</p>
+			</div>
+			<form th:action="@{/admin/logout}" method="post">
+				<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
+			</form>
+		</header>
+
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link" th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link" th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+			<a class="admin-nav-link" th:href="@{/admin/members}">会員管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/employees}">従業員管理</a>
+			<a class="admin-nav-link is-active" th:href="@{/admin/shifts}">シフト管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/hamsters}">ハムスター管理</a>
+		</nav>
+
+		<p class="admin-alert admin-alert--success" th:if="${shiftMessage}" th:text="${shiftMessage}">更新しました。</p>
+		<p class="admin-alert admin-alert--error" th:if="${shiftError}" th:text="${shiftError}">エラーがあります。</p>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>シフト一覧</h2>
+					<p>一覧から勤務予定を確認できます。</p>
+				</div>
+				<a class="admin-link-button" th:if="${canCreateShift}" th:href="@{/admin/shifts/new}">新規シフト登録</a>
+			</div>
+
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(shifts)}">
+				<table class="admin-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>従業員</th>
+							<th>勤務日</th>
+							<th>開始</th>
+							<th>終了</th>
+							<th>メモ</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="shift : ${shifts}">
+							<td th:text="${shift.id}">1</td>
+							<td th:text="${shift.employeeName}">山田 花子</td>
+							<td th:text="${#temporals.format(shift.workDate, 'yyyy/MM/dd')}">2026/03/27</td>
+							<td th:text="${#temporals.format(shift.startTime, 'HH:mm')}">09:00</td>
+							<td th:text="${#temporals.format(shift.endTime, 'HH:mm')}">18:00</td>
+							<td th:text="${shift.note}">通常勤務</td>
+							<td>
+								<a class="admin-link-button admin-button--ghost" th:href="@{/admin/shifts/{id}/edit(id=${shift.id})}">編集</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p th:if="${#lists.isEmpty(shifts)}">シフトはまだ登録されていません。</p>
+		</section>
+	</div>
+</body>
+</html>

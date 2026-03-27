@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.ProductStockMapper">
+
+	<resultMap id="ProductStockResultMap" type="com.ishijima.portfoliobackend.entity.ProductStock">
+		<id property="productId" column="product_id"/>
+		<result property="stock" column="stock"/>
+		<result property="recommendedStock" column="recommended_stock"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<select id="findAll" resultMap="ProductStockResultMap">
+		SELECT
+			product_id,
+			stock,
+			recommended_stock,
+			updated_at
+		FROM product_stocks
+		ORDER BY product_id
+	</select>
+
+	<select id="findByProductId" resultMap="ProductStockResultMap">
+		SELECT
+			product_id,
+			stock,
+			recommended_stock,
+			updated_at
+		FROM product_stocks
+		WHERE product_id = #{productId}
+	</select>
+
+	<insert id="insertDefaultIfMissing">
+		INSERT INTO product_stocks (
+			product_id,
+			stock,
+			recommended_stock,
+			updated_at
+		)
+		SELECT
+			#{productId},
+			#{defaultStock},
+			#{defaultRecommendedStock},
+			CURRENT_TIMESTAMP()
+		WHERE NOT EXISTS (
+			SELECT 1
+			FROM product_stocks
+			WHERE product_id = #{productId}
+		)
+	</insert>
+
+	<update id="decreaseStock">
+		UPDATE product_stocks
+		SET
+			stock = stock - #{quantity},
+			updated_at = CURRENT_TIMESTAMP()
+		WHERE product_id = #{productId}
+		  AND stock >= #{quantity}
+	</update>
+
+	<update id="increaseStock">
+		UPDATE product_stocks
+		SET
+			stock = stock + #{quantity},
+			updated_at = CURRENT_TIMESTAMP()
+		WHERE product_id = #{productId}
+	</update>
+
+	<update id="updateRecommendedStock">
+		UPDATE product_stocks
+		SET
+			recommended_stock = #{recommendedStock},
+			updated_at = CURRENT_TIMESTAMP()
+		WHERE product_id = #{productId}
+	</update>
+</mapper>

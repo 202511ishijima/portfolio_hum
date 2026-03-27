@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.ChatMessageMapper">
+
+	<resultMap id="ChatMessageResultMap" type="com.ishijima.portfoliobackend.entity.ChatMessage">
+		<id property="id" column="id"/>
+		<result property="roomId" column="room_id"/>
+		<result property="senderEmployeeId" column="sender_employee_id"/>
+		<result property="senderName" column="sender_name"/>
+		<result property="body" column="body"/>
+		<result property="sentAt" column="sent_at"/>
+	</resultMap>
+
+	<select id="findByRoomId" resultMap="ChatMessageResultMap">
+		SELECT
+			m.id,
+			m.room_id,
+			m.sender_employee_id,
+			e.name AS sender_name,
+			m.body,
+			m.sent_at
+		FROM chat_messages m
+		INNER JOIN employees e ON e.id = m.sender_employee_id
+		WHERE m.room_id = #{roomId}
+		ORDER BY m.sent_at ASC, m.id ASC
+	</select>
+
+	<insert id="insert" parameterType="com.ishijima.portfoliobackend.entity.ChatMessage" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO chat_messages (
+			room_id,
+			sender_employee_id,
+			body,
+			sent_at
+		) VALUES (
+			#{roomId},
+			#{senderEmployeeId},
+			#{body},
+			#{sentAt}
+		)
+	</insert>
+</mapper>

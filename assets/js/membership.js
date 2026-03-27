@@ -1,10 +1,12 @@
 window.MembershipPage = (function () {
   const memberKey = "hamu_member";
   const backendBaseUrl = "http://localhost:8080";
+  const threadRefreshMs = 10000;
+  let threadTimer = null;
 
   function getDefaultMember() {
     return {
-      name: "ゲストさま",
+      name: "ゲスト",
       points: 0,
       email: "",
       loggedIn: false,
@@ -33,7 +35,6 @@ window.MembershipPage = (function () {
 
   async function fetchMemberStatus(email) {
     if (!email) return null;
-
     try {
       const response = await fetch(`${backendBaseUrl}/api/members/status?email=${encodeURIComponent(email)}`);
       if (!response.ok) return null;
@@ -43,16 +44,37 @@ window.MembershipPage = (function () {
     }
   }
 
-  async function fetchInquiryReplies(email) {
+  async function fetchInquiryThread(email) {
     if (!email) return [];
     try {
-      const response = await fetch(`${backendBaseUrl}/api/inquiries/replies?email=${encodeURIComponent(email)}`);
+      const response = await fetch(`${backendBaseUrl}/api/inquiries/thread?email=${encodeURIComponent(email)}`);
       if (!response.ok) return [];
-      const replies = await response.json();
-      return Array.isArray(replies) ? replies : [];
+      const thread = await response.json();
+      return Array.isArray(thread) ? thread : [];
     } catch (error) {
       return [];
     }
+  }
+
+  async function sendInquiryMessage(member, message, subject) {
+    const payload = {
+      name: String(member.name || "ゲスト").trim(),
+      email: String(member.email || "").trim(),
+      subject: String(subject || "マイページからのお問い合わせ").trim(),
+      message: String(message || "").trim()
+    };
+
+    const response = await fetch(`${backendBaseUrl}/api/inquiries`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=UTF-8" },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.message || "送信に失敗しました。");
+    }
+    return result;
   }
 
   async function renderNews() {
@@ -87,7 +109,7 @@ window.MembershipPage = (function () {
     if (item.image) {
       return `<figure class="media-photo"><img src="${basePath}image/${item.image}" alt="${item.name}"></figure>`;
     }
-    return `<div class="media-placeholder" data-label="${item.imageLabel || "景品画像を追加"}"></div>`;
+    return `<div class="media-placeholder" data-label="${item.imageLabel || "Reward image"}"></div>`;
   }
 
   async function renderRewards() {
@@ -143,10 +165,8 @@ window.MembershipPage = (function () {
     const member = getMember();
     const name = member.loggedIn ? member.name : "未ログイン";
     const points = member.loggedIn ? `${member.points} pt` : "ログインすると表示されます";
-    const statusLabel = member.loggedIn
-      ? (member.status === "SUSPENDED" ? "停止中" : "利用中")
-      : "ログイン前";
-    const linkLabel = member.loggedIn ? "景品一覧を見る" : "ログインする";
+    const statusLabel = member.loggedIn ? (member.status === "SUSPENDED" ? "停止中" : "利用中") : "ログイン前";
+    const linkLabel = member.loggedIn ? "特典一覧を見る" : "ログイン";
     const linkHref = member.loggedIn ? "rewards.html" : "login.html";
 
     target.innerHTML = `
@@ -175,6 +195,53 @@ window.MembershipPage = (function () {
     });
   }
 
+  function escapeHtml(value) {
+    return String(value || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll("\"", "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function normalizeThread(messages) {
+    return messages
+      .filter((item) => item && item.body)
+      .sort((a, b) => {
+        const at = new Date(a.sentAt || 0).getTime();
+        const bt = new Date(b.sentAt || 0).getTime();
+        return at - bt;
+      });
+  }
+
+  function renderThreadBubbles(messages) {
+    return messages.map((item) => {
+      const isAdmin = item.sender === "admin";
+      const senderLabel = isAdmin ? "運営" : "あなた";
+      const subjectHtml = !isAdmin && item.subject ? `<p class="chat-message__subject">${escapeHtml(item.subject)}</p>` : "";
+      const bodyHtml = escapeHtml(item.body).replaceAll("\n", "<br>");
+      return `
+        <article class="chat-message ${isAdmin ? "chat-message--admin" : "chat-message--member"}">
+          <div class="chat-message__meta">
+            <span>${senderLabel}</span>
+            <span>${formatReplyDate(item.sentAt)}</span>
+          </div>
+          <div class="chat-message__bubble">
+            ${subjectHtml}
+            <p>${bodyHtml}</p>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  function setComposeStatus(statusEl, message, isError) {
+    if (!statusEl) return;
+    statusEl.textContent = message;
+    statusEl.className = "form-status";
+    statusEl.dataset.state = isError ? "error" : "success";
+  }
+
   async function renderMemberInquiryReplies() {
     const target = document.getElementById("member-inquiry-replies");
     if (!target) return;
@@ -183,38 +250,103 @@ window.MembershipPage = (function () {
     if (!member.loggedIn || !member.email) {
       target.innerHTML = `
         <article class="panel">
-          <h2>お問い合わせへの返信</h2>
-          <p>ログインすると、管理者からの返信を確認できます。</p>
+          <h2>お問い合わせチャット</h2>
+          <p>ログインすると、運営とのやり取り履歴を確認できます。</p>
         </article>
       `;
       return;
     }
 
-    const replies = await fetchInquiryReplies(member.email);
-    if (replies.length === 0) {
-      target.innerHTML = `
-        <article class="panel">
-          <h2>お問い合わせへの返信</h2>
-          <p>まだ返信は届いていません。返信があるとここに表示されます。</p>
-        </article>
-      `;
-      return;
-    }
-
+    const thread = normalizeThread(await fetchInquiryThread(member.email));
     target.innerHTML = `
-      <article class="panel">
-        <h2>お問い合わせへの返信</h2>
-        <div class="news-list">
-          ${replies.map((item) => `
-            <article class="news-card">
-              <p class="eyebrow">お問い合わせ #${item.inquiryId}</p>
-              <h3>${formatReplyDate(item.sentAt)}</h3>
-              <p>${item.reply}</p>
-            </article>
-          `).join("")}
+      <article class="panel chat-panel">
+        <h2>お問い合わせチャット</h2>
+        <p>送信した内容と運営からの返信を、時系列で確認できます。</p>
+        <div class="chat-thread" id="inquiry-thread">
+          ${thread.length ? renderThreadBubbles(thread) : '<p class="chat-empty">まだメッセージはありません。下の入力欄から送信できます。</p>'}
         </div>
+        <form class="form-grid chat-compose" id="inquiry-compose-form">
+          <label class="form-row">
+            件名
+            <select name="subject" required>
+              <option value="">選択してください</option>
+              <option>カフェ利用について</option>
+              <option>お迎えについて</option>
+              <option>飼育について</option>
+              <option>その他</option>
+            </select>
+          </label>
+          <label class="form-row">
+            メッセージ
+            <textarea name="message" rows="4" required placeholder="お問い合わせ内容を入力してください"></textarea>
+          </label>
+          <div class="button-row">
+            <button class="button" type="submit">送信する</button>
+          </div>
+          <p class="form-status" id="inquiry-compose-status" aria-live="polite"></p>
+        </form>
       </article>
     `;
+
+    const threadEl = document.getElementById("inquiry-thread");
+    if (threadEl) threadEl.scrollTop = threadEl.scrollHeight;
+
+    const form = document.getElementById("inquiry-compose-form");
+    const statusEl = document.getElementById("inquiry-compose-status");
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const subject = String(formData.get("subject") || "").trim();
+      const message = String(formData.get("message") || "").trim();
+
+      if (!subject) {
+        setComposeStatus(statusEl, "件名を選択してください。", true);
+        return;
+      }
+
+      if (!message) {
+        setComposeStatus(statusEl, "メッセージを入力してください。", true);
+        return;
+      }
+
+      try {
+        await sendInquiryMessage(member, message, subject);
+        form.reset();
+        setComposeStatus(statusEl, "送信しました。", false);
+        await refreshInquiryThread();
+      } catch (error) {
+        setComposeStatus(statusEl, error.message || "送信に失敗しました。", true);
+      }
+    });
+  }
+
+  async function refreshInquiryThread() {
+    if (!document.getElementById("inquiry-thread")) return;
+
+    const member = getMember();
+    if (!member.loggedIn || !member.email) return;
+
+    const threadEl = document.getElementById("inquiry-thread");
+    const beforeBottom = threadEl.scrollHeight - threadEl.scrollTop - threadEl.clientHeight;
+    const keepBottom = beforeBottom < 40;
+
+    const thread = normalizeThread(await fetchInquiryThread(member.email));
+    threadEl.innerHTML = thread.length
+      ? renderThreadBubbles(thread)
+      : '<p class="chat-empty">まだメッセージはありません。下の入力欄から送信できます。</p>';
+
+    if (keepBottom) {
+      threadEl.scrollTop = threadEl.scrollHeight;
+    }
+  }
+
+  function startThreadPolling() {
+    if (threadTimer) clearInterval(threadTimer);
+    if (!document.getElementById("member-inquiry-replies")) return;
+
+    threadTimer = setInterval(() => {
+      refreshInquiryThread();
+    }, threadRefreshMs);
   }
 
   function renderMembershipActions() {
@@ -228,7 +360,7 @@ window.MembershipPage = (function () {
     }
 
     target.innerHTML = `
-      <a class="button" href="register.html">アカウント作成</a>
+      <a class="button" href="register.html">アカウント登録</a>
       <a class="button button--ghost" href="login.html">ログイン</a>
     `;
   }
@@ -246,7 +378,6 @@ window.MembershipPage = (function () {
       alert(message);
       return;
     }
-
     target.textContent = message;
     target.className = isError ? "form-message error" : "form-message success";
   }
@@ -261,22 +392,20 @@ window.MembershipPage = (function () {
     };
 
     if (!payload.name || !payload.email || !payload.password) {
-      showFormMessage(status, "未入力の項目があります。すべて入力してください。", true);
+      showFormMessage(status, "必須項目を入力してください。", true);
       return;
     }
 
     try {
       const response = await fetch(`${backendBaseUrl}/api/members/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8"
-        },
+        headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify(payload)
       });
 
       const result = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(result.message || "アカウントを作成できませんでした。");
+        throw new Error(result.message || "アカウント作成に失敗しました。");
       }
 
       saveMember({
@@ -292,11 +421,7 @@ window.MembershipPage = (function () {
         window.location.href = "mypage.html";
       }, 600);
     } catch (error) {
-      showFormMessage(
-        status,
-        error.message || "登録できませんでした。Spring Boot が起動しているか確認してください。",
-        true
-      );
+      showFormMessage(status, error.message || "登録に失敗しました。", true);
     }
   }
 
@@ -338,7 +463,7 @@ window.MembershipPage = (function () {
         ...current,
         name: status?.name || (current.loggedIn && current.email === email ? current.name : email.split("@")[0]),
         email,
-        points: Number(status?.points ?? current.points ?? 128),
+        points: Number(status?.points ?? current.points ?? 0),
         loggedIn: true,
         status: status?.status || "ACTIVE"
       });
@@ -351,10 +476,17 @@ window.MembershipPage = (function () {
     renderRewards();
     renderCafeMenus();
     renderMemberSummary();
-    renderMemberInquiryReplies();
+    renderMemberInquiryReplies().then(startThreadPolling);
     renderMembershipActions();
     bindAuthForms();
     bindLogoutButton();
+  });
+
+  window.addEventListener("beforeunload", () => {
+    if (threadTimer) {
+      clearInterval(threadTimer);
+      threadTimer = null;
+    }
   });
 
   return {

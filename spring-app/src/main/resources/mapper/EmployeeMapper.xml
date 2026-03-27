@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.EmployeeMapper">
+
+	<resultMap id="EmployeeResultMap" type="com.ishijima.portfoliobackend.entity.Employee">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="email" column="email"/>
+		<result property="password" column="password"/>
+		<result property="position" column="position"/>
+		<result property="role" column="role"/>
+		<result property="active" column="active"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.ishijima.portfoliobackend.entity.Employee" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO employees (
+			name,
+			email,
+			password,
+			position,
+			role,
+			active,
+			created_at,
+			updated_at
+		) VALUES (
+			#{name},
+			#{email},
+			#{password},
+			#{position},
+			#{role},
+			#{active},
+			#{createdAt},
+			#{updatedAt}
+		)
+	</insert>
+
+	<select id="findAll" resultMap="EmployeeResultMap">
+		SELECT
+			id,
+			name,
+			email,
+			password,
+			position,
+			role,
+			active,
+			created_at,
+			updated_at
+		FROM employees
+		ORDER BY created_at DESC, id DESC
+	</select>
+
+	<select id="findById" resultMap="EmployeeResultMap">
+		SELECT
+			id,
+			name,
+			email,
+			password,
+			position,
+			role,
+			active,
+			created_at,
+			updated_at
+		FROM employees
+		WHERE id = #{id}
+	</select>
+
+	<select id="findByEmail" resultMap="EmployeeResultMap">
+		SELECT
+			id,
+			name,
+			email,
+			password,
+			position,
+			role,
+			active,
+			created_at,
+			updated_at
+		FROM employees
+		WHERE email = #{email}
+	</select>
+
+	<update id="update" parameterType="com.ishijima.portfoliobackend.entity.Employee">
+		UPDATE employees
+		SET
+			name = #{name},
+			email = #{email},
+			password = #{password},
+			position = #{position},
+			role = #{role},
+			active = #{active},
+			updated_at = #{updatedAt}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateActive">
+		UPDATE employees
+		SET
+			active = #{active},
+			updated_at = CURRENT_TIMESTAMP()
+		WHERE id = #{id}
+	</update>
+</mapper>

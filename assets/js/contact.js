@@ -12,9 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (member?.loggedIn) {
     const nameInput = form.querySelector('input[name="name"]');
-    const emailInput = form.querySelector('input[name="email"]');
-    if (nameInput && !nameInput.value) nameInput.value = member.name || "";
-    if (emailInput && !emailInput.value) emailInput.value = member.email || "";
+    if (nameInput && !nameInput.value) {
+      nameInput.value = member.name || "";
+    }
   }
 
   const endpoint = form.dataset.endpoint || "http://localhost:8080/api/inquiries";
@@ -22,10 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const submitButton = form.querySelector('button[type="submit"]');
 
   const setStatus = (message, type = "info") => {
-    if (statusBox) {
-      statusBox.textContent = message;
-      statusBox.dataset.state = type;
-    }
+    if (!statusBox) return;
+    statusBox.textContent = message;
+    statusBox.dataset.state = type;
   };
 
   form.addEventListener("submit", async (event) => {
@@ -34,12 +33,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const formData = new FormData(form);
     const payload = {
       name: String(formData.get("name") || "").trim(),
-      email: String(formData.get("email") || "").trim(),
+      email: String(member?.loggedIn ? (member.email || "") : "").trim(),
       subject: String(formData.get("subject") || "").trim(),
       message: String(formData.get("message") || "").trim()
     };
 
-    if (!payload.name || !payload.email || !payload.subject || !payload.message) {
+    if (!member?.loggedIn || !payload.email) {
+      const message = "フォーム送信にはログインが必要です。";
+      setStatus(message, "error");
+      alert(message);
+      return;
+    }
+
+    if (!payload.name || !payload.subject || !payload.message) {
       const message = "未入力の項目があります。すべて入力してください。";
       setStatus(message, "error");
       alert(message);
@@ -52,14 +58,11 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
       const data = await response.json().catch(() => ({}));
-
       if (!response.ok) {
         const message = data.message || "送信に失敗しました。入力内容を確認してください。";
         setStatus(message, "error");
@@ -72,14 +75,12 @@ document.addEventListener("DOMContentLoaded", () => {
       alert(message);
       form.reset();
 
-      if (member?.loggedIn) {
-        const nameInput = form.querySelector('input[name="name"]');
-        const emailInput = form.querySelector('input[name="email"]');
-        if (nameInput) nameInput.value = member.name || "";
-        if (emailInput) emailInput.value = member.email || "";
+      const nameInput = form.querySelector('input[name="name"]');
+      if (nameInput) {
+        nameInput.value = member.name || "";
       }
     } catch (error) {
-      const message = "送信できませんでした。Spring Boot が起動しているか確認してください。";
+      const message = "送信できませんでした。バックエンドが起動中か確認してください。";
       setStatus(message, "error");
       alert(message);
     } finally {

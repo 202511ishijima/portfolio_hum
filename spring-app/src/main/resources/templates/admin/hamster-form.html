@@ -36,6 +36,12 @@
 			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
 			   th:href="@{/admin/members}">会員管理</a>
 			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'employees'} ? ' is-active' : ''"
+			   th:href="@{/admin/employees}">従業員管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'shifts'} ? ' is-active' : ''"
+			   th:href="@{/admin/shifts}">シフト管理</a>
+			<a class="admin-nav-link"
 			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
 			   th:href="@{/admin/hamsters}">ハムスター管理</a>
 		</nav>

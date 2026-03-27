@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>従業員管理 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
+</head>
+<body class="admin-body">
+	<div class="admin-shell">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1>従業員管理</h1>
+				<p class="admin-lead">従業員アカウントの作成、編集、権限管理を行います。</p>
+			</div>
+			<form th:action="@{/admin/logout}" method="post">
+				<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
+			</form>
+		</header>
+
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
+			   th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
+			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
+			   th:href="@{/admin/members}">会員管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'employees'} ? ' is-active' : ''"
+			   th:href="@{/admin/employees}">従業員管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'shifts'} ? ' is-active' : ''"
+			   th:href="@{/admin/shifts}">シフト管理</a>
+			<a class="admin-nav-link"
+			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
+			   th:href="@{/admin/hamsters}">ハムスター管理</a>
+		</nav>
+
+		<p class="admin-alert admin-alert--success" th:if="${employeeMessage}" th:text="${employeeMessage}">更新しました。</p>
+		<p class="admin-alert admin-alert--error" th:if="${employeeError}" th:text="${employeeError}">エラーがあります。</p>
+
+		<section class="admin-summary-grid admin-summary-grid--compact">
+			<article class="admin-summary-card">
+				<h2>従業員数</h2>
+				<p class="admin-summary-number" th:text="${employeeCount}">0</p>
+			</article>
+			<article class="admin-summary-card">
+				<h2>有効</h2>
+				<p class="admin-summary-number" th:text="${activeCount}">0</p>
+			</article>
+			<article class="admin-summary-card">
+				<h2>無効</h2>
+				<p class="admin-summary-number" th:text="${inactiveCount}">0</p>
+			</article>
+		</section>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>従業員一覧</h2>
+					<p>編集から氏名、権限、在籍状態を変更できます。</p>
+				</div>
+				<a class="admin-link-button" th:if="${canCreateEmployee}" th:href="@{/admin/employees/new}">新規従業員を作成</a>
+			</div>
+
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(employees)}">
+				<table class="admin-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>氏名</th>
+							<th>ログインID</th>
+							<th>役職</th>
+							<th>権限</th>
+							<th>状態</th>
+							<th>作成日</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="employee : ${employees}">
+							<td th:text="${employee.id}">1</td>
+							<td th:text="${employee.name}">山田 花子</td>
+							<td th:text="${employee.email}">staff@example.com</td>
+							<td th:text="${employee.position}">スタッフ</td>
+							<td th:text="${employee.role}">STAFF</td>
+							<td>
+								<span class="admin-status"
+								      th:classappend="${employee.active} ? ' admin-status--done' : ' admin-status--progress'"
+								      th:text="${employee.active} ? '有効' : '無効'">有効</span>
+							</td>
+							<td th:text="${employee.createdAt != null ? #temporals.format(employee.createdAt, 'yyyy/MM/dd HH:mm') : '-'}">2026/03/27</td>
+							<td>
+								<div class="admin-header-actions">
+									<a class="admin-link-button admin-button--ghost"
+									   th:href="@{/admin/employees/{id}/edit(id=${employee.id})}">編集</a>
+									<form th:action="@{/admin/employees/{id}/active(id=${employee.id})}" method="post">
+										<button class="admin-button admin-button--ghost"
+										        th:text="${employee.active} ? '無効化' : '有効化'"
+										        type="submit">無効化</button>
+									</form>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p th:if="${#lists.isEmpty(employees)}">従業員アカウントはまだありません。</p>
+		</section>
+	</div>
+</body>
+</html>

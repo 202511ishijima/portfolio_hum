@@ -15,7 +15,7 @@
 			<div>
 				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>ダッシュボード</h1>
-				<p class="admin-lead">管理画面の主要機能へすぐ移動できる入口です。お問い合わせ、会員、個体情報の状況をまとめて確認できます。</p>
+				<p class="admin-lead">管理画面の主な機能へ移動できます。</p>
 			</div>
 			<form th:action="@{/admin/logout}" method="post">
 				<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
@@ -23,18 +23,13 @@
 		</header>
 
 		<nav class="admin-nav" aria-label="管理メニュー">
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
-			   th:href="@{/admin/dashboard}">ダッシュボード</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
-			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
-			   th:href="@{/admin/members}">会員管理</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
-			   th:href="@{/admin/hamsters}">ハムスター管理</a>
+			<a class="admin-nav-link is-active" th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link" th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+			<a class="admin-nav-link" th:href="@{/admin/members}">会員管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/employees}">従業員管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/shifts}">シフト管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/hamsters}">ハムスター管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/products/stocks}">商品在庫管理</a>
 		</nav>
 
 		<section class="admin-summary-grid">
@@ -56,142 +51,44 @@
 			</article>
 		</section>
 
-		<div class="admin-two-column">
-			<section class="admin-card">
-				<div class="admin-card-header">
-					<div>
-						<h2>管理メニュー</h2>
-						<p>ここから各管理画面へ移動できます。</p>
-					</div>
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>クイックリンク</h2>
+					<p>各管理ページへすぐ移動できます。</p>
 				</div>
-				<div class="admin-quick-links">
-					<a class="admin-link-card" th:href="@{/admin/dashboard}">
-						<h3>ダッシュボード</h3>
-						<p>全体の状況を最初に確認したいときに使います。</p>
-					</a>
-					<a class="admin-link-card" th:href="@{/admin/inquiries}">
-						<h3>お問い合わせ一覧</h3>
-						<p>受信内容の確認、対応状況の更新、返信履歴の確認ができます。</p>
-					</a>
-					<a class="admin-link-card" th:href="@{/admin/members}">
-						<h3>会員管理</h3>
-						<p>会員情報の確認、編集、停止状況の把握ができます。</p>
-					</a>
-					<a class="admin-link-card" th:href="@{/admin/hamsters}">
-						<h3>ハムスター管理</h3>
-						<p>ハムスター情報の登録、更新、詳細確認ができます。</p>
-					</a>
-				</div>
-			</section>
-
-			<section class="admin-card">
-				<div class="admin-card-header">
-					<div>
-						<h2>ステータス概要</h2>
-						<p>現在の大まかな状況をざっくり確認できます。</p>
-					</div>
-				</div>
-				<div class="admin-stat-list">
-					<div class="admin-stat-item">
-						<span>対応中のお問い合わせ</span>
-						<strong th:text="${inProgressInquiryCount}">0</strong>
-					</div>
-					<div class="admin-stat-item">
-						<span>利用中の会員</span>
-						<strong th:text="${activeMemberCount}">0</strong>
-					</div>
-					<div class="admin-stat-item">
-						<span>停止中の会員</span>
-						<strong th:text="${suspendedMemberCount}">0</strong>
-					</div>
-					<div class="admin-stat-item">
-						<span>在籍中の個体</span>
-						<strong th:text="${availableHamsterCount}">0</strong>
-					</div>
-				</div>
-			</section>
-		</div>
-
-		<div class="admin-two-column">
-			<section class="admin-card">
-				<div class="admin-card-header">
-					<div>
-						<h2>最新のお問い合わせ</h2>
-						<p>新しく届いた内容をすぐ確認できます。</p>
-					</div>
-					<a class="admin-link-button admin-button--ghost" th:href="@{/admin/inquiries}">一覧を見る</a>
-				</div>
-				<div class="admin-table-wrap" th:if="${!#lists.isEmpty(recentInquiries)}">
-					<table class="admin-table">
-						<thead>
-							<tr>
-								<th>受信日時</th>
-								<th>お名前</th>
-								<th>件名</th>
-								<th>状況</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="inquiry : ${recentInquiries}"
-								class="admin-table-row-link"
-								th:data-href="@{/admin/inquiries/{id}(id=${inquiry.id})}"
-								tabindex="0">
-								<td th:text="${#temporals.format(inquiry.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/25 10:00</td>
-								<td th:text="${inquiry.name}">山田 花子</td>
-								<td th:text="${inquiry.subject}">お問い合わせ件名</td>
-								<td th:text="${inquiry.status == 'NEW' ? '未対応' : (inquiry.status == 'IN_PROGRESS' ? '対応中' : '対応済み')}">未対応</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<p th:if="${#lists.isEmpty(recentInquiries)}">まだお問い合わせはありません。</p>
-			</section>
-
-			<section class="admin-card">
-				<div class="admin-card-header">
-					<div>
-						<h2>最近登録された会員</h2>
-						<p>会員登録の動きをざっくり確認できます。</p>
-					</div>
-					<a class="admin-link-button admin-button--ghost" th:href="@{/admin/members}">一覧を見る</a>
-				</div>
-				<div class="admin-table-wrap" th:if="${!#lists.isEmpty(recentMembers)}">
-					<table class="admin-table">
-						<thead>
-							<tr>
-								<th>登録日時</th>
-								<th>お名前</th>
-								<th>メールアドレス</th>
-								<th>状況</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="member : ${recentMembers}">
-								<td th:text="${#temporals.format(member.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/25 10:00</td>
-								<td th:text="${member.name}">山田 花子</td>
-								<td th:text="${member.email}">sample@example.com</td>
-								<td th:text="${member.status == 'ACTIVE' ? '利用中' : '停止中'}">利用中</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<p th:if="${#lists.isEmpty(recentMembers)}">まだ会員登録はありません。</p>
-			</section>
-		</div>
+			</div>
+			<div class="admin-quick-links">
+				<a class="admin-link-card" th:href="@{/admin/inquiries}">
+					<h3>お問い合わせ一覧</h3>
+					<p>問い合わせ内容の確認、ステータス更新、返信送信。</p>
+				</a>
+				<a class="admin-link-card" th:href="@{/admin/members}">
+					<h3>会員管理</h3>
+					<p>会員情報の確認と編集。</p>
+				</a>
+				<a class="admin-link-card" th:href="@{/admin/employees}">
+					<h3>従業員管理</h3>
+					<p>従業員アカウントの作成、編集、権限設定。</p>
+				</a>
+				<a class="admin-link-card" th:href="@{/admin/shifts}">
+					<h3>シフト管理</h3>
+					<p>シフトの登録と編集。</p>
+				</a>
+				<a class="admin-link-card" th:href="@{/admin/hamsters}">
+					<h3>ハムスター管理</h3>
+					<p>個体情報の確認と更新。</p>
+				</a>
+				<a class="admin-link-card" th:href="@{/admin/products/stocks}">
+					<h3>商品在庫管理</h3>
+					<p>在庫確認、在庫調整、発注登録。</p>
+				</a>
+				<a class="admin-link-card" th:href="@{/staff/chat}">
+					<h3>スタッフチャット</h3>
+					<p>スタッフ向け全体連絡チャット。</p>
+				</a>
+			</div>
+		</section>
 	</div>
-	<script>
-		document.querySelectorAll('.admin-table-row-link[data-href]').forEach((row) => {
-			row.addEventListener('click', () => {
-				window.location.href = row.dataset.href;
-			});
-
-			row.addEventListener('keydown', (event) => {
-				if (event.key === 'Enter' || event.key === ' ') {
-					event.preventDefault();
-					window.location.href = row.dataset.href;
-				}
-			});
-		});
-	</script>
 </body>
 </html>

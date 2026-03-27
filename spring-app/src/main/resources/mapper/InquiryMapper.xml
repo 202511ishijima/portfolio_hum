@@ -73,6 +73,23 @@
 		WHERE id = #{id}
 	</select>
 
+	<select id="findByEmail" resultMap="InquiryResultMap">
+		SELECT
+			id,
+			name,
+			email,
+			subject,
+			message,
+			admin_reply,
+			replied_at,
+			status,
+			created_at,
+			updated_at
+		FROM inquiries
+		WHERE email = #{email}
+		ORDER BY created_at ASC, id ASC
+	</select>
+
 	<update id="updateStatus">
 		UPDATE inquiries
 		SET
