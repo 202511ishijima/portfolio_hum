@@ -1,114 +1,193 @@
 # はむのくらし
 
-「はむのくらし」は、Web制作演習課題用に制作した架空サービスのサイトです。  
-ハムスターカフェ、ハムスター生体販売、関連商品のEC、会員制度を組み合わせた静的Webサイトとして構成しています。
+ハムスターカフェ・お迎え案内・飼育用品販売・会員機能を題材にしたポートフォリオ制作物です。  
+静的なフロントサイトに加えて、`spring-app/` には Spring Boot + MyBatis + H2 で構成した管理機能 / API / スタッフ向け画面を含めています。
 
 ## 概要
 
-- サイト名: はむのくらし
-- コンセプト: ハムスターの幸せが、いちばんの幸せ。
-- 内容:
-  - ハムスターカフェ紹介
+- フロントサイト
+  - カフェ紹介
   - ハムスター一覧 / 詳細
-  - 飼育用品の疑似EC
-  - 会員制度紹介
-- 対象:
-  - 23〜29歳の独身女性
-  - 小学生低学年とその保護者
+  - お迎え案内
+  - グッズ / 飼育用品販売
+  - 会員登録 / ログイン / マイページ
+  - お問い合わせ / アクセス / お知らせ
+- バックエンド
+  - 会員管理
+  - お問い合わせ管理
+  - ハムスター管理
+  - カフェ注文 / 来店受付管理
+  - 商品在庫 / 発注管理
+  - シフト管理
+  - スタッフチャット
+
+## ディレクトリ構成
+
+```text
+portfolio_hum/
+├─ assets/
+│  ├─ css/
+│  ├─ data/
+│  ├─ img/
+│  ├─ js/
+│  └─ partials/
+├─ css/
+├─ data/
+├─ design/
+├─ docs/
+├─ hamsters/
+├─ image/
+├─ js/
+├─ pages/
+├─ products/
+├─ prompts/
+├─ spring-app/
+├─ index.html
+├─ about.html
+├─ works.html
+├─ process.html
+├─ skills.html
+└─ README.md
+```
+
+## 主なページ
+
+- トップ: `index.html`
+- カフェ紹介: `pages/cafe.html`
+- ハムスター一覧: `hamsters/index.html`
+- ハムスター詳細: `hamsters/detail.html`
+- お迎え案内: `pages/receive.html`
+- 商品一覧: `products/index.html`
+- 商品詳細: `products/detail.html`
+- カート: `products/cart.html`
+- 会員機能: `pages/membership.html`, `pages/register.html`, `pages/login.html`, `pages/mypage.html`
+- お問い合わせ: `pages/contact.html`
+- アクセス: `pages/access.html`
+- お知らせ: `pages/news.html`
 
 ## 使用技術
+
+### フロントエンド
 
 - HTML
 - CSS
 - JavaScript
 - JSON
-- localStorage
+- `fetch`
+- `localStorage`
 
-現時点ではバックエンドやデータベースは未実装です。  
-商品、ハムスター、ニュース、景品などのデータは `assets/data/*.json` で管理しています。
+`assets/data/*.json` を読み込み、一覧表示や詳細表示を行う構成です。  
+共通ヘッダー / フッターは `assets/partials/`、画面ロジックは `assets/js/` に配置しています。
 
-## 起動方法
+### バックエンド
 
-このサイトは `fetch` で JSON や partials を読み込むため、`file://` 直開きではなくローカルサーバー経由で確認してください。
+- Java 17
+- Spring Boot 3.5.x
+- Spring Web
+- Spring Security
+- Thymeleaf
+- MyBatis
+- H2 Database
+- Maven
+
+## フロントサイトの起動方法
+
+`fetch` で JSON や partial HTML を読み込むため、`file://` ではなくローカルサーバー経由で起動してください。
 
 例:
+
+```powershell
+cd C:\portfolio_hum
+python -m http.server 3000
+```
+
+ブラウザで以下を開きます。
 
 ```text
 http://127.0.0.1:3000/
 ```
 
-トップページ:
+## Spring Boot アプリの起動方法
 
-```text
-http://127.0.0.1:3000/index.html
+```powershell
+cd C:\portfolio_hum\spring-app
+.\mvnw.cmd spring-boot:run
 ```
 
-## 主なページ
+起動後の主なアクセス先:
 
-- トップページ: `/index.html`
-- ブランド紹介: `/pages/about.html`
-- カフェ: `/pages/cafe.html`
-- お迎えガイド: `/pages/receive.html`
-- ハムスター一覧: `/hamsters/index.html`
-- 商品一覧: `/products/index.html`
-- 会員制度: `/pages/membership.html`
-- マイページ: `/pages/mypage.html`
-- お問い合わせ: `/pages/contact.html`
-- アクセス: `/pages/access.html`
+- アプリ: `http://localhost:8080`
+- H2 Console: `http://localhost:8080/h2-console`
 
-## ディレクトリ構成
+デフォルト設定:
 
-```text
-portfolio-templates/
-├ assets/
-│  ├ css/
-│  ├ data/
-│  ├ js/
-│  └ partials/
-├ docs/
-├ hamsters/
-├ image/
-├ pages/
-├ products/
-├ index.html
-├ about.html
-└ README.md
-```
+- JDBC URL: `jdbc:h2:file:./data/portfolio_backend;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE`
+- Username: `sa`
+- Password: 空欄
 
-## 主な機能
+## バックエンドの主な機能
 
-- 共通ヘッダー / フッターの読み込み
-- 商品一覧 / 商品詳細の JSON 描画
-- ハムスター一覧 / 詳細の JSON 描画
-- localStorage を使った疑似カート
-- 郵便番号から住所自動入力
-- ログイン状態の保持
-- マイページでのログアウト
+- 管理画面
+  - ハムスター管理
+  - 会員管理
+  - 商品在庫 / 発注管理
+  - カフェ注文管理
+  - 来店受付管理
+  - お問い合わせ対応
+  - シフト管理
+  - 売上 / 分析画面
+- スタッフ画面
+  - シフト確認
+  - チャット
+- API
+  - ハムスター
+  - 会員
+  - 商品
+  - カフェ注文
+  - お問い合わせ
+
+## データベースについて
+
+`spring-app/src/main/resources/schema.sql` でテーブル作成と初期データ投入を行います。  
+主に以下のテーブルを扱います。
+
+- `hamsters`
+- `members`
+- `employees`
+- `inquiries`
+- `inquiry_replies`
+- `product_stocks`
+- `product_orders`
+- `cafe_menus`
+- `cafe_orders`
+- `cafe_order_items`
+- `cafe_visit_sessions`
+- `cafe_sales_daily`
+- `shifts`
+- `chat_rooms`
+- `chat_messages`
 
 ## ドキュメント
 
-`docs/` 配下に、課題提出用の設計資料を配置しています。
+制作過程や設計資料は `docs/` と `design/` にまとめています。
 
-- `01-proposal.html`: 企画提案書
-- `02-market-research.html`: マーケットリサーチ
-- `03-persona.html`: ペルソナ
-- `04-sitemap.html`: サイトマップ
-- `05-wireframe.html`: ワイヤーフレーム
-- `06-design-guide.html`: デザインガイド
-- `07-specification.html`: 仕様書
-- `08-db-design.html`: DB設計書
-- `09-test-report.html`: テスト報告書
-- `10-retrospective.html`: 振り返り
+- `docs/01-proposal.html`: 企画書
+- `docs/02-market-research.html`: 市場調査
+- `docs/03-persona.html`: ペルソナ
+- `docs/04-sitemap.html`: サイトマップ
+- `docs/05-wireframe.html`: ワイヤーフレーム
+- `docs/06-design-guide.html`: デザインガイド
+- `docs/07-specification.html`: 仕様書
+- `docs/08-db-design.html`: DB設計
+- `docs/09-test-report.html`: テスト報告
+- `docs/10-retrospective.html`: 振り返り
+- `design/system-flow.html`: システムフロー
+- `design/class-diagram.html`: クラス図
+- `design/method-list.html`: メソッド一覧
+- `design/logic-explanation.html`: ロジック説明
 
-## 今後の予定
+## 補足
 
-Web制作総合演習2では、既存の見た目をできるだけ維持したまま、以下のバックエンド機能追加を想定しています。
-
-- Spring Boot + MyBatis
-- RESTful API
-- バリデーション
-- Spring Security
-- JUnit
-- 管理画面
-- お問い合わせ管理
-- 将来的な作品管理CRUD
+- ルート配下にはポートフォリオ紹介ページ (`about.html`, `works.html`, `process.html`, `skills.html`) も含まれます。
+- 既存の H2 データファイルは `data/` および `spring-app/data/` にあります。
+- `spring-app-run.out` / `spring-app-run.err` は起動ログです。
