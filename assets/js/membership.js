@@ -146,6 +146,38 @@ window.MembershipPage = (function () {
       return `<article class="menu-card">${media}<h3>${item.name}</h3><p>${item.description}</p><p class="price">${SiteRouter.formatPrice(item.price)}</p></article>`;
     };
 
+    let apiMenu = [];
+    try {
+      const response = await fetch(`${backendBaseUrl}/api/cafe/menu`);
+      if (response.ok) {
+        apiMenu = await response.json();
+      }
+    } catch (error) {
+      apiMenu = [];
+    }
+
+    if (apiMenu.length) {
+      if (drinkTarget) {
+        drinkTarget.innerHTML = apiMenu
+          .filter((item) => String(item.category || "").toUpperCase() === "DRINK")
+          .map(cardHtml)
+          .join("");
+      }
+      if (foodTarget) {
+        foodTarget.innerHTML = apiMenu
+          .filter((item) => String(item.category || "").toUpperCase() === "FOOD")
+          .map(cardHtml)
+          .join("");
+      }
+      if (treatTarget) {
+        treatTarget.innerHTML = apiMenu
+          .filter((item) => String(item.category || "").toUpperCase() === "TREAT")
+          .map(cardHtml)
+          .join("");
+      }
+      return;
+    }
+
     if (drinkTarget || foodTarget) {
       const menu = await SiteRouter.fetchJSON("cafe_menu.json");
       if (drinkTarget) drinkTarget.innerHTML = menu.filter((item) => item.type === "drink").map(cardHtml).join("");
@@ -177,7 +209,6 @@ window.MembershipPage = (function () {
           <div class="stats-card">アカウント状態<strong>${statusLabel}</strong></div>
           <div class="stats-card">次のステップ<strong><a href="${linkHref}">${linkLabel}</a></strong></div>
         </div>
-        ${member.loggedIn ? '<div class="button-row"><button class="button button--ghost" type="button" id="logout-button">ログアウト</button></div>' : ""}
       </div>
     `;
   }

@@ -15,7 +15,8 @@ import java.util.stream.Collectors;
 	InquiryApiController.class,
 	MemberApiController.class,
 	HamsterApiController.class,
-	ProductApiController.class
+	ProductApiController.class,
+	CafeOrderApiController.class
 })
 public class ApiExceptionHandler {
 

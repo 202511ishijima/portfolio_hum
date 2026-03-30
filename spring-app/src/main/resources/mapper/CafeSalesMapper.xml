@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.CafeSalesMapper">
+
+	<update id="addToDailySales">
+		UPDATE cafe_sales_daily
+		SET
+			order_count = order_count + #{orderCount},
+			total_amount = total_amount + #{totalAmount},
+			updated_at = CURRENT_TIMESTAMP()
+		WHERE sales_date = #{salesDate}
+	</update>
+
+	<insert id="insertDailySales">
+		INSERT INTO cafe_sales_daily (
+			sales_date,
+			order_count,
+			total_amount,
+			updated_at
+		) VALUES (
+			#{salesDate},
+			#{orderCount},
+			#{totalAmount},
+			CURRENT_TIMESTAMP()
+		)
+	</insert>
+
+	<select id="findDailySalesRecent" resultType="map">
+		SELECT
+			sales_date AS salesDate,
+			order_count AS orderCount,
+			total_amount AS totalAmount
+		FROM cafe_sales_daily
+		ORDER BY sales_date DESC
+		LIMIT #{limit}
+	</select>
+</mapper>
+

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>カフェ注文 | はむのくらし</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+<body data-base-path="../" data-page="cafe-order">
+  <main class="container page-shell">
+    <header class="cafe-order-topbar">
+      <p id="cafe-session-summary" class="text-soft">セッション確認中...</p>
+      <button class="button button--ghost" type="button" id="show-checkout-button">お会計</button>
+    </header>
+
+    <form class="section-stack" id="cafe-order-form">
+      <div class="section-heading">
+        <p class="eyebrow">MENU</p>
+        <h2>メニューを選択</h2>
+        <p>カードを押すと数量が1つずつ増えます。価格は管理画面の設定が反映されます。</p>
+      </div>
+      <details class="contact-chat-accordion" open>
+        <summary>ドリンク</summary>
+        <div id="cafe-order-menu-drink" class="card-grid"></div>
+      </details>
+      <details class="contact-chat-accordion" open>
+        <summary>フード</summary>
+        <div id="cafe-order-menu-food" class="card-grid"></div>
+      </details>
+    </form>
+
+    <section class="section-stack">
+      <article class="form-card" id="checkout-summary" hidden>
+        <h2>ご注文履歴とお会計</h2>
+        <div id="checkout-summary-content"></div>
+      </article>
+    </section>
+
+    <div class="cafe-order-bottom-bar">
+      <button class="button" type="submit" form="cafe-order-form" id="bottom-order-button">注文する</button>
+    </div>
+  </main>
+  <script src="../assets/js/router.js"></script>
+  <script src="../assets/js/cafe-order.js"></script>
+</body>
+</html>

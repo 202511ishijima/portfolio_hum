@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.CafeMenuMapper">
+
+	<resultMap id="CafeMenuResultMap" type="com.ishijima.portfoliobackend.entity.CafeMenu">
+		<id property="id" column="id"/>
+		<result property="category" column="category"/>
+		<result property="name" column="name"/>
+		<result property="description" column="description"/>
+		<result property="price" column="price"/>
+		<result property="image" column="image"/>
+		<result property="available" column="available"/>
+		<result property="displayOrder" column="display_order"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<select id="findAll" resultMap="CafeMenuResultMap">
+		SELECT
+			id,
+			category,
+			name,
+			description,
+			price,
+			image,
+			available,
+			display_order,
+			updated_at
+		FROM cafe_menus
+		ORDER BY category, display_order, id
+	</select>
+
+	<select id="findAvailable" resultMap="CafeMenuResultMap">
+		SELECT
+			id,
+			category,
+			name,
+			description,
+			price,
+			image,
+			available,
+			display_order,
+			updated_at
+		FROM cafe_menus
+		WHERE available = TRUE
+		ORDER BY category, display_order, id
+	</select>
+
+	<select id="findById" resultMap="CafeMenuResultMap">
+		SELECT
+			id,
+			category,
+			name,
+			description,
+			price,
+			image,
+			available,
+			display_order,
+			updated_at
+		FROM cafe_menus
+		WHERE id = #{id}
+	</select>
+
+	<update id="updatePriceAndAvailability">
+		UPDATE cafe_menus
+		SET
+			price = #{price},
+			available = #{available},
+			updated_at = CURRENT_TIMESTAMP()
+		WHERE id = #{id}
+	</update>
+</mapper>
+

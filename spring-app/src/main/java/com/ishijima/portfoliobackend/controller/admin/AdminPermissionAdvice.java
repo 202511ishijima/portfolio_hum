@@ -28,6 +28,11 @@ public class AdminPermissionAdvice {
 		return hasRole(authentication, "ROLE_ADMIN") || hasRole(authentication, "ROLE_STAFF_MANAGER");
 	}
 
+	@ModelAttribute("canManageCafe")
+	public boolean canManageCafe(Authentication authentication) {
+		return hasRole(authentication, "ROLE_ADMIN") || hasRole(authentication, "ROLE_STAFF_MANAGER");
+	}
+
 	private boolean hasRole(Authentication authentication, String authority) {
 		if (authentication == null || authentication.getAuthorities() == null) {
 			return false;

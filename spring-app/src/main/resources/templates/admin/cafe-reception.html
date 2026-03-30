@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>カフェ受付発行 | はむのくらし</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/admin.css}">
+</head>
+<body class="admin-body">
+	<div class="admin-shell">
+		<header class="admin-header">
+			<div>
+				<p class="admin-eyebrow">HAMU NO KURASHI</p>
+				<h1>カフェ受付発行</h1>
+				<p class="admin-lead">人数を入力して、座席ごとの注文QRセッションを発行します（有効90分）。</p>
+			</div>
+			<div class="admin-header-actions">
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/cafe/orders}">注文一覧へ</a>
+				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/cafe/menu}">メニュー価格設定</a>
+			</div>
+		</header>
+
+		<nav class="admin-nav" aria-label="管理メニュー">
+			<a class="admin-nav-link" th:href="@{/admin/dashboard}">ダッシュボード</a>
+			<a class="admin-nav-link" th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+			<a class="admin-nav-link" th:href="@{/admin/members}">会員管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/employees}">従業員管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/shifts}">シフト管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/hamsters}">ハムスター管理</a>
+			<a class="admin-nav-link" th:href="@{/admin/products/stocks}">商品在庫管理</a>
+			<a class="admin-nav-link is-active" th:href="@{/admin/cafe/reception}">カフェ注文</a>
+		</nav>
+
+		<p class="admin-alert admin-alert--success" th:if="${cafeMessage}" th:text="${cafeMessage}">発行しました。</p>
+		<p class="admin-alert admin-alert--error" th:if="${cafeError}" th:text="${cafeError}">処理に失敗しました。</p>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>座席表</h2>
+					<p>1人席12席、2人席8席、4人テーブル8席（ACTIVEセッションを利用中として表示）。</p>
+				</div>
+			</div>
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(seatMap)}">
+				<table class="admin-table">
+					<thead>
+						<tr>
+							<th>座席番号</th>
+							<th>種別</th>
+							<th>定員</th>
+							<th>状態</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="seat : ${seatMap}">
+							<td th:text="${seat.seatNo}">S1</td>
+							<td th:text="${seat.seatType}">1人席</td>
+							<td th:text="${seat.capacity} + '名'">1名</td>
+							<td>
+								<span class="admin-status"
+								      th:classappend="${seat.occupied} ? ' admin-status--progress' : ' admin-status--done'"
+								      th:text="${seat.occupied} ? '利用中' : '空席'">空席</span>
+							</td>
+							<td>
+								<form th:if="${!seat.occupied and canManageCafe}" th:action="@{/admin/cafe/reception}" method="post">
+									<input type="hidden" name="seatNo" th:value="${seat.seatNo}">
+									<input type="hidden" name="guestCount" th:value="${seat.capacity}">
+									<button class="admin-button admin-button--ghost" type="submit">この席で発行</button>
+								</form>
+								<span th:if="${seat.occupied or !canManageCafe}">-</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="admin-card" th:if="${issuedSession != null}">
+			<div class="admin-card-header">
+				<div>
+					<h2>最新の発行情報</h2>
+				</div>
+			</div>
+			<div style="display:grid;gap:12px;justify-items:start;">
+				<img th:src="@{/admin/cafe/reception/qr/{token}(token=${issuedSession.sessionToken})}"
+				     alt="注文QRコード"
+				     style="width:220px;height:220px;border:1px solid #e7d9ca;border-radius:12px;background:#fff;padding:10px;">
+			</div>
+			<ul class="check-list">
+				<li th:text="'座席番号: ' + ${issuedSession.seatNo}">座席番号: A-01</li>
+				<li th:text="'人数: ' + ${issuedSession.guestCount} + '名'">人数: 2名</li>
+				<li th:text="'有効期限: ' + ${#temporals.format(issuedSession.expiresAt, 'yyyy/MM/dd HH:mm')}">有効期限</li>
+				<li>注文URL:
+					<a th:href="${issuedOrderUrl}" th:text="${issuedOrderUrl}" target="_blank" rel="noopener noreferrer"></a>
+				</li>
+			</ul>
+			<form th:action="@{/admin/cafe/sessions/{token}/checkout(token=${issuedSession.sessionToken})}" method="post">
+				<button class="admin-button admin-button--ghost" th:if="${canManageCafe}" type="submit">このセッションを会計完了にする</button>
+			</form>
+		</section>
+	</div>
+</body>
+</html>

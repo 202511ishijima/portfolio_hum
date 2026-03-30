@@ -426,6 +426,125 @@
   line-height: 1.6;
 }
 
+.cafe-order-bottom-bar {
+  position: sticky;
+  bottom: 10px;
+  z-index: 20;
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255, 250, 243, 0.95);
+  border: 1px solid rgba(185, 144, 108, 0.25);
+  box-shadow: 0 8px 18px rgba(109, 80, 57, 0.12);
+}
+
+.cafe-order-bottom-bar .button {
+  width: 100%;
+}
+
+.cafe-order-card {
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.cafe-order-card:hover {
+  transform: translateY(-2px);
+}
+
+.cafe-order-card.is-disabled {
+  opacity: 0.58;
+  cursor: default;
+}
+
+.cafe-order-card .media-photo {
+  aspect-ratio: 4 / 2.7;
+  margin: 0;
+  border: none;
+  border-radius: 22px 22px 0 0;
+  background: transparent;
+}
+
+.cafe-order-card__body {
+  padding: 14px 16px 16px;
+}
+
+.cafe-order-card__body .price {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.cafe-order-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cafe-order-card__counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cafe-order-card__step {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(122, 74, 44, 0.2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--color-main-deep);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cafe-order-card__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  background: #f6eadb;
+  color: var(--color-main-deep);
+}
+
+.cafe-order-actions-top {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.cafe-order-topbar {
+  position: sticky;
+  top: 8px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0 8px;
+  margin-bottom: 10px;
+  background: rgba(252, 245, 236, 0.96);
+  backdrop-filter: blur(8px);
+}
+
+.cafe-order-topbar #cafe-session-summary {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.cafe-order-topbar #show-checkout-button {
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 0.88rem;
+}
+
 @media (min-width: 900px) {
   .detail-layout {
     grid-template-columns: 0.9fr 1.1fr;

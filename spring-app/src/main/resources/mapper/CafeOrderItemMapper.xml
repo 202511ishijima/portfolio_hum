@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.CafeOrderItemMapper">
+
+	<resultMap id="CafeOrderItemResultMap" type="com.ishijima.portfoliobackend.entity.CafeOrderItem">
+		<id property="id" column="id"/>
+		<result property="orderId" column="order_id"/>
+		<result property="menuId" column="menu_id"/>
+		<result property="menuName" column="menu_name"/>
+		<result property="unitPrice" column="unit_price"/>
+		<result property="quantity" column="quantity"/>
+		<result property="lineTotal" column="line_total"/>
+		<result property="createdAt" column="created_at"/>
+	</resultMap>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO cafe_order_items (
+			order_id,
+			menu_id,
+			menu_name,
+			unit_price,
+			quantity,
+			line_total,
+			created_at
+		) VALUES (
+			#{orderId},
+			#{menuId},
+			#{menuName},
+			#{unitPrice},
+			#{quantity},
+			#{lineTotal},
+			#{createdAt}
+		)
+	</insert>
+
+	<select id="findByOrderId" resultMap="CafeOrderItemResultMap">
+		SELECT
+			id,
+			order_id,
+			menu_id,
+			menu_name,
+			unit_price,
+			quantity,
+			line_total,
+			created_at
+		FROM cafe_order_items
+		WHERE order_id = #{orderId}
+		ORDER BY id ASC
+	</select>
+</mapper>
+

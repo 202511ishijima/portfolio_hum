@@ -108,3 +108,80 @@ ALTER TABLE hamsters ADD COLUMN IF NOT EXISTS health_condition VARCHAR(255) DEFA
 UPDATE hamsters SET birth_date = COALESCE(birth_date, arrival_date);
 UPDATE hamsters SET health_condition = COALESCE(health_condition, '店頭で個別管理');
 ALTER TABLE hamsters DROP COLUMN IF EXISTS age_description;
+
+CREATE TABLE IF NOT EXISTS cafe_menus (
+	id VARCHAR(100) PRIMARY KEY,
+	category VARCHAR(30) NOT NULL,
+	name VARCHAR(120) NOT NULL,
+	description VARCHAR(600) NOT NULL,
+	price INT NOT NULL,
+	image VARCHAR(255),
+	available BOOLEAN NOT NULL DEFAULT TRUE,
+	display_order INT NOT NULL DEFAULT 0,
+	updated_at DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cafe_orders (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	visit_session_id BIGINT,
+	seat_no VARCHAR(30) NOT NULL,
+	status VARCHAR(30) NOT NULL,
+	subtotal INT NOT NULL,
+	tax INT NOT NULL,
+	total INT NOT NULL,
+	created_at DATETIME NOT NULL,
+	updated_at DATETIME NOT NULL,
+	paid_at DATETIME
+);
+
+ALTER TABLE cafe_orders ADD COLUMN IF NOT EXISTS visit_session_id BIGINT;
+
+CREATE TABLE IF NOT EXISTS cafe_order_items (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	order_id BIGINT NOT NULL,
+	menu_id VARCHAR(100) NOT NULL,
+	menu_name VARCHAR(120) NOT NULL,
+	unit_price INT NOT NULL,
+	quantity INT NOT NULL,
+	line_total INT NOT NULL,
+	created_at DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cafe_sales_daily (
+	sales_date DATE PRIMARY KEY,
+	order_count INT NOT NULL,
+	total_amount INT NOT NULL,
+	updated_at DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cafe_visit_sessions (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	session_token VARCHAR(100) NOT NULL UNIQUE,
+	seat_no VARCHAR(30) NOT NULL,
+	guest_count INT NOT NULL,
+	status VARCHAR(30) NOT NULL,
+	issued_at DATETIME NOT NULL,
+	expires_at DATETIME NOT NULL,
+	checkout_completed_at DATETIME,
+	updated_at DATETIME NOT NULL
+);
+
+MERGE INTO cafe_menus KEY(id) VALUES ('drink-01', 'DRINK', 'ハムスター柄のモカ', 'やさしい甘さのカフェモカ。看板メニューとして人気の一杯です。', 580, 'ham_moca.png', TRUE, 10, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('drink-02', 'DRINK', 'ミルクティー', 'まろやかな香りでゆったり楽しめる定番ドリンクです。', 560, 'Milk Tea.png', TRUE, 20, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('drink-03', 'DRINK', 'ほうじ茶ラテ', '香ばしさとやさしい甘さを合わせた落ち着いた味わいです。', 600, 'Roasted Tea Latte.png', TRUE, 30, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('drink-04', 'DRINK', 'キャラメルミルク', '写真映えする甘めのドリンクで、デザートとの相性も良好です。', 620, 'Caramel Milk.png', TRUE, 40, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('drink-05', 'DRINK', 'いちごソーダ', 'くすみピンクの色合いがかわいい、季節感のあるソーダです。', 590, 'Strawberry Soda.png', TRUE, 50, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('drink-06', 'DRINK', 'オレンジハーブティー', 'さっぱりした香りで、軽食と合わせやすい一杯です。', 540, 'Orange Herb Tea.png', TRUE, 60, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('drink-07', 'DRINK', 'ココア', 'やさしい甘さで、寒い日にも楽しみやすい定番メニューです。', 570, 'Cocoa.png', TRUE, 70, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('drink-08', 'DRINK', '季節のレモネード', '果実感を楽しめるすっきりした味わいのドリンクです。', 610, 'Seasonal Lemonade.png', TRUE, 80, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('food-01', 'FOOD', 'ふわとろオムライス', 'たまごのやわらかさを楽しめる、しっかり食べたい方向けの一皿です。', 980, 'Soft Omelette Rice.png', TRUE, 110, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('food-02', 'FOOD', 'クリームドリア', 'まろやかなソースで食べやすい、あたたかいごはんメニューです。', 1020, 'Cream Doria.png', TRUE, 120, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('food-03', 'FOOD', 'きのこパスタ', '香りよく仕上げた、落ち着いた味わいのパスタです。', 960, 'Mushroom Pasta.png', TRUE, 130, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('food-04', 'FOOD', 'ハムスタークッキープレート', '写真を撮りたくなるかわいさを意識したデザートプレートです。', 880, 'Hamster Cookie Plate.png', TRUE, 140, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('food-05', 'FOOD', 'ハムスター柄のパンケーキ', '看板メニューのひとつ。ふわふわ食感と見た目のかわいさが魅力です。', 920, 'ham_pan.png', TRUE, 150, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('food-06', 'FOOD', 'ベジスーププレート', '軽めに食べたいときにちょうどいい、やさしい味わいのセットです。', 900, 'Veggie Soup Plate.png', TRUE, 160, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('food-07', 'FOOD', 'チーズトースト', 'シンプルで食べやすく、ドリンクにも合わせやすい軽食です。', 760, 'Cheese Toast.png', TRUE, 170, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('food-08', 'FOOD', 'ミニグラタン', '小腹を満たしやすい、あたたかいオーブンメニューです。', 840, 'Mini Gratin.png', TRUE, 180, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('treat-01', 'TREAT', 'ひまわりの種おためし', '定番のえさ体験を気軽に楽しめる小さめサイズです。', 150, 'Sunflower Seed Trial.png', TRUE, 210, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('treat-02', 'TREAT', 'ベジチップおためし', 'やさしい味わいのベジチップを使った体験メニューです。', 180, 'Veggie Chip Trial.png', TRUE, 220, CURRENT_TIMESTAMP());
+MERGE INTO cafe_menus KEY(id) VALUES ('treat-03', 'TREAT', 'まるころスナックおためし', '写真にも映える、ころんとかわいい小さなスナックです。', 200, 'Round Snack Trial.png', TRUE, 230, CURRENT_TIMESTAMP());
