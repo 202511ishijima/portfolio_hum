@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
@@ -22,15 +22,7 @@
 			</div>
 		</header>
 
-		<nav class="admin-nav" aria-label="管理メニュー">
-			<a class="admin-nav-link" th:href="@{/admin/dashboard}">ダッシュボード</a>
-			<a class="admin-nav-link" th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
-			<a class="admin-nav-link" th:href="@{/admin/members}">会員管理</a>
-			<a class="admin-nav-link" th:href="@{/admin/employees}">従業員管理</a>
-			<a class="admin-nav-link" th:href="@{/admin/shifts}">シフト管理</a>
-			<a class="admin-nav-link" th:href="@{/admin/hamsters}">ハムスター管理</a>
-			<a class="admin-nav-link is-active" th:href="@{/admin/products/stocks}">商品在庫管理</a>
-		</nav>
+		<div th:replace="~{admin/fragments :: adminNav(${adminSection})}"></div>
 
 		<p class="admin-alert admin-alert--success" th:if="${productMessage}" th:text="${productMessage}">棚卸を反映しました。</p>
 		<p class="admin-alert admin-alert--error" th:if="${productError}" th:text="${productError}">更新に失敗しました。</p>
@@ -83,3 +75,4 @@
 	</div>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
@@ -22,26 +22,7 @@
 			</form>
 		</header>
 
-		<nav class="admin-nav" aria-label="管理メニュー">
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
-			   th:href="@{/admin/dashboard}">ダッシュボード</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
-			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
-			   th:href="@{/admin/members}">会員管理</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'employees'} ? ' is-active' : ''"
-			   th:href="@{/admin/employees}">従業員管理</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'shifts'} ? ' is-active' : ''"
-			   th:href="@{/admin/shifts}">シフト管理</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
-			   th:href="@{/admin/hamsters}">ハムスター管理</a>
-		</nav>
+		<div th:replace="~{admin/fragments :: adminNav(${adminSection})}"></div>
 
 		<p class="admin-alert admin-alert--success" th:if="${memberMessage}" th:text="${memberMessage}">会員情報を更新しました。</p>
 		<p class="admin-alert admin-alert--error" th:if="${memberError}" th:text="${memberError}">入力内容を確認してください。</p>
@@ -112,3 +93,4 @@
 	</div>
 </body>
 </html>
+

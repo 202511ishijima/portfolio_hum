@@ -103,4 +103,17 @@
 			updated_at = CURRENT_TIMESTAMP()
 		WHERE id = #{id}
 	</update>
+
+	<delete id="deleteById">
+		DELETE FROM employees
+		WHERE id = #{id}
+	</delete>
+
+	<update id="updateRole">
+		UPDATE employees
+		SET
+			role = #{role},
+			updated_at = CURRENT_TIMESTAMP()
+		WHERE id = #{id}
+	</update>
 </mapper>

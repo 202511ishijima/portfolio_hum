@@ -274,6 +274,16 @@ body.admin-body {
   color: var(--admin-text-soft);
 }
 
+.admin-accordion summary {
+  cursor: pointer;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.admin-accordion[open] summary {
+  margin-bottom: 16px;
+}
+
 .admin-stat-list {
   display: grid;
   gap: 12px;
@@ -408,6 +418,23 @@ body.admin-body {
 
 .admin-sort-icon {
   font-size: 0.8rem;
+}
+
+.admin-sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+}
+
+.admin-sort-button:hover {
+  color: var(--admin-main-deep);
 }
 
 .admin-table tr:last-child td {
@@ -625,6 +652,23 @@ body.admin-body {
 .admin-history-item {
   display: grid;
   gap: 8px;
+}
+
+.admin-history-item--self {
+  justify-items: end;
+}
+
+.admin-history-item--other {
+  justify-items: start;
+}
+
+.admin-history-item--self .admin-message-box,
+.admin-history-item--other .admin-message-box {
+  max-width: min(680px, 88%);
+}
+
+.admin-history-item--self .admin-message-box {
+  background: rgba(185, 139, 102, 0.16);
 }
 
 .admin-textarea {

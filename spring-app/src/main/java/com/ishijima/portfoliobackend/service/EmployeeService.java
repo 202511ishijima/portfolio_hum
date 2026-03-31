@@ -21,7 +21,13 @@ public interface EmployeeService {
 
 	void toggleActive(Long id, String actorLoginId);
 
+	void delete(Long id, String actorLoginId);
+
+	void updateRole(Long id, String role, String actorLoginId);
+
 	List<String> getAssignablePositions(String actorLoginId);
+
+	List<String> getAssignableRoles(String actorLoginId);
 
 	boolean canManagePosition(String actorLoginId, String targetPosition);
 

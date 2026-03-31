@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
@@ -23,16 +23,7 @@
 			</div>
 		</header>
 
-		<nav class="admin-nav" aria-label="管理メニュー">
-			<a class="admin-nav-link" th:href="@{/admin/dashboard}">ダッシュボード</a>
-			<a class="admin-nav-link" th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
-			<a class="admin-nav-link" th:href="@{/admin/members}">会員管理</a>
-			<a class="admin-nav-link" th:href="@{/admin/employees}">従業員管理</a>
-			<a class="admin-nav-link" th:href="@{/admin/shifts}">シフト管理</a>
-			<a class="admin-nav-link" th:href="@{/admin/hamsters}">ハムスター管理</a>
-			<a class="admin-nav-link" th:href="@{/admin/products/stocks}">商品在庫管理</a>
-			<a class="admin-nav-link is-active" th:href="@{/admin/cafe/reception}">カフェ注文</a>
-		</nav>
+		<div th:replace="~{admin/fragments :: adminNav(${adminSection})}"></div>
 
 		<p class="admin-alert admin-alert--success" th:if="${cafeMessage}" th:text="${cafeMessage}">発行しました。</p>
 		<p class="admin-alert admin-alert--error" th:if="${cafeError}" th:text="${cafeError}">処理に失敗しました。</p>
@@ -86,7 +77,12 @@
 				</div>
 			</div>
 			<div style="display:grid;gap:12px;justify-items:start;">
-				<img th:src="@{/admin/cafe/reception/qr/{token}(token=${issuedSession.sessionToken})}"
+				<img th:if="${issuedQrDataUrl != null}"
+				     th:src="${issuedQrDataUrl}"
+				     alt="注文QRコード"
+				     style="width:220px;height:220px;border:1px solid #e7d9ca;border-radius:12px;background:#fff;padding:10px;">
+				<img th:if="${issuedQrDataUrl == null}"
+				     th:src="@{/admin/cafe/reception/qr/{token}(token=${issuedSession.sessionToken})}"
 				     alt="注文QRコード"
 				     style="width:220px;height:220px;border:1px solid #e7d9ca;border-radius:12px;background:#fff;padding:10px;">
 			</div>
@@ -105,3 +101,4 @@
 	</div>
 </body>
 </html>
+

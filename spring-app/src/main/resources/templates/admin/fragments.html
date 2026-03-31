@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav class="admin-nav" aria-label="管理メニュー" th:fragment="adminNav(section)">
+	<a class="admin-nav-link"
+	   th:classappend="${section == 'dashboard'} ? ' is-active' : ''"
+	   th:href="@{/admin/dashboard}">ダッシュボード</a>
+	<a class="admin-nav-link"
+	   th:if="${canViewInquiries}"
+	   th:classappend="${section == 'inquiries'} ? ' is-active' : ''"
+	   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
+	<a class="admin-nav-link"
+	   th:if="${canViewMembers}"
+	   th:classappend="${section == 'members'} ? ' is-active' : ''"
+	   th:href="@{/admin/members}">会員管理</a>
+	<a class="admin-nav-link"
+	   th:if="${canViewEmployees}"
+	   th:classappend="${section == 'employees'} ? ' is-active' : ''"
+	   th:href="@{/admin/employees}">従業員管理</a>
+	<a class="admin-nav-link"
+	   th:if="${canViewShifts}"
+	   th:classappend="${section == 'shifts'} ? ' is-active' : ''"
+	   th:href="@{/admin/shifts}">シフト管理</a>
+	<a class="admin-nav-link"
+	   th:if="${canViewHamsters}"
+	   th:classappend="${section == 'hamsters'} ? ' is-active' : ''"
+	   th:href="@{/admin/hamsters}">ハムスター管理</a>
+	<a class="admin-nav-link"
+	   th:if="${canViewProducts}"
+	   th:classappend="${section == 'products'} ? ' is-active' : ''"
+	   th:href="@{/admin/products/stocks}">商品在庫管理</a>
+	<a class="admin-nav-link"
+	   th:if="${canViewCafe}"
+	   th:classappend="${section != null and #strings.startsWith(section, 'cafe')} ? ' is-active' : ''"
+	   th:href="@{/admin/cafe/orders}">カフェ注文</a>
+</nav>
+</body>
+</html>

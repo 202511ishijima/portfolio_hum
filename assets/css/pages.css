@@ -450,13 +450,22 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
+.cafe-order-card * {
+  cursor: pointer;
+}
+
 .cafe-order-card:hover {
   transform: translateY(-2px);
 }
 
 .cafe-order-card.is-disabled {
-  opacity: 0.58;
-  cursor: default;
+  opacity: 1;
+  cursor: pointer;
+  filter: none;
+}
+
+.cafe-order-card.is-disabled * {
+  cursor: pointer;
 }
 
 .cafe-order-card .media-photo {

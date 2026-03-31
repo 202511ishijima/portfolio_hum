@@ -15,7 +15,7 @@
 <body data-base-path="../" data-page="cafe-order">
   <main class="container page-shell">
     <header class="cafe-order-topbar">
-      <p id="cafe-session-summary" class="text-soft">セッション確認中...</p>
+      <p id="cafe-session-summary" class="text-soft">セッション情報を読み込み中...</p>
       <button class="button button--ghost" type="button" id="show-checkout-button">お会計</button>
     </header>
 
@@ -23,12 +23,14 @@
       <div class="section-heading">
         <p class="eyebrow">MENU</p>
         <h2>メニューを選択</h2>
-        <p>カードを押すと数量が1つずつ増えます。価格は管理画面の設定が反映されます。</p>
+        <p>カードを押すと数量が1つ増えます。数量は各商品の + / - で調整できます。</p>
       </div>
+
       <details class="contact-chat-accordion" open>
         <summary>ドリンク</summary>
         <div id="cafe-order-menu-drink" class="card-grid"></div>
       </details>
+
       <details class="contact-chat-accordion" open>
         <summary>フード</summary>
         <div id="cafe-order-menu-food" class="card-grid"></div>
@@ -37,7 +39,7 @@
 
     <section class="section-stack">
       <article class="form-card" id="checkout-summary" hidden>
-        <h2>ご注文履歴とお会計</h2>
+        <h2>注文履歴とお会計</h2>
         <div id="checkout-summary-content"></div>
       </article>
     </section>

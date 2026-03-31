@@ -38,14 +38,28 @@ public class AdminInquiryController {
 	public String inquiryList(
 		@RequestParam(defaultValue = "createdAt") String sort,
 		@RequestParam(defaultValue = "desc") String order,
+		@RequestParam(defaultValue = "false") boolean showCompleted,
 		Model model
 	) {
-		List<Inquiry> inquiries = inquiryService.findAll();
-		List<Inquiry> sortedInquiries = sortInquiries(inquiries, sort, order);
+		List<Inquiry> allInquiries = inquiryService.findAll();
+		List<Inquiry> visibleInquiries = showCompleted
+			? allInquiries
+			: allInquiries.stream()
+				.filter(inquiry -> !"COMPLETED".equals(inquiry.getStatus()))
+				.toList();
+		List<Inquiry> sortedInquiries = sortInquiries(visibleInquiries, sort, order);
+		long newCount = allInquiries.stream().filter(inquiry -> "NEW".equals(inquiry.getStatus())).count();
+		long inProgressCount = allInquiries.stream().filter(inquiry -> "IN_PROGRESS".equals(inquiry.getStatus())).count();
+		long completedCount = allInquiries.stream().filter(inquiry -> "COMPLETED".equals(inquiry.getStatus())).count();
 
 		model.addAttribute("inquiries", sortedInquiries);
+		model.addAttribute("totalInquiryCount", allInquiries.size());
+		model.addAttribute("newInquiryCount", newCount);
+		model.addAttribute("inProgressInquiryCount", inProgressCount);
+		model.addAttribute("completedInquiryCount", completedCount);
 		model.addAttribute("sort", normalizeSort(sort));
 		model.addAttribute("order", normalizeOrder(order));
+		model.addAttribute("showCompleted", showCompleted);
 		model.addAttribute("adminSection", "inquiries");
 		return "admin/inquiries";
 	}

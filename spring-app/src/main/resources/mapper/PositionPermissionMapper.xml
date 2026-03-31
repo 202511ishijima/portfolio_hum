@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.PositionPermissionMapper">
+
+	<resultMap id="PositionPermissionResultMap" type="com.ishijima.portfoliobackend.entity.PositionPermission">
+		<id property="position" column="position"/>
+		<result property="defaultRole" column="default_role"/>
+		<result property="canDashboard" column="can_dashboard"/>
+		<result property="canInquiries" column="can_inquiries"/>
+		<result property="canMembers" column="can_members"/>
+		<result property="canEmployees" column="can_employees"/>
+		<result property="canShifts" column="can_shifts"/>
+		<result property="canHamsters" column="can_hamsters"/>
+		<result property="canProducts" column="can_products"/>
+		<result property="canCafe" column="can_cafe"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<select id="findAll" resultMap="PositionPermissionResultMap">
+		SELECT
+			position,
+			default_role,
+			can_dashboard,
+			can_inquiries,
+			can_members,
+			can_employees,
+			can_shifts,
+			can_hamsters,
+			can_products,
+			can_cafe,
+			updated_at
+		FROM position_permissions
+		ORDER BY
+			CASE position
+				WHEN '本部' THEN 1
+				WHEN '店長' THEN 2
+				WHEN '副店長' THEN 3
+				WHEN 'リーダー' THEN 4
+				WHEN '一般従業員' THEN 5
+				ELSE 99
+			END
+	</select>
+
+	<select id="findByPosition" resultMap="PositionPermissionResultMap">
+		SELECT
+			position,
+			default_role,
+			can_dashboard,
+			can_inquiries,
+			can_members,
+			can_employees,
+			can_shifts,
+			can_hamsters,
+			can_products,
+			can_cafe,
+			updated_at
+		FROM position_permissions
+		WHERE position = #{position}
+	</select>
+
+	<insert id="upsert" parameterType="com.ishijima.portfoliobackend.entity.PositionPermission">
+		MERGE INTO position_permissions (
+			position,
+			default_role,
+			can_dashboard,
+			can_inquiries,
+			can_members,
+			can_employees,
+			can_shifts,
+			can_hamsters,
+			can_products,
+			can_cafe,
+			updated_at
+		) KEY(position)
+		VALUES (
+			#{position},
+			#{defaultRole},
+			#{canDashboard},
+			#{canInquiries},
+			#{canMembers},
+			#{canEmployees},
+			#{canShifts},
+			#{canHamsters},
+			#{canProducts},
+			#{canCafe},
+			#{updatedAt}
+		)
+	</insert>
+</mapper>

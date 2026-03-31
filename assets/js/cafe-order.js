@@ -1,15 +1,15 @@
 window.CafeOrderPage = (function () {
   const backendBaseUrl = "http://localhost:8080";
   const warningThresholdSeconds = 5 * 60;
-  let menuCache = [];
   let selectedCounts = {};
   let sessionToken = "";
   let sessionInfo = null;
+  let orderEnabled = false;
   let statusTimer = null;
   let sessionClockTimer = null;
 
   function yen(value) {
-    return `${Number(value || 0).toLocaleString("ja-JP")}円`;
+    return `¥${Number(value || 0).toLocaleString("ja-JP")}`;
   }
 
   function setStatus(message, isError) {
@@ -53,27 +53,35 @@ window.CafeOrderPage = (function () {
   }
 
   function setOrderEnabled(enabled) {
+    orderEnabled = !!enabled;
     const submit = document.getElementById("bottom-order-button");
-    if (submit) {
-      submit.disabled = !enabled;
-    }
+    if (submit) submit.disabled = !enabled;
+
     document.querySelectorAll("[data-order-card]").forEach((card) => {
       card.classList.toggle("is-disabled", !enabled);
     });
   }
 
+  function getRemainingSecondsLocal() {
+    if (!sessionInfo?.expiresAt) return 0;
+    const expires = new Date(sessionInfo.expiresAt).getTime();
+    if (!Number.isFinite(expires)) return 0;
+    const diff = Math.floor((expires - Date.now()) / 1000);
+    return Math.max(0, diff);
+  }
+
   function updateSessionSummary() {
     const el = document.getElementById("cafe-session-summary");
     if (!el) return;
+
     if (!sessionInfo) {
-      el.textContent = "セッション情報を取得できませんでした。";
+      el.textContent = "有効な注文セッションがありません。";
       return;
     }
 
     const remainingSeconds = getRemainingSecondsLocal();
     const remainingText = formatRemaining(remainingSeconds);
     const base = `座席: ${sessionInfo.seatNo} / 有効期限: ${formatDateTime(sessionInfo.expiresAt)} / 残り: ${remainingText}まで注文できます`;
-
     const canOrderNow = sessionInfo.status === "ACTIVE" && remainingSeconds > 0;
 
     if (!canOrderNow) {
@@ -94,11 +102,20 @@ window.CafeOrderPage = (function () {
     setOrderEnabled(true);
   }
 
+  async function fetchPublicMenu() {
+    const response = await fetch(`${backendBaseUrl}/api/cafe/menu`);
+    const payload = await response.json().catch(() => ([]));
+    if (!response.ok) {
+      throw new Error("メニューの取得に失敗しました。");
+    }
+    return Array.isArray(payload) ? payload : [];
+  }
+
   async function fetchOrderMenu() {
     const response = await fetch(`${backendBaseUrl}/api/cafe/order-menu?session=${encodeURIComponent(sessionToken)}`);
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      throw new Error(payload.message || "セッション確認に失敗しました。");
+      throw new Error(payload.message || "セッション認証に失敗しました。");
     }
     return payload;
   }
@@ -144,24 +161,6 @@ window.CafeOrderPage = (function () {
     `;
   }
 
-  function renderMenus(menu) {
-    const drinkTarget = document.getElementById("cafe-order-menu-drink");
-    const foodTarget = document.getElementById("cafe-order-menu-food");
-    if (!drinkTarget || !foodTarget) return;
-
-    const drinks = menu.filter((item) => String(item.category || item.type || "").toUpperCase() === "DRINK");
-    const foods = menu.filter((item) => {
-      const category = String(item.category || item.type || "").toUpperCase();
-      return category === "FOOD" || category === "TREAT";
-    });
-
-    drinkTarget.innerHTML = drinks.length ? drinks.map(renderMenuCard).join("") : "<p>ドリンクメニューはありません。</p>";
-    foodTarget.innerHTML = foods.length ? foods.map(renderMenuCard).join("") : "<p>フードメニューはありません。</p>";
-    bindMenuCardSelection();
-    bindCounterButtons();
-    refreshOrderCounts();
-  }
-
   function bindMenuCardSelection() {
     document.querySelectorAll("[data-order-card]").forEach((card) => {
       card.addEventListener("click", () => incrementMenuCount(card.dataset.orderCard));
@@ -190,6 +189,13 @@ window.CafeOrderPage = (function () {
     });
   }
 
+  function refreshOrderCounts() {
+    document.querySelectorAll("[data-order-count]").forEach((node) => {
+      const menuId = node.dataset.orderCount;
+      node.textContent = String(Number(selectedCounts[menuId] || 0));
+    });
+  }
+
   function incrementMenuCount(menuId) {
     selectedCounts[menuId] = Number(selectedCounts[menuId] || 0) + 1;
     refreshOrderCounts();
@@ -199,17 +205,27 @@ window.CafeOrderPage = (function () {
     const current = Number(selectedCounts[menuId] || 0);
     if (current <= 0) return;
     selectedCounts[menuId] = current - 1;
-    if (selectedCounts[menuId] <= 0) {
-      delete selectedCounts[menuId];
-    }
+    if (selectedCounts[menuId] <= 0) delete selectedCounts[menuId];
     refreshOrderCounts();
   }
 
-  function refreshOrderCounts() {
-    document.querySelectorAll("[data-order-count]").forEach((node) => {
-      const menuId = node.dataset.orderCount;
-      node.textContent = String(Number(selectedCounts[menuId] || 0));
+  function renderMenus(menu) {
+    const drinkTarget = document.getElementById("cafe-order-menu-drink");
+    const foodTarget = document.getElementById("cafe-order-menu-food");
+    if (!drinkTarget || !foodTarget) return;
+
+    const drinks = menu.filter((item) => String(item.category || item.type || "").toUpperCase() === "DRINK");
+    const foods = menu.filter((item) => {
+      const category = String(item.category || item.type || "").toUpperCase();
+      return category === "FOOD" || category === "TREAT";
     });
+
+    drinkTarget.innerHTML = drinks.length ? drinks.map(renderMenuCard).join("") : "<p>ドリンクメニューはありません。</p>";
+    foodTarget.innerHTML = foods.length ? foods.map(renderMenuCard).join("") : "<p>フードメニューはありません。</p>";
+
+    bindMenuCardSelection();
+    bindCounterButtons();
+    refreshOrderCounts();
   }
 
   function renderHistoryContent(payload) {
@@ -232,15 +248,13 @@ window.CafeOrderPage = (function () {
             <p><strong>注文番号:</strong> ${order.orderId} / <strong>状態:</strong> ${order.status}</p>
             <p class="text-soft">${formatDateTime(order.createdAt)}</p>
             <ul class="check-list">
-              ${(order.items || []).map((item) => `
-                <li>${item.menuName} x ${item.quantity} ＝ ${yen(item.lineTotal)}</li>
-              `).join("")}
+              ${(order.items || []).map((item) => `<li>${item.menuName} x ${item.quantity} ・・${yen(item.lineTotal)}</li>`).join("")}
             </ul>
             <p><strong>小計:</strong> ${yen(order.total)}</p>
           </article>
         `).join("")}
       </div>
-      <p class="price">合計金額: ${yen(payload.grandTotal || 0)}</p>
+      <p class="price">合計: ${yen(payload.grandTotal || 0)}</p>
     `;
     wrapper.hidden = false;
   }
@@ -248,10 +262,7 @@ window.CafeOrderPage = (function () {
   function collectItems() {
     return Object.entries(selectedCounts)
       .filter(([, quantity]) => Number(quantity) > 0)
-      .map(([menuId, quantity]) => ({
-        menuId,
-        quantity: Number(quantity)
-      }));
+      .map(([menuId, quantity]) => ({ menuId, quantity: Number(quantity) }));
   }
 
   async function submitOrder(event) {
@@ -264,7 +275,7 @@ window.CafeOrderPage = (function () {
 
     const items = collectItems();
     if (!items.length) {
-      setStatus("カードを押して注文商品を選択してください。", true);
+      setStatus("カードを押して注文数量を選択してください。", true);
       return;
     }
 
@@ -291,6 +302,10 @@ window.CafeOrderPage = (function () {
   }
 
   async function showCheckoutSummary() {
+    if (!sessionToken) {
+      setStatus("有効な注文セッションがありません。", true);
+      return;
+    }
     try {
       const payload = await fetchOrderHistory();
       renderHistoryContent(payload);
@@ -323,21 +338,21 @@ window.CafeOrderPage = (function () {
     }, 1000);
   }
 
-  function getRemainingSecondsLocal() {
-    if (!sessionInfo?.expiresAt) return 0;
-    const expires = new Date(sessionInfo.expiresAt).getTime();
-    if (!Number.isFinite(expires)) return 0;
-    const diff = Math.floor((expires - Date.now()) / 1000);
-    return Math.max(0, diff);
-  }
-
   async function init() {
     const form = document.getElementById("cafe-order-form");
     if (!form) return;
+    form.addEventListener("submit", submitOrder);
+    document.getElementById("show-checkout-button")?.addEventListener("click", showCheckoutSummary);
 
     sessionToken = getSessionTokenFromQuery();
     if (!sessionToken) {
-      setStatus("注文用セッションが見つかりません。レシートQRからアクセスしてください。", true);
+      try {
+        renderMenus(await fetchPublicMenu());
+      } catch (_error) {
+        // ignore
+      }
+      const summary = document.getElementById("cafe-session-summary");
+      if (summary) summary.textContent = "有効な注文セッションがありません。レシートのQRからアクセスしてください。";
       setOrderEnabled(false);
       return;
     }
@@ -345,30 +360,25 @@ window.CafeOrderPage = (function () {
     try {
       const payload = await fetchOrderMenu();
       sessionInfo = payload.session;
-      menuCache = Array.isArray(payload.menus) ? payload.menus : [];
-      renderMenus(menuCache);
+      renderMenus(Array.isArray(payload.menus) ? payload.menus : []);
       updateSessionSummary();
       startStatusPolling();
       startSessionClock();
     } catch (error) {
-      setStatus(error.message || "注文ページの初期化に失敗しました。", true);
+      try {
+        renderMenus(await fetchPublicMenu());
+      } catch (_menuError) {
+        // ignore
+      }
+      const summary = document.getElementById("cafe-session-summary");
+      if (summary) summary.textContent = error.message || "注文ページの読み込みに失敗しました。";
       setOrderEnabled(false);
-      return;
     }
-
-    form.addEventListener("submit", submitOrder);
-    document.getElementById("show-checkout-button")?.addEventListener("click", showCheckoutSummary);
   }
 
   window.addEventListener("beforeunload", () => {
-    if (statusTimer) {
-      clearInterval(statusTimer);
-      statusTimer = null;
-    }
-    if (sessionClockTimer) {
-      clearInterval(sessionClockTimer);
-      sessionClockTimer = null;
-    }
+    if (statusTimer) clearInterval(statusTimer);
+    if (sessionClockTimer) clearInterval(sessionClockTimer);
   });
 
   document.addEventListener("DOMContentLoaded", init);

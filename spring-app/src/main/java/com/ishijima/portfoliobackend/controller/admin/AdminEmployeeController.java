@@ -1,9 +1,11 @@
 package com.ishijima.portfoliobackend.controller.admin;
 
 import com.ishijima.portfoliobackend.entity.Employee;
+import com.ishijima.portfoliobackend.entity.PositionPermission;
 import com.ishijima.portfoliobackend.form.EmployeeCreateForm;
 import com.ishijima.portfoliobackend.form.EmployeeUpdateForm;
 import com.ishijima.portfoliobackend.service.EmployeeService;
+import com.ishijima.portfoliobackend.service.PositionPermissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -25,6 +28,7 @@ import java.util.List;
 public class AdminEmployeeController {
 
 	private final EmployeeService employeeService;
+	private final PositionPermissionService positionPermissionService;
 
 	@GetMapping
 	public String list(Model model, Principal principal) {
@@ -39,6 +43,55 @@ public class AdminEmployeeController {
 		model.addAttribute("canCreateEmployee", employeeService.isHeadOffice(principal.getName()));
 		model.addAttribute("adminSection", "employees");
 		return "admin/employees";
+	}
+
+	@GetMapping("/permissions")
+	public String permissions(Model model, Principal principal, RedirectAttributes redirectAttributes) {
+		if (!employeeService.isHeadOffice(principal.getName())) {
+			redirectAttributes.addFlashAttribute("employeeError", "Only head office can open position permissions.");
+			return "redirect:/admin/employees";
+		}
+		model.addAttribute("permissions", positionPermissionService.findAll());
+		model.addAttribute("adminSection", "employees");
+		return "admin/employee-permissions";
+	}
+
+	@PostMapping("/permissions/{position}")
+	public String updatePermission(
+		@PathVariable String position,
+		@RequestParam(defaultValue = "false") boolean canDashboard,
+		@RequestParam(defaultValue = "false") boolean canInquiries,
+		@RequestParam(defaultValue = "false") boolean canMembers,
+		@RequestParam(defaultValue = "false") boolean canEmployees,
+		@RequestParam(defaultValue = "false") boolean canShifts,
+		@RequestParam(defaultValue = "false") boolean canHamsters,
+		@RequestParam(defaultValue = "false") boolean canProducts,
+		@RequestParam(defaultValue = "false") boolean canCafe,
+		Principal principal,
+		RedirectAttributes redirectAttributes
+	) {
+		if (!employeeService.isHeadOffice(principal.getName())) {
+			redirectAttributes.addFlashAttribute("employeeError", "Only head office can update position permissions.");
+			return "redirect:/admin/employees";
+		}
+		try {
+			PositionPermission permission = PositionPermission.builder()
+				.position(position)
+				.canDashboard(canDashboard)
+				.canInquiries(canInquiries)
+				.canMembers(canMembers)
+				.canEmployees(canEmployees)
+				.canShifts(canShifts)
+				.canHamsters(canHamsters)
+				.canProducts(canProducts)
+				.canCafe(canCafe)
+				.build();
+			positionPermissionService.update(permission, principal.getName());
+			redirectAttributes.addFlashAttribute("employeeMessage", "Position permission updated.");
+		} catch (IllegalArgumentException ex) {
+			redirectAttributes.addFlashAttribute("employeeError", ex.getMessage());
+		}
+		return "redirect:/admin/employees/permissions";
 	}
 
 	@GetMapping("/new")
@@ -159,4 +212,16 @@ public class AdminEmployeeController {
 		}
 		return "redirect:/admin/employees";
 	}
+
+	@PostMapping("/{id}/delete")
+	public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes, Principal principal) {
+		try {
+			employeeService.delete(id, principal.getName());
+			redirectAttributes.addFlashAttribute("employeeMessage", "Employee account deleted.");
+		} catch (IllegalArgumentException ex) {
+			redirectAttributes.addFlashAttribute("employeeError", ex.getMessage());
+		}
+		return "redirect:/admin/employees";
+	}
+
 }

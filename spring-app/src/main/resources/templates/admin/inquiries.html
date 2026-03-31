@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
@@ -22,43 +22,24 @@
 			</form>
 		</header>
 
-		<nav class="admin-nav" aria-label="管理メニュー">
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'dashboard'} ? ' is-active' : ''"
-			   th:href="@{/admin/dashboard}">ダッシュボード</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'inquiries'} ? ' is-active' : ''"
-			   th:href="@{/admin/inquiries}">お問い合わせ一覧</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'members'} ? ' is-active' : ''"
-			   th:href="@{/admin/members}">会員管理</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'employees'} ? ' is-active' : ''"
-			   th:href="@{/admin/employees}">従業員管理</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'shifts'} ? ' is-active' : ''"
-			   th:href="@{/admin/shifts}">シフト管理</a>
-			<a class="admin-nav-link"
-			   th:classappend="${adminSection == 'hamsters'} ? ' is-active' : ''"
-			   th:href="@{/admin/hamsters}">ハムスター管理</a>
-		</nav>
+		<div th:replace="~{admin/fragments :: adminNav(${adminSection})}"></div>
 
 		<section class="admin-summary-grid">
 			<article class="admin-summary-card">
 				<h2>総件数</h2>
-				<p class="admin-summary-number" th:text="${#lists.size(inquiries)}">0</p>
+				<p class="admin-summary-number" th:text="${totalInquiryCount}">0</p>
 			</article>
 			<article class="admin-summary-card">
 				<h2>未対応</h2>
-				<p class="admin-summary-number" th:text="${#lists.size(inquiries.?[status == 'NEW'])}">0</p>
+				<p class="admin-summary-number" th:text="${newInquiryCount}">0</p>
 			</article>
 			<article class="admin-summary-card">
 				<h2>対応中</h2>
-				<p class="admin-summary-number" th:text="${#lists.size(inquiries.?[status == 'IN_PROGRESS'])}">0</p>
+				<p class="admin-summary-number" th:text="${inProgressInquiryCount}">0</p>
 			</article>
 			<article class="admin-summary-card">
 				<h2>対応済み</h2>
-				<p class="admin-summary-number" th:text="${#lists.size(inquiries.?[status == 'COMPLETED'])}">0</p>
+				<p class="admin-summary-number" th:text="${completedInquiryCount}">0</p>
 			</article>
 		</section>
 
@@ -69,6 +50,14 @@
 					<p th:if="${!#lists.isEmpty(inquiries)}">列名を押すと並び順を変更できます。</p>
 					<p th:if="${#lists.isEmpty(inquiries)}">まだお問い合わせは登録されていません。</p>
 				</div>
+				<div class="admin-header-actions">
+					<a class="admin-link-button admin-button--ghost"
+					   th:if="${!showCompleted}"
+					   th:href="@{/admin/inquiries(sort=${sort}, order=${order}, showCompleted=true)}">対応済みを表示</a>
+					<a class="admin-link-button admin-button--ghost"
+					   th:if="${showCompleted}"
+					   th:href="@{/admin/inquiries(sort=${sort}, order=${order}, showCompleted=false)}">対応済みを非表示</a>
+				</div>
 			</div>
 
 			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(inquiries)}">
@@ -78,7 +67,7 @@
 							<th>
 								<a class="admin-sort-link"
 								   th:classappend="${sort == 'id'} ? ' is-active' : ''"
-								   th:href="@{/admin/inquiries(sort='id', order=${sort == 'id' and order == 'asc' ? 'desc' : 'asc'})}">
+								   th:href="@{/admin/inquiries(sort='id', order=${sort == 'id' and order == 'asc' ? 'desc' : 'asc'}, showCompleted=${showCompleted})}">
 									ID
 									<span class="admin-sort-icon" th:if="${sort == 'id'}" th:text="${order == 'asc' ? '↑' : '↓'}">↓</span>
 								</a>
@@ -86,7 +75,7 @@
 							<th>
 								<a class="admin-sort-link"
 								   th:classappend="${sort == 'createdAt'} ? ' is-active' : ''"
-								   th:href="@{/admin/inquiries(sort='createdAt', order=${sort == 'createdAt' and order == 'asc' ? 'desc' : 'asc'})}">
+								   th:href="@{/admin/inquiries(sort='createdAt', order=${sort == 'createdAt' and order == 'asc' ? 'desc' : 'asc'}, showCompleted=${showCompleted})}">
 									受信日時
 									<span class="admin-sort-icon" th:if="${sort == 'createdAt'}" th:text="${order == 'asc' ? '↑' : '↓'}">↓</span>
 								</a>
@@ -94,7 +83,7 @@
 							<th>
 								<a class="admin-sort-link"
 								   th:classappend="${sort == 'name'} ? ' is-active' : ''"
-								   th:href="@{/admin/inquiries(sort='name', order=${sort == 'name' and order == 'asc' ? 'desc' : 'asc'})}">
+								   th:href="@{/admin/inquiries(sort='name', order=${sort == 'name' and order == 'asc' ? 'desc' : 'asc'}, showCompleted=${showCompleted})}">
 									お名前
 									<span class="admin-sort-icon" th:if="${sort == 'name'}" th:text="${order == 'asc' ? '↑' : '↓'}">↓</span>
 								</a>
@@ -102,7 +91,7 @@
 							<th>
 								<a class="admin-sort-link"
 								   th:classappend="${sort == 'email'} ? ' is-active' : ''"
-								   th:href="@{/admin/inquiries(sort='email', order=${sort == 'email' and order == 'asc' ? 'desc' : 'asc'})}">
+								   th:href="@{/admin/inquiries(sort='email', order=${sort == 'email' and order == 'asc' ? 'desc' : 'asc'}, showCompleted=${showCompleted})}">
 									メールアドレス
 									<span class="admin-sort-icon" th:if="${sort == 'email'}" th:text="${order == 'asc' ? '↑' : '↓'}">↓</span>
 								</a>
@@ -110,7 +99,7 @@
 							<th>
 								<a class="admin-sort-link"
 								   th:classappend="${sort == 'subject'} ? ' is-active' : ''"
-								   th:href="@{/admin/inquiries(sort='subject', order=${sort == 'subject' and order == 'asc' ? 'desc' : 'asc'})}">
+								   th:href="@{/admin/inquiries(sort='subject', order=${sort == 'subject' and order == 'asc' ? 'desc' : 'asc'}, showCompleted=${showCompleted})}">
 									件名
 									<span class="admin-sort-icon" th:if="${sort == 'subject'}" th:text="${order == 'asc' ? '↑' : '↓'}">↓</span>
 								</a>
@@ -118,7 +107,7 @@
 							<th>
 								<a class="admin-sort-link"
 								   th:classappend="${sort == 'status'} ? ' is-active' : ''"
-								   th:href="@{/admin/inquiries(sort='status', order=${sort == 'status' and order == 'asc' ? 'desc' : 'asc'})}">
+								   th:href="@{/admin/inquiries(sort='status', order=${sort == 'status' and order == 'asc' ? 'desc' : 'asc'}, showCompleted=${showCompleted})}">
 									対応状況
 									<span class="admin-sort-icon" th:if="${sort == 'status'}" th:text="${order == 'asc' ? '↑' : '↓'}">↓</span>
 								</a>
@@ -175,3 +164,4 @@
 	</script>
 </body>
 </html>
+

@@ -21,4 +21,8 @@ public interface EmployeeMapper {
 	void update(Employee employee);
 
 	void updateActive(@Param("id") Long id, @Param("active") boolean active);
+
+	void deleteById(@Param("id") Long id);
+
+	void updateRole(@Param("id") Long id, @Param("role") String role);
 }

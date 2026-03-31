@@ -21,8 +21,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	private final EmployeeMapper employeeMapper;
 	private final PasswordEncoder passwordEncoder;
+	private final PositionPermissionService positionPermissionService;
 
 	private static final Map<String, Integer> POSITION_RANK = new LinkedHashMap<>();
+	private static final Map<String, Integer> ROLE_RANK = new LinkedHashMap<>();
 
 	static {
 		POSITION_RANK.put("本部", 5);
@@ -30,6 +32,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 		POSITION_RANK.put("副店長", 3);
 		POSITION_RANK.put("リーダー", 2);
 		POSITION_RANK.put("一般従業員", 1);
+
+		ROLE_RANK.put("ADMIN", 4);
+		ROLE_RANK.put("STAFF_MANAGER", 3);
+		ROLE_RANK.put("STAFF", 2);
+		ROLE_RANK.put("VIEWER", 1);
 	}
 
 	@Override
@@ -112,6 +119,39 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
+	@Transactional
+	public void delete(Long id, String actorLoginId) {
+		Employee target = findById(id);
+		Employee actor = findByEmail(actorLoginId)
+			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
+
+		if (actor.getId() != null && actor.getId().equals(target.getId())) {
+			throw new IllegalArgumentException("You cannot delete your own account.");
+		}
+		assertCanAssign(actorLoginId, target.getPosition());
+		employeeMapper.deleteById(id);
+	}
+
+	@Override
+	@Transactional
+	public void updateRole(Long id, String role, String actorLoginId) {
+		Employee target = findById(id);
+		Employee actor = findByEmail(actorLoginId)
+			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
+
+		if (actor.getId() != null && actor.getId().equals(target.getId())) {
+			throw new IllegalArgumentException("You cannot change your own role.");
+		}
+		assertCanAssign(actorLoginId, target.getPosition());
+
+		List<String> assignableRoles = getAssignableRoles(actorLoginId);
+		if (role == null || !assignableRoles.contains(role)) {
+			throw new IllegalArgumentException("You can assign only roles below your own.");
+		}
+		employeeMapper.updateRole(id, role);
+	}
+
+	@Override
 	public List<String> getAssignablePositions(String actorLoginId) {
 		Employee actor = findByEmail(actorLoginId)
 			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
@@ -120,6 +160,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 			throw new IllegalArgumentException("Invalid actor position.");
 		}
 		return POSITION_RANK.entrySet().stream()
+			.filter(entry -> entry.getValue() < actorRank)
+			.map(Map.Entry::getKey)
+			.toList();
+	}
+
+	@Override
+	public List<String> getAssignableRoles(String actorLoginId) {
+		Employee actor = findByEmail(actorLoginId)
+			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
+		Integer actorRank = ROLE_RANK.get(actor.getRole());
+		if (actorRank == null) {
+			throw new IllegalArgumentException("Invalid actor role.");
+		}
+		return ROLE_RANK.entrySet().stream()
 			.filter(entry -> entry.getValue() < actorRank)
 			.map(Map.Entry::getKey)
 			.toList();
@@ -155,11 +209,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	private String mapRoleFromPosition(String position) {
-		return switch (position) {
-			case "本部" -> "ADMIN";
-			case "店長", "副店長" -> "STAFF_MANAGER";
-			case "リーダー", "一般従業員" -> "STAFF";
-			default -> throw new IllegalArgumentException("Invalid position.");
-		};
+		return positionPermissionService.resolveRoleByPosition(position);
 	}
 }

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 import java.util.List;
 
 @Controller
@@ -81,6 +82,7 @@ public class AdminCafeController {
 			redirectAttributes.addFlashAttribute("cafeMessage", "受付を発行しました。");
 			redirectAttributes.addFlashAttribute("issuedSession", session);
 			redirectAttributes.addFlashAttribute("issuedOrderUrl", orderUrl);
+			redirectAttributes.addFlashAttribute("issuedQrDataUrl", buildQrDataUrl(orderUrl));
 		} catch (IllegalArgumentException ex) {
 			redirectAttributes.addFlashAttribute("cafeError", ex.getMessage());
 		}
@@ -110,6 +112,7 @@ public class AdminCafeController {
 			redirectAttributes.addFlashAttribute("cafeMessage", "自動割り当てで受付を発行しました。");
 			redirectAttributes.addFlashAttribute("issuedSession", session);
 			redirectAttributes.addFlashAttribute("issuedOrderUrl", orderUrl);
+			redirectAttributes.addFlashAttribute("issuedQrDataUrl", buildQrDataUrl(orderUrl));
 		} catch (IllegalArgumentException ex) {
 			redirectAttributes.addFlashAttribute("cafeError", ex.getMessage());
 		}
@@ -255,5 +258,17 @@ public class AdminCafeController {
 
 	private String buildOrderUrl(String token) {
 		return FRONT_ORDER_BASE_URL + token;
+	}
+
+	private String buildQrDataUrl(String text) {
+		try {
+			QRCodeWriter qrCodeWriter = new QRCodeWriter();
+			BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 320, 320);
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+			return "data:image/png;base64," + Base64.getEncoder().encodeToString(outputStream.toByteArray());
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 }
