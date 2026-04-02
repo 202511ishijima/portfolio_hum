@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
@@ -31,7 +31,7 @@
 		<section class="admin-card">
 			<form class="admin-form"
 			      th:object="${shiftForm}"
-			      th:action="${mode == 'create'} ? @{/admin/shifts/new} : @{/admin/shifts/{id}/edit(id=${shift.id})}"
+			      th:action="${mode == 'create'} ? @{/admin/shifts/create-disabled} : @{/admin/shifts/{id}/edit(id=${shift.id})}"
 			      method="post">
 
 				<label class="admin-field">
@@ -40,7 +40,7 @@
 						<option value="">選択してください</option>
 						<option th:each="employee : ${employeeOptions}"
 						        th:value="${employee.id}"
-						        th:text="${employee.name + ' (' + employee.role + ')'}">山田 花子</option>
+						        th:text="${employee.name + '（' + employee.position + '）'}">山田 花子</option>
 					</select>
 					<small class="admin-field-error" th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}">Error</small>
 				</label>
@@ -52,20 +52,18 @@
 				</label>
 
 				<label class="admin-field">
-					<span>開始時刻</span>
-					<input th:field="*{startTime}" type="time">
-					<small class="admin-field-error" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}">Error</small>
+					<span>シフト区分</span>
+					<select th:field="*{shiftSlot}">
+						<option value="">選択してください</option>
+						<option th:each="slot : ${shiftSlots}" th:value="${slot.value}" th:text="${slot.label}">終日</option>
+					</select>
+					<small class="admin-help-text">副店長以上は終日のみ登録できます。</small>
+					<small class="admin-field-error" th:if="${#fields.hasErrors('shiftSlot')}" th:errors="*{shiftSlot}">Error</small>
 				</label>
 
 				<label class="admin-field">
-					<span>終了時刻</span>
-					<input th:field="*{endTime}" type="time">
-					<small class="admin-field-error" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}">Error</small>
-				</label>
-
-				<label class="admin-field">
-					<span>メモ</span>
-					<input th:field="*{note}" type="text" placeholder="任意">
+					<span>メモ（任意）</span>
+					<input th:field="*{note}" type="text" placeholder="例）研修対応">
 					<small class="admin-field-error" th:if="${#fields.hasErrors('note')}" th:errors="*{note}">Error</small>
 				</label>
 
@@ -78,4 +76,3 @@
 	</div>
 </body>
 </html>
-

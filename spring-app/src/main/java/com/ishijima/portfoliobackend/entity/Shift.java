@@ -18,9 +18,26 @@ public class Shift {
 	private Long employeeId;
 	private String employeeName;
 	private LocalDate workDate;
+	private String shiftSlot;
 	private LocalTime startTime;
 	private LocalTime endTime;
 	private String note;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
+
+	public ShiftSlot getShiftSlotEnum() {
+		return ShiftSlot.from(shiftSlot);
+	}
+
+	public String getShiftSlotLabel() {
+		return getShiftSlotEnum().getLabel();
+	}
+
+	public String getShiftSlotShortLabel() {
+		return switch (getShiftSlotEnum()) {
+			case EARLY -> "早";
+			case LATE -> "遅";
+			case FULL -> "終";
+		};
+	}
 }

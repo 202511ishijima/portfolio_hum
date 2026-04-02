@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.ShiftRequestMapper">
+
+	<resultMap id="ShiftRequestSettingResultMap" type="com.ishijima.portfoliobackend.entity.ShiftRequestSetting">
+		<id property="id" column="id"/>
+		<result property="employeeId" column="employee_id"/>
+		<result property="targetYear" column="target_year"/>
+		<result property="targetMonth" column="target_month"/>
+		<result property="weeklyDays" column="weekly_days"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<resultMap id="ShiftRequestDayResultMap" type="com.ishijima.portfoliobackend.entity.ShiftRequestDay">
+		<id property="id" column="id"/>
+		<result property="employeeId" column="employee_id"/>
+		<result property="requestDate" column="request_date"/>
+		<result property="requestSlot" column="request_slot"/>
+		<result property="targetYear" column="target_year"/>
+		<result property="targetMonth" column="target_month"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<select id="findSetting" resultMap="ShiftRequestSettingResultMap">
+		SELECT id, employee_id, target_year, target_month, weekly_days, updated_at
+		FROM shift_request_settings
+		WHERE employee_id = #{employeeId}
+		  AND target_year = #{targetYear}
+		  AND target_month = #{targetMonth}
+	</select>
+
+	<insert id="upsertSetting" parameterType="com.ishijima.portfoliobackend.entity.ShiftRequestSetting">
+		MERGE INTO shift_request_settings (
+			employee_id,
+			target_year,
+			target_month,
+			weekly_days,
+			updated_at
+		) KEY(employee_id, target_year, target_month)
+		VALUES (
+			#{employeeId},
+			#{targetYear},
+			#{targetMonth},
+			#{weeklyDays},
+			#{updatedAt}
+		)
+	</insert>
+
+	<select id="findDaysByMonth" resultMap="ShiftRequestDayResultMap">
+		SELECT id, employee_id, request_date, request_slot, target_year, target_month, updated_at
+		FROM shift_request_days
+		WHERE employee_id = #{employeeId}
+		  AND target_year = #{targetYear}
+		  AND target_month = #{targetMonth}
+		ORDER BY request_date ASC
+	</select>
+
+	<select id="findAllDaysByMonth" resultMap="ShiftRequestDayResultMap">
+		SELECT id, employee_id, request_date, request_slot, target_year, target_month, updated_at
+		FROM shift_request_days
+		WHERE target_year = #{targetYear}
+		  AND target_month = #{targetMonth}
+		ORDER BY employee_id ASC, request_date ASC
+	</select>
+
+	<select id="findAllSettingsByMonth" resultMap="ShiftRequestSettingResultMap">
+		SELECT id, employee_id, target_year, target_month, weekly_days, updated_at
+		FROM shift_request_settings
+		WHERE target_year = #{targetYear}
+		  AND target_month = #{targetMonth}
+		ORDER BY employee_id ASC
+	</select>
+
+	<delete id="deleteDaysByMonth">
+		DELETE FROM shift_request_days
+		WHERE employee_id = #{employeeId}
+		  AND target_year = #{targetYear}
+		  AND target_month = #{targetMonth}
+	</delete>
+
+	<insert id="insertDay" parameterType="com.ishijima.portfoliobackend.entity.ShiftRequestDay">
+		INSERT INTO shift_request_days (
+			employee_id,
+			request_date,
+			request_slot,
+			target_year,
+			target_month,
+			updated_at
+		) VALUES (
+			#{employeeId},
+			#{requestDate},
+			#{requestSlot},
+			#{targetYear},
+			#{targetMonth},
+			#{updatedAt}
+		)
+	</insert>
+</mapper>

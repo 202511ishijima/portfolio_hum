@@ -31,17 +31,17 @@
 					<thead>
 						<tr>
 							<th>勤務日</th>
-							<th>開始</th>
-							<th>終了</th>
+							<th>区分</th>
+							<th>時間</th>
 							<th>メモ</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr th:each="shift : ${shifts}">
 							<td th:text="${#temporals.format(shift.workDate, 'yyyy/MM/dd')}">2026/03/27</td>
-							<td th:text="${#temporals.format(shift.startTime, 'HH:mm')}">09:00</td>
-							<td th:text="${#temporals.format(shift.endTime, 'HH:mm')}">18:00</td>
-							<td th:text="${shift.note}">通常勤務</td>
+							<td th:text="${shift.shiftSlotLabel}">終日</td>
+							<td th:text="${#temporals.format(shift.startTime, 'HH:mm') + ' - ' + #temporals.format(shift.endTime, 'HH:mm')}">10:00 - 21:00</td>
+							<td th:text="${#strings.isEmpty(shift.note) ? '-' : shift.note}">通常勤務</td>
 						</tr>
 					</tbody>
 				</table>

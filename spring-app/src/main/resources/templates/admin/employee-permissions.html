@@ -36,10 +36,20 @@
 					<h2>役職ごとの権限設定</h2>
 					<p>チェックを入れたメニューが表示され、対応URLにもアクセス可能になります。</p>
 				</div>
+				<div class="admin-header-actions">
+					<form id="permissions-batch-form" th:action="@{/admin/employees/permissions/apply}" method="post">
+						<input type="hidden" name="payload" id="permissions-payload">
+					</form>
+					<button id="permissions-apply-button"
+					        class="admin-button"
+					        type="submit"
+					        form="permissions-batch-form"
+					        disabled>適用</button>
+				</div>
 			</div>
 
 			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(permissions)}">
-				<table class="admin-table">
+				<table class="admin-table" data-permission-table="true">
 					<thead>
 						<tr>
 							<th>役職</th>
@@ -51,26 +61,19 @@
 							<th>ハムスター管理</th>
 							<th>商品在庫管理</th>
 							<th>カフェ注文</th>
-							<th>保存</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="permission, stat : ${permissions}">
-							<th:block th:with="formId=${'perm-form-' + stat.index}">
-								<td th:text="${permission.position}">一般従業員</td>
-								<td><input type="checkbox" name="canDashboard" th:checked="${permission.canDashboard}" th:attr="form=${formId}"></td>
-								<td><input type="checkbox" name="canInquiries" th:checked="${permission.canInquiries}" th:attr="form=${formId}"></td>
-								<td><input type="checkbox" name="canMembers" th:checked="${permission.canMembers}" th:attr="form=${formId}"></td>
-								<td><input type="checkbox" name="canEmployees" th:checked="${permission.canEmployees}" th:attr="form=${formId}"></td>
-								<td><input type="checkbox" name="canShifts" th:checked="${permission.canShifts}" th:attr="form=${formId}"></td>
-								<td><input type="checkbox" name="canHamsters" th:checked="${permission.canHamsters}" th:attr="form=${formId}"></td>
-								<td><input type="checkbox" name="canProducts" th:checked="${permission.canProducts}" th:attr="form=${formId}"></td>
-								<td><input type="checkbox" name="canCafe" th:checked="${permission.canCafe}" th:attr="form=${formId}"></td>
-								<td>
-									<form th:id="${formId}" th:action="@{/admin/employees/permissions/{position}(position=${permission.position})}" method="post"></form>
-									<button class="admin-button admin-button--ghost" type="submit" th:attr="form=${formId}">更新</button>
-								</td>
-							</th:block>
+						<tr th:each="permission : ${permissions}" th:attr="data-position=${permission.position}">
+							<td th:text="${permission.position}">一般従業員</td>
+							<td><input type="checkbox" data-perm-key="canDashboard" th:checked="${permission.canDashboard}"></td>
+							<td><input type="checkbox" data-perm-key="canInquiries" th:checked="${permission.canInquiries}"></td>
+							<td><input type="checkbox" data-perm-key="canMembers" th:checked="${permission.canMembers}"></td>
+							<td><input type="checkbox" data-perm-key="canEmployees" th:checked="${permission.canEmployees}"></td>
+							<td><input type="checkbox" data-perm-key="canShifts" th:checked="${permission.canShifts}"></td>
+							<td><input type="checkbox" data-perm-key="canHamsters" th:checked="${permission.canHamsters}"></td>
+							<td><input type="checkbox" data-perm-key="canProducts" th:checked="${permission.canProducts}"></td>
+							<td><input type="checkbox" data-perm-key="canCafe" th:checked="${permission.canCafe}"></td>
 						</tr>
 					</tbody>
 				</table>
@@ -78,6 +81,37 @@
 
 			<p th:if="${#lists.isEmpty(permissions)}">役職権限設定が見つかりませんでした。</p>
 		</section>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>変更ログ</h2>
+					<p>誰がどの役職権限を変更したかを記録します。</p>
+				</div>
+			</div>
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(permissionLogs)}">
+				<table class="admin-table">
+					<thead>
+						<tr>
+							<th>変更日時</th>
+							<th>変更者</th>
+							<th>対象役職</th>
+							<th>変更内容</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="log : ${permissionLogs}">
+							<td th:text="${log.changedAt != null ? #temporals.format(log.changedAt, 'yyyy/MM/dd HH:mm:ss') : '-'}">2026/04/02 14:10:00</td>
+							<td th:text="${log.changedBy}">店長</td>
+							<td th:text="${log.position}">一般従業員</td>
+							<td th:text="${log.summary}">商品在庫管理: OFF→ON</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p th:if="${#lists.isEmpty(permissionLogs)}">まだ変更ログはありません。</p>
+		</section>
 	</div>
+	<script th:src="@{/admin.js}"></script>
 </body>
 </html>

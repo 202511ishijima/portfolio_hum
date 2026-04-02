@@ -77,15 +77,48 @@ MERGE INTO position_permissions KEY(position) VALUES ('副店長', 'STAFF_MANAGE
 MERGE INTO position_permissions KEY(position) VALUES ('リーダー', 'STAFF', TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE, CURRENT_TIMESTAMP());
 MERGE INTO position_permissions KEY(position) VALUES ('一般従業員', 'STAFF', TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE, CURRENT_TIMESTAMP());
 
+CREATE TABLE IF NOT EXISTS position_permission_logs (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	position VARCHAR(100) NOT NULL,
+	changed_by VARCHAR(255) NOT NULL,
+	summary VARCHAR(1000) NOT NULL,
+	changed_at DATETIME NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS shifts (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
 	employee_id BIGINT NOT NULL,
 	work_date DATE NOT NULL,
+	shift_slot VARCHAR(20) NOT NULL DEFAULT 'FULL',
 	start_time TIME NOT NULL,
 	end_time TIME NOT NULL,
 	note VARCHAR(500),
 	created_at DATETIME NOT NULL,
 	updated_at DATETIME NOT NULL
+);
+
+ALTER TABLE shifts ADD COLUMN IF NOT EXISTS shift_slot VARCHAR(20) NOT NULL DEFAULT 'FULL';
+UPDATE shifts SET shift_slot = COALESCE(shift_slot, 'FULL');
+
+CREATE TABLE IF NOT EXISTS shift_request_settings (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	employee_id BIGINT NOT NULL,
+	target_year INT NOT NULL,
+	target_month INT NOT NULL,
+	weekly_days INT NOT NULL,
+	updated_at DATETIME NOT NULL,
+	UNIQUE(employee_id, target_year, target_month)
+);
+
+CREATE TABLE IF NOT EXISTS shift_request_days (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	employee_id BIGINT NOT NULL,
+	request_date DATE NOT NULL,
+	request_slot VARCHAR(20) NOT NULL,
+	target_year INT NOT NULL,
+	target_month INT NOT NULL,
+	updated_at DATETIME NOT NULL,
+	UNIQUE(employee_id, request_date)
 );
 
 CREATE TABLE IF NOT EXISTS chat_rooms (

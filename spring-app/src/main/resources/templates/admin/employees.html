@@ -46,7 +46,7 @@
 			<div class="admin-card-header">
 				<div>
 					<h2>従業員一覧</h2>
-					<p>編集から氏名、権限、在籍状態を変更できます。</p>
+					<p>編集から氏名、役職、在籍状態を変更できます。</p>
 				</div>
 				<div class="admin-header-actions">
 					<a class="admin-link-button admin-button--ghost" th:href="@{/admin/employees/permissions}">役職権限変更</a>
@@ -62,7 +62,6 @@
 							<th>氏名</th>
 							<th>ログインID</th>
 							<th>役職</th>
-							<th>権限</th>
 							<th>状態</th>
 							<th>作成日</th>
 							<th>操作</th>
@@ -74,7 +73,6 @@
 							<td th:text="${employee.name}">山田 花子</td>
 							<td th:text="${employee.email}">staff@example.com</td>
 							<td th:text="${employee.position}">スタッフ</td>
-							<td th:text="${employee.role}">STAFF</td>
 							<td>
 								<span class="admin-status"
 								      th:classappend="${employee.active} ? ' admin-status--done' : ' admin-status--progress'"

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
@@ -15,7 +15,7 @@
 			<div>
 				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>シフト管理</h1>
-				<p class="admin-lead">従業員シフトの登録・編集を行います。</p>
+				<p class="admin-lead">当日予定を上段、月間シフトを下段に表示しています。</p>
 			</div>
 			<form th:action="@{/admin/logout}" method="post">
 				<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
@@ -30,33 +30,31 @@
 		<section class="admin-card">
 			<div class="admin-card-header">
 				<div>
-					<h2>シフト一覧</h2>
-					<p>一覧から勤務予定を確認できます。</p>
+					<h2 th:text="${#temporals.format(today, 'yyyy/MM/dd') + ' のシフト'}">本日のシフト</h2>
+					<p>本日分のみを表示します。</p>
 				</div>
-				<a class="admin-link-button" th:if="${canCreateShift}" th:href="@{/admin/shifts/new}">新規シフト登録</a>
+				<div class="admin-header-actions">
+					<a class="admin-link-button admin-button--ghost"
+					   th:href="@{/admin/shifts/requests(year=${targetYear},month=${targetMonth})}">シフト希望</a>
+				</div>
 			</div>
-
-			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(shifts)}">
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(todayShifts)}">
 				<table class="admin-table">
 					<thead>
 						<tr>
-							<th>ID</th>
 							<th>従業員</th>
-							<th>勤務日</th>
-							<th>開始</th>
-							<th>終了</th>
+							<th>区分</th>
+							<th>時間</th>
 							<th>メモ</th>
 							<th>操作</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="shift : ${shifts}">
-							<td th:text="${shift.id}">1</td>
+						<tr th:each="shift : ${todayShifts}">
 							<td th:text="${shift.employeeName}">山田 花子</td>
-							<td th:text="${#temporals.format(shift.workDate, 'yyyy/MM/dd')}">2026/03/27</td>
-							<td th:text="${#temporals.format(shift.startTime, 'HH:mm')}">09:00</td>
-							<td th:text="${#temporals.format(shift.endTime, 'HH:mm')}">18:00</td>
-							<td th:text="${shift.note}">通常勤務</td>
+							<td th:text="${shift.shiftSlotLabel}">終日</td>
+							<td th:text="${#temporals.format(shift.startTime, 'HH:mm') + ' - ' + #temporals.format(shift.endTime, 'HH:mm')}">10:00 - 21:00</td>
+							<td th:text="${#strings.isEmpty(shift.note) ? '-' : shift.note}">-</td>
 							<td>
 								<a class="admin-link-button admin-button--ghost" th:href="@{/admin/shifts/{id}/edit(id=${shift.id})}">編集</a>
 							</td>
@@ -64,9 +62,65 @@
 					</tbody>
 				</table>
 			</div>
-			<p th:if="${#lists.isEmpty(shifts)}">シフトはまだ登録されていません。</p>
+			<p th:if="${#lists.isEmpty(todayShifts)}">本日のシフトはまだ登録されていません。</p>
+		</section>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2 th:text="${monthLabel + ' 月間シフト表'}">2026年4月 月間シフト表</h2>
+					<p>1人1日複数シフトに対応しています。</p>
+					<p class="admin-help-text" th:text="${'月間シフト件数: ' + monthShiftCount}">月間シフト件数: 0</p>
+				</div>
+				<div class="admin-header-actions">
+					<a class="admin-link-button admin-button--ghost"
+					   th:href="@{/admin/shifts(year=${prevYear},month=${prevMonth})}">前月</a>
+					<a class="admin-link-button admin-button--ghost"
+					   th:href="@{/admin/shifts(year=${nextYear},month=${nextMonth})}">次月</a>
+					<form th:action="@{/admin/shifts/auto-generate}" method="post">
+						<input type="hidden" name="year" th:value="${targetYear}">
+						<input type="hidden" name="month" th:value="${targetMonth}">
+						<button class="admin-button admin-button--ghost" type="submit">希望から自動作成</button>
+					</form>
+				</div>
+			</div>
+			<div class="admin-table-wrap">
+				<table class="admin-table admin-shift-calendar-table">
+					<thead>
+						<tr>
+							<th class="admin-shift-sticky-col">従業員</th>
+							<th th:each="day : ${monthDays}"
+							    th:classappend="${holidayMap[#temporals.format(day, 'yyyy-MM-dd')]} ? ' admin-day-holiday' : (${day.dayOfWeek.value == 6} ? ' admin-day-sat' : (${day.dayOfWeek.value == 7} ? ' admin-day-sun' : ' admin-day-weekday'))">
+								<div class="admin-day-header">
+									<span th:text="${day.dayOfMonth}">1</span>
+									<small th:text="${#temporals.format(day, 'E')}">月</small>
+								</div>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${#lists.isEmpty(employees)}">
+							<td class="admin-shift-empty" th:colspan="${#lists.size(monthDays) + 1}">表示できる従業員がいません。</td>
+						</tr>
+						<tr th:each="employee : ${employees}">
+							<td class="admin-shift-sticky-col" th:text="${employee.name}">山田 花子</td>
+							<td th:each="day : ${monthDays}" th:with="dayKey=${#temporals.format(day, 'yyyy-MM-dd')}">
+								<div class="admin-shift-cell"
+								     th:if="${shiftMatrix[employee.id] != null and shiftMatrix[employee.id][dayKey] != null and !#lists.isEmpty(shiftMatrix[employee.id][dayKey])}">
+									<a class="admin-shift-pill"
+									   th:each="shift : ${shiftMatrix[employee.id][dayKey]}"
+									   th:href="@{/admin/shifts/{id}/edit(id=${shift.id})}"
+									   th:title="${shift.shiftSlotLabel}"
+									   th:text="${shift.shiftSlotShortLabel}">早</a>
+								</div>
+								<span class="admin-shift-empty-marker"
+								      th:if="${shiftMatrix[employee.id] == null or shiftMatrix[employee.id][dayKey] == null or #lists.isEmpty(shiftMatrix[employee.id][dayKey])}">-</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</section>
 	</div>
 </body>
 </html>
-

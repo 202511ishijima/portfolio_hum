@@ -9,6 +9,7 @@
 		<result property="employeeId" column="employee_id"/>
 		<result property="employeeName" column="employee_name"/>
 		<result property="workDate" column="work_date"/>
+		<result property="shiftSlot" column="shift_slot"/>
 		<result property="startTime" column="start_time"/>
 		<result property="endTime" column="end_time"/>
 		<result property="note" column="note"/>
@@ -22,6 +23,7 @@
 			s.employee_id,
 			e.name AS employee_name,
 			s.work_date,
+			s.shift_slot,
 			s.start_time,
 			s.end_time,
 			s.note,
@@ -32,12 +34,31 @@
 		ORDER BY s.work_date DESC, s.start_time ASC, s.id DESC
 	</select>
 
+	<select id="findByWorkDateBetween" resultMap="ShiftResultMap">
+		SELECT
+			s.id,
+			s.employee_id,
+			e.name AS employee_name,
+			s.work_date,
+			s.shift_slot,
+			s.start_time,
+			s.end_time,
+			s.note,
+			s.created_at,
+			s.updated_at
+		FROM shifts s
+		INNER JOIN employees e ON e.id = s.employee_id
+		WHERE s.work_date BETWEEN #{fromDate} AND #{toDate}
+		ORDER BY s.work_date ASC, s.start_time ASC, s.id ASC
+	</select>
+
 	<select id="findByEmployeeId" resultMap="ShiftResultMap">
 		SELECT
 			s.id,
 			s.employee_id,
 			e.name AS employee_name,
 			s.work_date,
+			s.shift_slot,
 			s.start_time,
 			s.end_time,
 			s.note,
@@ -55,6 +76,7 @@
 			s.employee_id,
 			e.name AS employee_name,
 			s.work_date,
+			s.shift_slot,
 			s.start_time,
 			s.end_time,
 			s.note,
@@ -69,6 +91,7 @@
 		INSERT INTO shifts (
 			employee_id,
 			work_date,
+			shift_slot,
 			start_time,
 			end_time,
 			note,
@@ -77,6 +100,7 @@
 		) VALUES (
 			#{employeeId},
 			#{workDate},
+			#{shiftSlot},
 			#{startTime},
 			#{endTime},
 			#{note},
@@ -90,6 +114,7 @@
 		SET
 			employee_id = #{employeeId},
 			work_date = #{workDate},
+			shift_slot = #{shiftSlot},
 			start_time = #{startTime},
 			end_time = #{endTime},
 			note = #{note},

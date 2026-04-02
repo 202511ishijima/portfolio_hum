@@ -12,6 +12,8 @@ public interface ShiftMapper {
 
 	List<Shift> findAll();
 
+	List<Shift> findByWorkDateBetween(@Param("fromDate") java.time.LocalDate fromDate, @Param("toDate") java.time.LocalDate toDate);
+
 	List<Shift> findByEmployeeId(@Param("employeeId") Long employeeId);
 
 	Optional<Shift> findById(@Param("id") Long id);

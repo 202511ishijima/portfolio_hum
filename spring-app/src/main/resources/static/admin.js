@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			});
 		});
 	});
+
+	initPermissionBatchApply();
 });
 
 function compareRows(rowA, rowB, columnIndex, sortType, direction) {
@@ -93,4 +95,59 @@ function normalizeSortValue(raw, sortType) {
 	}
 
 	return raw;
+}
+
+function initPermissionBatchApply() {
+	const table = document.querySelector('table[data-permission-table="true"]');
+	const applyButton = document.getElementById('permissions-apply-button');
+	const payloadInput = document.getElementById('permissions-payload');
+	const batchForm = document.getElementById('permissions-batch-form');
+	if (!table || !applyButton || !payloadInput || !batchForm) return;
+
+	const rows = Array.from(table.querySelectorAll('tbody tr[data-position]'));
+	const snapshot = () => JSON.stringify(collectPermissions(rows));
+	const initial = snapshot();
+
+	const refreshApplyState = () => {
+		const current = snapshot();
+		applyButton.disabled = current === initial;
+	};
+
+	rows.forEach((row) => {
+		row.querySelectorAll('input[type="checkbox"][data-perm-key]').forEach((checkbox) => {
+			checkbox.addEventListener('change', refreshApplyState);
+		});
+	});
+
+	batchForm.addEventListener('submit', (event) => {
+		const current = snapshot();
+		if (current === initial) {
+			event.preventDefault();
+			applyButton.disabled = true;
+			return;
+		}
+		payloadInput.value = current;
+	});
+
+	refreshApplyState();
+}
+
+function collectPermissions(rows) {
+	return rows.map((row) => {
+		const get = (key) => {
+			const checkbox = row.querySelector(`input[data-perm-key="${key}"]`);
+			return !!(checkbox && checkbox.checked);
+		};
+		return {
+			position: row.dataset.position || '',
+			canDashboard: get('canDashboard'),
+			canInquiries: get('canInquiries'),
+			canMembers: get('canMembers'),
+			canEmployees: get('canEmployees'),
+			canShifts: get('canShifts'),
+			canHamsters: get('canHamsters'),
+			canProducts: get('canProducts'),
+			canCafe: get('canCafe')
+		};
+	});
 }

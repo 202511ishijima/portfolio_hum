@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ishijima.portfoliobackend.mapper.PositionPermissionLogMapper">
+
+	<resultMap id="PositionPermissionLogResultMap" type="com.ishijima.portfoliobackend.entity.PositionPermissionLog">
+		<id property="id" column="id"/>
+		<result property="position" column="position"/>
+		<result property="changedBy" column="changed_by"/>
+		<result property="summary" column="summary"/>
+		<result property="changedAt" column="changed_at"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.ishijima.portfoliobackend.entity.PositionPermissionLog" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO position_permission_logs (
+			position,
+			changed_by,
+			summary,
+			changed_at
+		) VALUES (
+			#{position},
+			#{changedBy},
+			#{summary},
+			#{changedAt}
+		)
+	</insert>
+
+	<select id="findRecent" resultMap="PositionPermissionLogResultMap">
+		SELECT
+			id,
+			position,
+			changed_by,
+			summary,
+			changed_at
+		FROM position_permission_logs
+		ORDER BY changed_at DESC, id DESC
+		LIMIT #{limit}
+	</select>
+</mapper>

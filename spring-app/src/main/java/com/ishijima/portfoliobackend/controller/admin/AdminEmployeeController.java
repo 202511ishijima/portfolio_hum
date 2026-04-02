@@ -1,5 +1,7 @@
 package com.ishijima.portfoliobackend.controller.admin;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ishijima.portfoliobackend.entity.Employee;
 import com.ishijima.portfoliobackend.entity.PositionPermission;
 import com.ishijima.portfoliobackend.form.EmployeeCreateForm;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -29,6 +32,7 @@ public class AdminEmployeeController {
 
 	private final EmployeeService employeeService;
 	private final PositionPermissionService positionPermissionService;
+	private final ObjectMapper objectMapper;
 
 	@GetMapping
 	public String list(Model model, Principal principal) {
@@ -48,48 +52,33 @@ public class AdminEmployeeController {
 	@GetMapping("/permissions")
 	public String permissions(Model model, Principal principal, RedirectAttributes redirectAttributes) {
 		if (!employeeService.isHeadOffice(principal.getName())) {
-			redirectAttributes.addFlashAttribute("employeeError", "Only head office can open position permissions.");
+			redirectAttributes.addFlashAttribute("employeeError", "役職権限設定は本部のみ開けます。");
 			return "redirect:/admin/employees";
 		}
 		model.addAttribute("permissions", positionPermissionService.findAll());
+		model.addAttribute("permissionLogs", positionPermissionService.findRecentLogs(30));
 		model.addAttribute("adminSection", "employees");
 		return "admin/employee-permissions";
 	}
 
-	@PostMapping("/permissions/{position}")
-	public String updatePermission(
-		@PathVariable String position,
-		@RequestParam(defaultValue = "false") boolean canDashboard,
-		@RequestParam(defaultValue = "false") boolean canInquiries,
-		@RequestParam(defaultValue = "false") boolean canMembers,
-		@RequestParam(defaultValue = "false") boolean canEmployees,
-		@RequestParam(defaultValue = "false") boolean canShifts,
-		@RequestParam(defaultValue = "false") boolean canHamsters,
-		@RequestParam(defaultValue = "false") boolean canProducts,
-		@RequestParam(defaultValue = "false") boolean canCafe,
+	@PostMapping("/permissions/apply")
+	public String applyPermissions(
+		@RequestParam("payload") String payload,
 		Principal principal,
 		RedirectAttributes redirectAttributes
 	) {
 		if (!employeeService.isHeadOffice(principal.getName())) {
-			redirectAttributes.addFlashAttribute("employeeError", "Only head office can update position permissions.");
+			redirectAttributes.addFlashAttribute("employeeError", "役職権限設定を更新できるのは本部のみです。");
 			return "redirect:/admin/employees";
 		}
 		try {
-			PositionPermission permission = PositionPermission.builder()
-				.position(position)
-				.canDashboard(canDashboard)
-				.canInquiries(canInquiries)
-				.canMembers(canMembers)
-				.canEmployees(canEmployees)
-				.canShifts(canShifts)
-				.canHamsters(canHamsters)
-				.canProducts(canProducts)
-				.canCafe(canCafe)
-				.build();
-			positionPermissionService.update(permission, principal.getName());
-			redirectAttributes.addFlashAttribute("employeeMessage", "Position permission updated.");
+			List<PositionPermission> permissions = objectMapper.readValue(payload, new TypeReference<List<PositionPermission>>() {});
+			positionPermissionService.updateAll(permissions, principal.getName());
+			redirectAttributes.addFlashAttribute("employeeMessage", "役職権限を一括更新しました。");
 		} catch (IllegalArgumentException ex) {
 			redirectAttributes.addFlashAttribute("employeeError", ex.getMessage());
+		} catch (Exception ex) {
+			redirectAttributes.addFlashAttribute("employeeError", "権限データの解析に失敗しました。");
 		}
 		return "redirect:/admin/employees/permissions";
 	}
@@ -97,7 +86,7 @@ public class AdminEmployeeController {
 	@GetMapping("/new")
 	public String newForm(Model model, Principal principal, RedirectAttributes redirectAttributes) {
 		if (!employeeService.isHeadOffice(principal.getName())) {
-			redirectAttributes.addFlashAttribute("employeeError", "Only head office can create employees.");
+			redirectAttributes.addFlashAttribute("employeeError", "従業員アカウントを作成できるのは本部のみです。");
 			return "redirect:/admin/employees";
 		}
 
@@ -119,7 +108,7 @@ public class AdminEmployeeController {
 		Principal principal
 	) {
 		if (!employeeService.isHeadOffice(principal.getName())) {
-			redirectAttributes.addFlashAttribute("employeeError", "Only head office can create employees.");
+			redirectAttributes.addFlashAttribute("employeeError", "従業員アカウントを作成できるのは本部のみです。");
 			return "redirect:/admin/employees";
 		}
 
@@ -131,7 +120,7 @@ public class AdminEmployeeController {
 		}
 		try {
 			employeeService.create(form, principal.getName());
-			redirectAttributes.addFlashAttribute("employeeMessage", "Employee account created.");
+			redirectAttributes.addFlashAttribute("employeeMessage", "従業員アカウントを作成しました。");
 			return "redirect:/admin/employees";
 		} catch (IllegalArgumentException ex) {
 			model.addAttribute("positionOptions", employeeService.getAssignablePositions(principal.getName()));
@@ -146,7 +135,7 @@ public class AdminEmployeeController {
 	public String editForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes, Principal principal) {
 		Employee employee = employeeService.findById(id);
 		if (!employeeService.canManagePosition(principal.getName(), employee.getPosition())) {
-			redirectAttributes.addFlashAttribute("employeeError", "You can edit only employees below your position.");
+			redirectAttributes.addFlashAttribute("employeeError", "自分より下位の役職の従業員のみ編集できます。");
 			return "redirect:/admin/employees";
 		}
 
@@ -159,7 +148,7 @@ public class AdminEmployeeController {
 				Boolean.TRUE.equals(employee.getActive())
 			));
 		}
-		model.addAttribute("positionOptions", employeeService.getAssignablePositions(principal.getName()));
+		model.addAttribute("positionOptions", positionOptionsForEdit(principal.getName(), employee.getPosition()));
 		model.addAttribute("employee", employee);
 		model.addAttribute("mode", "edit");
 		model.addAttribute("adminSection", "employees");
@@ -177,12 +166,12 @@ public class AdminEmployeeController {
 	) {
 		Employee employee = employeeService.findById(id);
 		if (!employeeService.canManagePosition(principal.getName(), employee.getPosition())) {
-			redirectAttributes.addFlashAttribute("employeeError", "You can edit only employees below your position.");
+			redirectAttributes.addFlashAttribute("employeeError", "自分より下位の役職の従業員のみ編集できます。");
 			return "redirect:/admin/employees";
 		}
 
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("positionOptions", employeeService.getAssignablePositions(principal.getName()));
+			model.addAttribute("positionOptions", positionOptionsForEdit(principal.getName(), employee.getPosition()));
 			model.addAttribute("employee", employee);
 			model.addAttribute("mode", "edit");
 			model.addAttribute("adminSection", "employees");
@@ -190,10 +179,10 @@ public class AdminEmployeeController {
 		}
 		try {
 			employeeService.update(id, form, principal.getName());
-			redirectAttributes.addFlashAttribute("employeeMessage", "Employee account updated.");
+			redirectAttributes.addFlashAttribute("employeeMessage", "従業員アカウントを更新しました。");
 			return "redirect:/admin/employees";
 		} catch (IllegalArgumentException ex) {
-			model.addAttribute("positionOptions", employeeService.getAssignablePositions(principal.getName()));
+			model.addAttribute("positionOptions", positionOptionsForEdit(principal.getName(), employee.getPosition()));
 			model.addAttribute("employee", employee);
 			model.addAttribute("mode", "edit");
 			model.addAttribute("adminSection", "employees");
@@ -206,7 +195,7 @@ public class AdminEmployeeController {
 	public String toggleActive(@PathVariable Long id, RedirectAttributes redirectAttributes, Principal principal) {
 		try {
 			employeeService.toggleActive(id, principal.getName());
-			redirectAttributes.addFlashAttribute("employeeMessage", "Employee active status updated.");
+			redirectAttributes.addFlashAttribute("employeeMessage", "在籍状態を更新しました。");
 		} catch (IllegalArgumentException ex) {
 			redirectAttributes.addFlashAttribute("employeeError", ex.getMessage());
 		}
@@ -217,11 +206,18 @@ public class AdminEmployeeController {
 	public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes, Principal principal) {
 		try {
 			employeeService.delete(id, principal.getName());
-			redirectAttributes.addFlashAttribute("employeeMessage", "Employee account deleted.");
+			redirectAttributes.addFlashAttribute("employeeMessage", "従業員アカウントを削除しました。");
 		} catch (IllegalArgumentException ex) {
 			redirectAttributes.addFlashAttribute("employeeError", ex.getMessage());
 		}
 		return "redirect:/admin/employees";
 	}
 
+	private List<String> positionOptionsForEdit(String actorLoginId, String currentPosition) {
+		List<String> options = new ArrayList<>(employeeService.getAssignablePositions(actorLoginId));
+		if (!options.contains(currentPosition)) {
+			options.add(0, currentPosition);
+		}
+		return options;
+	}
 }

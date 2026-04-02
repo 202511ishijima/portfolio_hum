@@ -1,6 +1,7 @@
 package com.ishijima.portfoliobackend.service;
 
 import com.ishijima.portfoliobackend.entity.PositionPermission;
+import com.ishijima.portfoliobackend.entity.PositionPermissionLog;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,4 +15,8 @@ public interface PositionPermissionService {
 	String resolveRoleByPosition(String position);
 
 	void update(PositionPermission permission, String actorLoginId);
+
+	void updateAll(List<PositionPermission> permissions, String actorLoginId);
+
+	List<PositionPermissionLog> findRecentLogs(int limit);
 }

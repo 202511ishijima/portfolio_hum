@@ -45,7 +45,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		validatePosition(form.position());
 		assertCanAssign(actorLoginId, form.position());
 		employeeMapper.findByEmail(form.email()).ifPresent(existing -> {
-			throw new IllegalArgumentException("This login ID is already in use.");
+			throw new IllegalArgumentException("このログインIDはすでに使用されています。");
 		});
 
 		Employee employee = Employee.builder()
@@ -71,7 +71,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public Employee findById(Long id) {
 		return employeeMapper.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("Employee not found. id=" + id));
+			.orElseThrow(() -> new IllegalArgumentException("従業員が見つかりません。id=" + id));
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		employeeMapper.findByEmail(form.email()).ifPresent(existing -> {
 			if (!existing.getId().equals(id)) {
-				throw new IllegalArgumentException("This login ID is already in use.");
+				throw new IllegalArgumentException("このログインIDはすでに使用されています。");
 			}
 		});
 
@@ -99,7 +99,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		employee.setActive(form.active());
 		if (form.password() != null && !form.password().isBlank()) {
 			if (form.password().length() < 8) {
-				throw new IllegalArgumentException("Password must be at least 8 characters.");
+				throw new IllegalArgumentException("パスワードは8文字以上で入力してください。");
 			}
 			employee.setPassword(passwordEncoder.encode(form.password()));
 		}
@@ -123,10 +123,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public void delete(Long id, String actorLoginId) {
 		Employee target = findById(id);
 		Employee actor = findByEmail(actorLoginId)
-			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
+			.orElseThrow(() -> new IllegalArgumentException("操作ユーザーが見つかりません。"));
 
 		if (actor.getId() != null && actor.getId().equals(target.getId())) {
-			throw new IllegalArgumentException("You cannot delete your own account.");
+			throw new IllegalArgumentException("自分自身のアカウントは削除できません。");
 		}
 		assertCanAssign(actorLoginId, target.getPosition());
 		employeeMapper.deleteById(id);
@@ -137,16 +137,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public void updateRole(Long id, String role, String actorLoginId) {
 		Employee target = findById(id);
 		Employee actor = findByEmail(actorLoginId)
-			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
+			.orElseThrow(() -> new IllegalArgumentException("操作ユーザーが見つかりません。"));
 
 		if (actor.getId() != null && actor.getId().equals(target.getId())) {
-			throw new IllegalArgumentException("You cannot change your own role.");
+			throw new IllegalArgumentException("自分自身の権限は変更できません。");
 		}
 		assertCanAssign(actorLoginId, target.getPosition());
 
 		List<String> assignableRoles = getAssignableRoles(actorLoginId);
 		if (role == null || !assignableRoles.contains(role)) {
-			throw new IllegalArgumentException("You can assign only roles below your own.");
+			throw new IllegalArgumentException("自分より下位の権限のみ設定できます。");
 		}
 		employeeMapper.updateRole(id, role);
 	}
@@ -154,10 +154,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public List<String> getAssignablePositions(String actorLoginId) {
 		Employee actor = findByEmail(actorLoginId)
-			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
+			.orElseThrow(() -> new IllegalArgumentException("操作ユーザーが見つかりません。"));
 		Integer actorRank = POSITION_RANK.get(actor.getPosition());
 		if (actorRank == null) {
-			throw new IllegalArgumentException("Invalid actor position.");
+			throw new IllegalArgumentException("操作ユーザーの役職が不正です。");
 		}
 		return POSITION_RANK.entrySet().stream()
 			.filter(entry -> entry.getValue() < actorRank)
@@ -168,10 +168,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public List<String> getAssignableRoles(String actorLoginId) {
 		Employee actor = findByEmail(actorLoginId)
-			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
+			.orElseThrow(() -> new IllegalArgumentException("操作ユーザーが見つかりません。"));
 		Integer actorRank = ROLE_RANK.get(actor.getRole());
 		if (actorRank == null) {
-			throw new IllegalArgumentException("Invalid actor role.");
+			throw new IllegalArgumentException("操作ユーザーの権限が不正です。");
 		}
 		return ROLE_RANK.entrySet().stream()
 			.filter(entry -> entry.getValue() < actorRank)
@@ -182,29 +182,35 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public boolean canManagePosition(String actorLoginId, String targetPosition) {
 		Employee actor = findByEmail(actorLoginId)
-			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
+			.orElseThrow(() -> new IllegalArgumentException("操作ユーザーが見つかりません。"));
 		Integer actorRank = POSITION_RANK.get(actor.getPosition());
 		Integer targetRank = POSITION_RANK.get(targetPosition);
-		return actorRank != null && targetRank != null && targetRank < actorRank;
+		if (actorRank == null || targetRank == null) {
+			return false;
+		}
+		if (actorRank == 5 && targetRank == 5) {
+			return true;
+		}
+		return targetRank < actorRank;
 	}
 
 	@Override
 	public boolean isHeadOffice(String actorLoginId) {
 		Employee actor = findByEmail(actorLoginId)
-			.orElseThrow(() -> new IllegalArgumentException("Actor not found."));
+			.orElseThrow(() -> new IllegalArgumentException("操作ユーザーが見つかりません。"));
 		Integer actorRank = POSITION_RANK.get(actor.getPosition());
 		return actorRank != null && actorRank == 5;
 	}
 
 	private void assertCanAssign(String actorLoginId, String targetPosition) {
 		if (!canManagePosition(actorLoginId, targetPosition)) {
-			throw new IllegalArgumentException("You can assign only positions below your own.");
+			throw new IllegalArgumentException("自分より下位の役職のみ設定できます。");
 		}
 	}
 
 	private void validatePosition(String position) {
 		if (!POSITION_RANK.containsKey(position)) {
-			throw new IllegalArgumentException("Invalid position.");
+			throw new IllegalArgumentException("役職が不正です。");
 		}
 	}
 
