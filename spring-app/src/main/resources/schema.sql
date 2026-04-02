@@ -230,6 +230,15 @@ CREATE TABLE IF NOT EXISTS cafe_visit_sessions (
 	updated_at DATETIME NOT NULL
 );
 
+ALTER TABLE cafe_visit_sessions ADD COLUMN IF NOT EXISTS session_token VARCHAR(100);
+ALTER TABLE cafe_visit_sessions ADD COLUMN IF NOT EXISTS seat_no VARCHAR(30);
+ALTER TABLE cafe_visit_sessions ADD COLUMN IF NOT EXISTS guest_count INT NOT NULL DEFAULT 1;
+ALTER TABLE cafe_visit_sessions ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE';
+ALTER TABLE cafe_visit_sessions ADD COLUMN IF NOT EXISTS issued_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP();
+ALTER TABLE cafe_visit_sessions ADD COLUMN IF NOT EXISTS expires_at DATETIME NOT NULL DEFAULT DATEADD('MINUTE', 90, CURRENT_TIMESTAMP());
+ALTER TABLE cafe_visit_sessions ADD COLUMN IF NOT EXISTS checkout_completed_at DATETIME;
+ALTER TABLE cafe_visit_sessions ADD COLUMN IF NOT EXISTS updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP();
+
 MERGE INTO cafe_menus KEY(id) VALUES ('drink-01', 'DRINK', 'ハムスター柄のモカ', 'やさしい甘さのカフェモカ。看板メニューとして人気の一杯です。', 580, 'ham_moca.png', TRUE, 10, CURRENT_TIMESTAMP());
 MERGE INTO cafe_menus KEY(id) VALUES ('drink-02', 'DRINK', 'ミルクティー', 'まろやかな香りでゆったり楽しめる定番ドリンクです。', 560, 'Milk Tea.png', TRUE, 20, CURRENT_TIMESTAMP());
 MERGE INTO cafe_menus KEY(id) VALUES ('drink-03', 'DRINK', 'ほうじ茶ラテ', '香ばしさとやさしい甘さを合わせた落ち着いた味わいです。', 600, 'Roasted Tea Latte.png', TRUE, 30, CURRENT_TIMESTAMP());

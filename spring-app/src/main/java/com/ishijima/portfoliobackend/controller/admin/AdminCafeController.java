@@ -85,6 +85,8 @@ public class AdminCafeController {
 			redirectAttributes.addFlashAttribute("issuedQrDataUrl", buildQrDataUrl(orderUrl));
 		} catch (IllegalArgumentException ex) {
 			redirectAttributes.addFlashAttribute("cafeError", ex.getMessage());
+		} catch (RuntimeException ex) {
+			redirectAttributes.addFlashAttribute("cafeError", "受付発行でエラーが発生しました: " + ex.getMessage());
 		}
 		return "redirect:/admin/cafe/reception";
 	}
@@ -115,6 +117,8 @@ public class AdminCafeController {
 			redirectAttributes.addFlashAttribute("issuedQrDataUrl", buildQrDataUrl(orderUrl));
 		} catch (IllegalArgumentException ex) {
 			redirectAttributes.addFlashAttribute("cafeError", ex.getMessage());
+		} catch (RuntimeException ex) {
+			redirectAttributes.addFlashAttribute("cafeError", "自動割り当て発行でエラーが発生しました: " + ex.getMessage());
 		}
 		return "redirect:/admin/cafe/reception";
 	}

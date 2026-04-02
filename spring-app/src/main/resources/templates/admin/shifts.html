@@ -103,18 +103,19 @@
 							<td class="admin-shift-empty" th:colspan="${#lists.size(monthDays) + 1}">表示できる従業員がいません。</td>
 						</tr>
 						<tr th:each="employee : ${employees}">
-							<td class="admin-shift-sticky-col" th:text="${employee.name}">山田 花子</td>
-							<td th:each="day : ${monthDays}" th:with="dayKey=${#temporals.format(day, 'yyyy-MM-dd')}">
+							<td class="admin-shift-sticky-col"
+							    th:text="${employee.name + '（' + (shiftCountByEmployee[employee.id] != null ? shiftCountByEmployee[employee.id] : 0) + '件）'}">山田 花子（12件）</td>
+							<td th:each="day : ${monthDays}" th:with="dayKey=${#temporals.format(day, 'yyyy-MM-dd')}, employeeRow=${shiftMatrix.get(employee.id)}, dayShifts=${employeeRow != null ? employeeRow.get(dayKey) : null}">
 								<div class="admin-shift-cell"
-								     th:if="${shiftMatrix[employee.id] != null and shiftMatrix[employee.id][dayKey] != null and !#lists.isEmpty(shiftMatrix[employee.id][dayKey])}">
+								     th:if="${dayShifts != null and !#lists.isEmpty(dayShifts)}">
 									<a class="admin-shift-pill"
-									   th:each="shift : ${shiftMatrix[employee.id][dayKey]}"
+									   th:each="shift : ${dayShifts}"
 									   th:href="@{/admin/shifts/{id}/edit(id=${shift.id})}"
 									   th:title="${shift.shiftSlotLabel}"
 									   th:text="${shift.shiftSlotShortLabel}">早</a>
 								</div>
 								<span class="admin-shift-empty-marker"
-								      th:if="${shiftMatrix[employee.id] == null or shiftMatrix[employee.id][dayKey] == null or #lists.isEmpty(shiftMatrix[employee.id][dayKey])}">-</span>
+								      th:if="${dayShifts == null or #lists.isEmpty(dayShifts)}">-</span>
 							</td>
 						</tr>
 					</tbody>

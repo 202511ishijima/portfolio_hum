@@ -83,18 +83,22 @@ public class AdminPermissionAdvice {
 		Authentication authentication,
 		java.util.function.Function<PositionPermission, Boolean> accessor
 	) {
-		if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+		try {
+			if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+				return false;
+			}
+			String position = employeeService.findByEmail(authentication.getName())
+				.map(employee -> employee.getPosition())
+				.orElse(null);
+			if (position == null || accessor == null) {
+				return false;
+			}
+			return positionPermissionService.findByPosition(position)
+				.map(accessor)
+				.filter(Boolean::booleanValue)
+				.orElse(false);
+		} catch (RuntimeException ex) {
 			return false;
 		}
-		String position = employeeService.findByEmail(authentication.getName())
-			.map(employee -> employee.getPosition())
-			.orElse(null);
-		if (position == null || accessor == null) {
-			return false;
-		}
-		return positionPermissionService.findByPosition(position)
-			.map(accessor)
-			.filter(Boolean::booleanValue)
-			.orElse(false);
 	}
 }

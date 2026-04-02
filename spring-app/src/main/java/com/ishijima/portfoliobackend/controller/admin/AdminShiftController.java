@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/shifts")
@@ -57,6 +58,8 @@ public class AdminShiftController {
 			.toList();
 
 		List<Shift> monthShifts = shiftService.findByWorkDateBetween(firstDay, lastDay);
+		Map<Long, Long> shiftCountByEmployee = monthShifts.stream()
+			.collect(Collectors.groupingBy(Shift::getEmployeeId, Collectors.counting()));
 		List<Shift> todayShifts = monthShifts.stream()
 			.filter(shift -> today.equals(shift.getWorkDate()))
 			.sorted(Comparator.comparing(Shift::getStartTime).thenComparing(Shift::getEmployeeName))
@@ -82,6 +85,7 @@ public class AdminShiftController {
 		model.addAttribute("employees", employees);
 		model.addAttribute("monthDays", monthDays);
 		model.addAttribute("shiftMatrix", shiftMatrix);
+		model.addAttribute("shiftCountByEmployee", shiftCountByEmployee);
 		model.addAttribute("monthShiftCount", monthShifts.size());
 		model.addAttribute("todayShifts", todayShifts);
 		model.addAttribute("today", today);
