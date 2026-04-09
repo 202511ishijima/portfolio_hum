@@ -727,6 +727,104 @@ body.admin-body {
   gap: 16px;
 }
 
+.admin-form-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-form-row {
+  display: grid;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.admin-form-row input,
+.admin-form-row select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--admin-text);
+  font: inherit;
+  font-weight: 500;
+}
+
+.admin-touch-card {
+  max-width: 860px;
+  margin-inline: auto;
+}
+
+.admin-touch-row {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-touch-label {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.admin-touch-number {
+  min-height: 72px;
+  width: 130px;
+  max-width: 100%;
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  padding: 0 18px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.admin-touch-seat-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-touch-seat-option {
+  display: block;
+}
+
+.admin-touch-seat-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.admin-touch-seat-option span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 84px;
+  border: 2px solid var(--admin-border);
+  border-radius: 16px;
+  background: #fff;
+  font-weight: 700;
+  text-align: center;
+  padding: 10px;
+}
+
+.admin-touch-seat-option input:checked + span {
+  border-color: var(--admin-main);
+  background: #fff1e4;
+  color: var(--admin-main-deep);
+}
+
+.admin-touch-submit-wrap {
+  margin-top: 6px;
+}
+
+.admin-touch-submit {
+  width: 100%;
+  min-height: 74px;
+  font-size: 1.2rem;
+}
+
 .admin-inline-form {
   display: flex;
   align-items: center;
@@ -982,6 +1080,14 @@ body.admin-body {
   .admin-inline-form {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-touch-seat-grid {
+    grid-template-columns: 1fr;
   }
 
   .admin-inline-form input {

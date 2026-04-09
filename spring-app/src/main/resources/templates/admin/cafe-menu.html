@@ -32,41 +32,61 @@
 			<div class="admin-card-header">
 				<div>
 					<h2>メニュー一覧</h2>
-					<p>提供停止したいメニューは「提供中」のチェックを外してください。</p>
+					<p>メニュー名・価格・提供状態を編集して、右上の一括更新で保存できます。</p>
+				</div>
+				<div class="admin-header-actions" th:if="${canManageCafe}">
+					<button class="admin-button" type="submit" form="cafe-menu-bulk-form">一括更新</button>
 				</div>
 			</div>
 			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(menus)}">
-				<table class="admin-table">
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>区分</th>
-							<th>メニュー名</th>
-							<th>価格</th>
-							<th>提供中</th>
-							<th>更新</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="menu : ${menus}">
-							<td th:text="${menu.id}">drink-01</td>
-							<td th:text="${menu.category}">DRINK</td>
-							<td th:text="${menu.name}">ハムスター柄のモカ</td>
-							<td>
-								<form class="admin-inline-form" th:action="@{/admin/cafe/menu/{id}/update(id=${menu.id})}" method="post">
-									<input type="number" min="0" name="price" th:value="${menu.price}" required>
+				<form id="cafe-menu-bulk-form" th:action="@{/admin/cafe/menu/bulk-update}" method="post">
+					<table class="admin-table">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>区分</th>
+								<th>メニュー名</th>
+								<th>価格</th>
+								<th>提供中</th>
+								<th>最終更新</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="menu : ${menus}">
+								<td th:text="${menu.id}">drink-01</td>
+								<td th:text="${menu.category}">DRINK</td>
+								<td>
+									<input
+										type="text"
+										th:name="${'name_' + menu.id}"
+										th:value="${menu.name}"
+										th:disabled="${!canManageCafe}"
+										required>
+								</td>
+								<td>
+									<input
+										type="number"
+										min="0"
+										th:name="${'price_' + menu.id}"
+										th:value="${menu.price}"
+										th:disabled="${!canManageCafe}"
+										required>
+								</td>
+								<td>
 									<label style="display:inline-flex;align-items:center;gap:4px;">
-										<input type="checkbox" name="available" th:checked="${menu.available}">
+										<input
+											type="checkbox"
+											th:name="${'available_' + menu.id}"
+											th:checked="${menu.available}"
+											th:disabled="${!canManageCafe}">
 										<span>提供中</span>
 									</label>
-									<button class="admin-button admin-button--ghost" th:if="${canManageCafe}" type="submit">更新</button>
-								</form>
-							</td>
-							<td th:text="${menu.available ? 'はい' : 'いいえ'}">はい</td>
-							<td th:text="${menu.updatedAt != null ? #temporals.format(menu.updatedAt, 'yyyy/MM/dd HH:mm') : '-'}">2026/03/30 12:30</td>
-						</tr>
-					</tbody>
-				</table>
+								</td>
+								<td th:text="${menu.updatedAt != null ? #temporals.format(menu.updatedAt, 'yyyy/MM/dd HH:mm') : '-'}">2026/03/30 12:30</td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
 			</div>
 			<p th:if="${#lists.isEmpty(menus)}">メニューデータがありません。</p>
 		</section>

@@ -16,10 +16,10 @@ public interface CafeMenuMapper {
 
 	Optional<CafeMenu> findById(@Param("id") String id);
 
-	int updatePriceAndAvailability(
+	int updateNamePriceAndAvailability(
 		@Param("id") String id,
+		@Param("name") String name,
 		@Param("price") Integer price,
 		@Param("available") boolean available
 	);
 }
-

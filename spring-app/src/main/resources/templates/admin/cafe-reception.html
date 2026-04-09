@@ -81,10 +81,9 @@
 				     th:src="${issuedQrDataUrl}"
 				     alt="注文QRコード"
 				     style="width:220px;height:220px;border:1px solid #e7d9ca;border-radius:12px;background:#fff;padding:10px;">
-				<img th:if="${issuedQrDataUrl == null}"
-				     th:src="@{/admin/cafe/reception/qr/{token}(token=${issuedSession.sessionToken})}"
-				     alt="注文QRコード"
-				     style="width:220px;height:220px;border:1px solid #e7d9ca;border-radius:12px;background:#fff;padding:10px;">
+				<p class="admin-help-text" th:if="${issuedQrDataUrl == null}">
+					QR生成に失敗しました。下の注文URLをご利用ください。
+				</p>
 			</div>
 			<ul class="check-list">
 				<li th:text="'座席番号: ' + ${issuedSession.seatNo}">座席番号: A-01</li>

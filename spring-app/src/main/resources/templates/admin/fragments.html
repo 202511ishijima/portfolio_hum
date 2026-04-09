@@ -31,7 +31,11 @@
 	   th:href="@{/admin/products/stocks}">商品在庫管理</a>
 	<a class="admin-nav-link"
 	   th:if="${canViewCafe}"
-	   th:classappend="${section != null and #strings.startsWith(section, 'cafe')} ? ' is-active' : ''"
+	   th:classappend="${section == 'cafe-customer'} ? ' is-active' : ''"
+	   th:href="@{/admin/cafe/customer-screen}">顧客操作画面</a>
+	<a class="admin-nav-link"
+	   th:if="${canViewCafe}"
+	   th:classappend="${section != null and #strings.startsWith(section, 'cafe') and section != 'cafe-customer'} ? ' is-active' : ''"
 	   th:href="@{/admin/cafe/orders}">カフェ注文</a>
 </nav>
 </body>

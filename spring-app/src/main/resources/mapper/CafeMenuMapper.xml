@@ -62,13 +62,13 @@
 		WHERE id = #{id}
 	</select>
 
-	<update id="updatePriceAndAvailability">
+	<update id="updateNamePriceAndAvailability">
 		UPDATE cafe_menus
 		SET
+			name = #{name},
 			price = #{price},
 			available = #{available},
 			updated_at = CURRENT_TIMESTAMP()
 		WHERE id = #{id}
 	</update>
 </mapper>
-

@@ -22,6 +22,8 @@ public interface CafeOrderService {
 
 	CafeVisitSession createVisitSessionAuto(Integer guestCount);
 
+	CafeVisitSession createVisitSessionAuto(Integer guestCount, String seatPreference);
+
 	CafeVisitSession getVisitSession(String sessionToken);
 
 	List<CafeSeatView> buildSeatMap();

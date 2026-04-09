@@ -82,11 +82,17 @@ public class CafeOrderServiceImpl implements CafeOrderService {
 	@Override
 	@Transactional
 	public CafeVisitSession createVisitSessionAuto(Integer guestCount) {
+		return createVisitSessionAuto(guestCount, "AUTO");
+	}
+
+	@Override
+	@Transactional
+	public CafeVisitSession createVisitSessionAuto(Integer guestCount, String seatPreference) {
 		int safeGuestCount = guestCount == null || guestCount <= 0 ? 1 : guestCount;
 		if (safeGuestCount > 4) {
 			throw new IllegalArgumentException("1回の受付は4名まで対応しています。");
 		}
-		String seatNo = assignSeatAutomatically(safeGuestCount);
+		String seatNo = assignSeatAutomatically(safeGuestCount, seatPreference);
 		return createVisitSession(seatNo, safeGuestCount);
 	}
 
@@ -253,7 +259,15 @@ public class CafeOrderServiceImpl implements CafeOrderService {
 		if (form == null || form.getPrice() == null || form.getPrice() < 0) {
 			throw new IllegalArgumentException("価格は0以上で入力してください。");
 		}
-		int updated = cafeMenuMapper.updatePriceAndAvailability(menuId, form.getPrice(), form.isAvailable());
+		if (form.getName() == null || form.getName().trim().isEmpty()) {
+			throw new IllegalArgumentException("メニュー名を入力してください。");
+		}
+		int updated = cafeMenuMapper.updateNamePriceAndAvailability(
+			menuId,
+			form.getName().trim(),
+			form.getPrice(),
+			form.isAvailable()
+		);
 		if (updated == 0) {
 			throw new IllegalArgumentException("更新対象の商品が見つかりません。");
 		}
@@ -332,17 +346,32 @@ public class CafeOrderServiceImpl implements CafeOrderService {
 			.build();
 	}
 
-	private String assignSeatAutomatically(int guestCount) {
+	private String assignSeatAutomatically(int guestCount, String rawSeatPreference) {
+		String seatPreference = rawSeatPreference == null ? "AUTO" : rawSeatPreference.trim().toUpperCase();
 		List<List<String>> priorityGroups = new ArrayList<>();
-		if (guestCount == 1) {
+		if ("COUNTER".equals(seatPreference)) {
+			if (guestCount > 1) {
+				throw new IllegalArgumentException("カウンター席は1名のみ指定できます。");
+			}
 			priorityGroups.add(SINGLE_SEATS);
-			priorityGroups.add(DOUBLE_SEATS);
-			priorityGroups.add(FOUR_SEATS);
-		} else if (guestCount == 2) {
-			priorityGroups.add(DOUBLE_SEATS);
-			priorityGroups.add(FOUR_SEATS);
+		} else if ("TABLE".equals(seatPreference)) {
+			if (guestCount <= 2) {
+				priorityGroups.add(DOUBLE_SEATS);
+				priorityGroups.add(FOUR_SEATS);
+			} else {
+				priorityGroups.add(FOUR_SEATS);
+			}
 		} else {
-			priorityGroups.add(FOUR_SEATS);
+			if (guestCount == 1) {
+				priorityGroups.add(SINGLE_SEATS);
+				priorityGroups.add(DOUBLE_SEATS);
+				priorityGroups.add(FOUR_SEATS);
+			} else if (guestCount == 2) {
+				priorityGroups.add(DOUBLE_SEATS);
+				priorityGroups.add(FOUR_SEATS);
+			} else {
+				priorityGroups.add(FOUR_SEATS);
+			}
 		}
 
 		Set<String> occupied = getActiveSeatSet();
