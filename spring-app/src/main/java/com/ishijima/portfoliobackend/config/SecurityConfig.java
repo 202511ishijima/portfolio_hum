@@ -27,7 +27,15 @@ public class SecurityConfig {
 				.requestMatchers("/h2-console/**").permitAll()
 				.requestMatchers("/api/hamsters/summary").permitAll()
 				.requestMatchers("/api/products/stocks", "/api/products/purchase").permitAll()
-				.requestMatchers("/api/cafe/menu", "/api/cafe/checkin", "/api/cafe/order-menu", "/api/cafe/orders", "/api/cafe/sessions/*").permitAll()
+				.requestMatchers(
+					"/api/cafe/menu",
+					"/api/cafe/checkin",
+					"/api/cafe/order-menu",
+					"/api/cafe/orders",
+					"/api/cafe/orders/history",
+					"/api/cafe/sessions/*",
+					"/api/cafe/sessions/*/checkout"
+				).permitAll()
 				.requestMatchers("/api/inquiries", "/api/inquiries/replies", "/api/inquiries/thread", "/api/members/register", "/api/members/points", "/api/members/status").permitAll()
 				.requestMatchers("/admin/**", "/api/admin/**").hasAnyRole("ADMIN", "STAFF_MANAGER", "STAFF", "VIEWER")
 				.requestMatchers("/staff/**").hasAnyRole("ADMIN", "STAFF_MANAGER", "STAFF", "VIEWER")

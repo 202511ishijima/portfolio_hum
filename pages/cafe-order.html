@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>カフェ注文 | はむのくらし</title>
+  <title>カフェ注文</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
@@ -14,40 +14,73 @@
 </head>
 <body data-base-path="../" data-page="cafe-order">
   <main class="container page-shell">
-    <header class="cafe-order-topbar">
-      <p id="cafe-session-summary" class="text-soft">セッション情報を読み込み中...</p>
-      <button class="button button--ghost" type="button" id="show-checkout-button">お会計</button>
-    </header>
+    <div class="cafe-order-layout">
+      <form class="section-stack" id="cafe-order-form">
+        <div class="section-heading">
+          <p class="eyebrow">MENU</p>
+          <h2>メニューを選択</h2>
+          <p id="cafe-session-summary" class="text-soft">セッションを読み込み中...</p>
+        </div>
 
-    <form class="section-stack" id="cafe-order-form">
-      <div class="section-heading">
-        <p class="eyebrow">MENU</p>
-        <h2>メニューを選択</h2>
-        <p>カードを押すと数量が1つ増えます。数量は各商品の + / - で調整できます。</p>
-      </div>
+        <details class="contact-chat-accordion" open>
+          <summary>ドリンク</summary>
+          <div id="cafe-order-menu-drink" class="card-grid"></div>
+        </details>
 
-      <details class="contact-chat-accordion" open>
-        <summary>ドリンク</summary>
-        <div id="cafe-order-menu-drink" class="card-grid"></div>
-      </details>
+        <details class="contact-chat-accordion" open>
+          <summary>フード</summary>
+          <div id="cafe-order-menu-food" class="card-grid"></div>
+        </details>
 
-      <details class="contact-chat-accordion" open>
-        <summary>フード</summary>
-        <div id="cafe-order-menu-food" class="card-grid"></div>
-      </details>
-    </form>
+        <p id="cafe-order-status" class="text-soft"></p>
+      </form>
 
-    <section class="section-stack">
-      <article class="form-card" id="checkout-summary" hidden>
-        <h2>注文履歴とお会計</h2>
-        <div id="checkout-summary-content"></div>
-      </article>
-    </section>
+      <aside class="section-stack cafe-order-history-side">
+        <article class="form-card" id="checkout-summary">
+          <div class="cafe-order-actions-top">
+            <button class="button button--ghost" type="button" id="show-checkout-button">お会計</button>
+          </div>
+          <h2>注文履歴と合計金額</h2>
+          <div id="checkout-summary-content"></div>
+        </article>
+      </aside>
+    </div>
 
     <div class="cafe-order-bottom-bar">
       <button class="button" type="submit" form="cafe-order-form" id="bottom-order-button">注文する</button>
     </div>
   </main>
+
+  <section id="cafe-finished-screen" class="cafe-finished-screen" hidden>
+    <div class="cafe-finished-card">
+      <h1>ご利用ありがとうございました</h1>
+      <p id="cafe-finished-total" class="cafe-finished-total">合計金額 ¥0</p>
+    </div>
+  </section>
+
+  <div id="cafe-order-modal" class="cafe-order-modal" hidden>
+    <div class="cafe-order-modal__backdrop" data-order-modal-close></div>
+    <div class="cafe-order-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="cafe-order-modal-title">
+      <h2 id="cafe-order-modal-title">お知らせ</h2>
+      <p id="cafe-order-modal-message">お会計が確定しています。</p>
+      <div class="button-row">
+        <button class="button button--ghost" type="button" id="cafe-order-modal-ok">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cafe-checkout-confirm-modal" class="cafe-order-modal" hidden>
+    <div class="cafe-order-modal__backdrop" data-checkout-modal-close></div>
+    <div class="cafe-order-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="cafe-checkout-modal-title">
+      <h2 id="cafe-checkout-modal-title">お会計の確定</h2>
+      <p id="cafe-checkout-modal-message">お会計を確定してもよろしいですか？</p>
+      <div class="button-row">
+        <button class="button button--ghost" type="button" id="cafe-checkout-modal-cancel">いいえ</button>
+        <button class="button" type="button" id="cafe-checkout-modal-ok">はい</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../assets/js/router.js"></script>
   <script src="../assets/js/cafe-order.js"></script>
 </body>

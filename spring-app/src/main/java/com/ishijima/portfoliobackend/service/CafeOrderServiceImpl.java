@@ -105,6 +105,20 @@ public class CafeOrderServiceImpl implements CafeOrderService {
 
 	@Override
 	@Transactional
+	public CafeVisitSession findLatestActiveSession() {
+		return cafeVisitSessionMapper.findActiveSessions(LocalDateTime.now()).stream()
+			.findFirst()
+			.orElse(null);
+	}
+
+	@Override
+	@Transactional
+	public List<CafeVisitSession> findActiveSessions() {
+		return cafeVisitSessionMapper.findActiveSessions(LocalDateTime.now());
+	}
+
+	@Override
+	@Transactional
 	public List<CafeSeatView> buildSeatMap() {
 		Set<String> occupied = getActiveSeatSet();
 		List<CafeSeatView> map = new ArrayList<>();

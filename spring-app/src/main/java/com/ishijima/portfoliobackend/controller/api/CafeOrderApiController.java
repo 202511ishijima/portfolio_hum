@@ -68,6 +68,17 @@ public class CafeOrderApiController {
 		return ResponseEntity.ok(toSessionResponse(session, remainingSeconds));
 	}
 
+	@PostMapping("/sessions/{token}/checkout")
+	public ResponseEntity<Map<String, Object>> checkoutSession(@PathVariable("token") String token) {
+		cafeOrderService.completeCheckout(token);
+		CafeVisitSession session = cafeOrderService.getVisitSession(token);
+		long remainingSeconds = calculateRemainingSeconds(session);
+		Map<String, Object> response = new LinkedHashMap<>();
+		response.put("message", "お会計を確定しました。");
+		response.put("session", toSessionResponse(session, remainingSeconds));
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping("/orders/history")
 	public ResponseEntity<Map<String, Object>> orderHistory(@RequestParam("session") String sessionToken) {
 		CafeVisitSession session = cafeOrderService.getVisitSession(sessionToken);
@@ -129,16 +140,16 @@ public class CafeOrderApiController {
 
 	private Map<String, Object> toSessionResponse(CafeVisitSession session, long remainingSeconds) {
 		boolean canOrder = session.getStatus() == CafeVisitSessionStatus.ACTIVE && remainingSeconds > 0;
-		return Map.of(
-			"sessionToken", session.getSessionToken(),
-			"seatNo", session.getSeatNo(),
-			"status", session.getStatus(),
-			"issuedAt", session.getIssuedAt(),
-			"expiresAt", session.getExpiresAt(),
-			"checkoutCompletedAt", session.getCheckoutCompletedAt(),
-			"remainingSeconds", remainingSeconds,
-			"canOrder", canOrder
-		);
+		Map<String, Object> response = new LinkedHashMap<>();
+		response.put("sessionToken", session.getSessionToken());
+		response.put("seatNo", session.getSeatNo());
+		response.put("status", session.getStatus());
+		response.put("issuedAt", session.getIssuedAt());
+		response.put("expiresAt", session.getExpiresAt());
+		response.put("checkoutCompletedAt", session.getCheckoutCompletedAt());
+		response.put("remainingSeconds", remainingSeconds);
+		response.put("canOrder", canOrder);
+		return response;
 	}
 
 	private long calculateRemainingSeconds(CafeVisitSession session) {

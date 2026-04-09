@@ -459,13 +459,13 @@
 }
 
 .cafe-order-card.is-disabled {
-  opacity: 1;
-  cursor: pointer;
-  filter: none;
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: saturate(0.9);
 }
 
 .cafe-order-card.is-disabled * {
-  cursor: pointer;
+  cursor: not-allowed;
 }
 
 .cafe-order-card .media-photo {
@@ -554,6 +554,100 @@
   font-size: 0.88rem;
 }
 
+.cafe-order-layout {
+  display: grid;
+  gap: 16px;
+}
+
+.cafe-order-history-side .form-card {
+  margin: 0;
+}
+
+.cafe-order-history-side .panel {
+  padding: 10px 12px;
+}
+
+.cafe-order-history-item--served {
+  background: #eef9ee;
+  border: 1px solid #b7ddb7;
+}
+
+.cafe-order-modal[hidden] {
+  display: none;
+}
+
+.cafe-order-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+}
+
+.cafe-order-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(44, 27, 17, 0.45);
+}
+
+.cafe-order-modal__dialog {
+  position: relative;
+  width: min(480px, calc(100% - 24px));
+  margin: 18vh auto 0;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(185, 144, 108, 0.35);
+  background: #fffdfa;
+  box-shadow: 0 24px 56px rgba(73, 45, 26, 0.24);
+}
+
+.cafe-order-modal__dialog h2 {
+  margin: 0 0 10px;
+}
+
+.cafe-order-modal__dialog p {
+  margin: 0 0 14px;
+  color: var(--color-text-soft);
+}
+
+.cafe-finished-screen[hidden] {
+  display: none;
+}
+
+.cafe-finished-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 250, 243, 0.97);
+}
+
+.cafe-finished-card {
+  width: min(680px, calc(100% - 32px));
+  padding: 40px 28px;
+  text-align: center;
+  border: 1px solid rgba(185, 144, 108, 0.35);
+  border-radius: 24px;
+  background: #fffdfa;
+  box-shadow: 0 24px 56px rgba(73, 45, 26, 0.18);
+}
+
+.cafe-finished-card h1 {
+  margin: 0 0 16px;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--color-main-deep);
+}
+
+.cafe-finished-total {
+  margin: 0;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cafe-order-history-side .section-stack {
+  gap: 10px;
+}
+
 @media (min-width: 900px) {
   .detail-layout {
     grid-template-columns: 0.9fr 1.1fr;
@@ -584,5 +678,19 @@
 
   .hamster-carousel__page {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cafe-order-layout {
+    grid-template-columns: minmax(0, 1.5fr) minmax(300px, 0.9fr);
+    align-items: start;
+  }
+
+  .cafe-order-history-side {
+    position: sticky;
+    top: 68px;
+    align-self: start;
+    max-height: calc(100vh - 120px);
+    overflow: auto;
+    padding-right: 2px;
   }
 }

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ProductOrder {
 	private Long id;
+	private String orderGroupId;
 	private String productId;
 	private Integer quantity;
 	private String note;

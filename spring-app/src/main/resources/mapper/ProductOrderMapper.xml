@@ -6,6 +6,7 @@
 
 	<resultMap id="ProductOrderResultMap" type="com.ishijima.portfoliobackend.entity.ProductOrder">
 		<id property="id" column="id"/>
+		<result property="orderGroupId" column="order_group_id"/>
 		<result property="productId" column="product_id"/>
 		<result property="quantity" column="quantity"/>
 		<result property="note" column="note"/>
@@ -15,12 +16,14 @@
 
 	<insert id="insert" parameterType="com.ishijima.portfoliobackend.entity.ProductOrder" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO product_orders (
+			order_group_id,
 			product_id,
 			quantity,
 			note,
 			ordered_by,
 			created_at
 		) VALUES (
+			#{orderGroupId},
 			#{productId},
 			#{quantity},
 			#{note},
@@ -32,6 +35,7 @@
 	<select id="findRecent" resultMap="ProductOrderResultMap">
 		SELECT
 			id,
+			order_group_id,
 			product_id,
 			quantity,
 			note,
@@ -39,6 +43,33 @@
 			created_at
 		FROM product_orders
 		ORDER BY created_at DESC, id DESC
-		LIMIT 100
+		LIMIT #{limit}
+	</select>
+
+	<select id="findByOrderGroupId" resultMap="ProductOrderResultMap">
+		SELECT
+			id,
+			order_group_id,
+			product_id,
+			quantity,
+			note,
+			ordered_by,
+			created_at
+		FROM product_orders
+		WHERE order_group_id = #{orderGroupId}
+		ORDER BY id ASC
+	</select>
+
+	<select id="findById" resultMap="ProductOrderResultMap">
+		SELECT
+			id,
+			order_group_id,
+			product_id,
+			quantity,
+			note,
+			ordered_by,
+			created_at
+		FROM product_orders
+		WHERE id = #{id}
 	</select>
 </mapper>

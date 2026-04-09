@@ -70,32 +70,32 @@
 			</div>
 		</section>
 
-		<section class="admin-card" th:if="${issuedSession != null}">
+		<section class="admin-card" th:if="${!#lists.isEmpty(activeSessionViews)}">
 			<div class="admin-card-header">
 				<div>
-					<h2>最新の発行情報</h2>
+					<h2>利用中セッション一覧</h2>
 				</div>
 			</div>
-			<div style="display:grid;gap:12px;justify-items:start;">
-				<img th:if="${issuedQrDataUrl != null}"
-				     th:src="${issuedQrDataUrl}"
-				     alt="注文QRコード"
-				     style="width:220px;height:220px;border:1px solid #e7d9ca;border-radius:12px;background:#fff;padding:10px;">
-				<p class="admin-help-text" th:if="${issuedQrDataUrl == null}">
-					QR生成に失敗しました。下の注文URLをご利用ください。
-				</p>
+			<div class="admin-cafe-active-grid">
+				<div th:each="view : ${activeSessionViews}" class="admin-cafe-active-card">
+					<div class="admin-cafe-active-qr">
+					<img th:if="${view.qrDataUrl != null}"
+					     th:src="${view.qrDataUrl}"
+					     alt="注文QRコード"
+					     style="width:120px;height:120px;border:1px solid #e7d9ca;border-radius:10px;background:#fff;padding:6px;">
+					</div>
+					<div class="admin-cafe-active-meta">
+						<p><strong th:text="${view.session.seatNo}">A-01</strong> / <span th:text="${view.session.guestCount + '名'}">2名</span></p>
+						<p th:text="${'期限: ' + #temporals.format(view.session.expiresAt, 'MM/dd HH:mm')}">期限: 04/09 18:20</p>
+						<p>
+							<a th:href="${view.orderUrl}" target="_blank" rel="noopener noreferrer">注文URL</a>
+						</p>
+						<form th:action="@{/admin/cafe/sessions/{token}/checkout(token=${view.session.sessionToken})}" method="post">
+							<button class="admin-button admin-button--ghost" th:if="${canManageCafe}" type="submit">会計完了</button>
+						</form>
+					</div>
+				</div>
 			</div>
-			<ul class="check-list">
-				<li th:text="'座席番号: ' + ${issuedSession.seatNo}">座席番号: A-01</li>
-				<li th:text="'人数: ' + ${issuedSession.guestCount} + '名'">人数: 2名</li>
-				<li th:text="'有効期限: ' + ${#temporals.format(issuedSession.expiresAt, 'yyyy/MM/dd HH:mm')}">有効期限</li>
-				<li>注文URL:
-					<a th:href="${issuedOrderUrl}" th:text="${issuedOrderUrl}" target="_blank" rel="noopener noreferrer"></a>
-				</li>
-			</ul>
-			<form th:action="@{/admin/cafe/sessions/{token}/checkout(token=${issuedSession.sessionToken})}" method="post">
-				<button class="admin-button admin-button--ghost" th:if="${canManageCafe}" type="submit">このセッションを会計完了にする</button>
-			</form>
 		</section>
 	</div>
 </body>

@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -75,6 +76,7 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 			throw new IllegalArgumentException("発注対象がありません。");
 		}
 
+		String orderGroupId = UUID.randomUUID().toString();
 		int createdCount = 0;
 		for (ProductOrderLineForm item : items) {
 			String productId = item.getProductId();
@@ -95,9 +97,10 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 			productStockMapper.updateRecommendedStock(productId, recommendedStock);
 
 			if (quantity > 0) {
-				productStockMapper.increaseStock(productId, quantity);
-				ProductOrder order = ProductOrder.builder()
-					.productId(productId)
+					productStockMapper.increaseStock(productId, quantity);
+					ProductOrder order = ProductOrder.builder()
+						.orderGroupId(orderGroupId)
+						.productId(productId)
 					.quantity(quantity)
 					.note("一括発注")
 					.orderedBy(orderedBy)
@@ -112,7 +115,23 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 
 	@Override
 	public List<ProductOrder> findRecentOrders() {
-		return productOrderMapper.findRecent();
+		return productOrderMapper.findRecent(1000);
+	}
+
+	@Override
+	public List<ProductOrder> findOrdersByGroupId(String orderGroupId) {
+		if (orderGroupId == null || orderGroupId.isBlank()) {
+			return List.of();
+		}
+		return productOrderMapper.findByOrderGroupId(orderGroupId);
+	}
+
+	@Override
+	public ProductOrder findOrderById(Long id) {
+		if (id == null) {
+			return null;
+		}
+		return productOrderMapper.findById(id);
 	}
 
 	@Override

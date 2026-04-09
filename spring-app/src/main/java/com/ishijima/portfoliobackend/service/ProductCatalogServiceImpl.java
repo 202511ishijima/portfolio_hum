@@ -34,9 +34,10 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
 			List<ProductCatalogItem> items = new ArrayList<>();
 			for (JsonNode node : root) {
 				String id = node.path("id").asText("");
+				String category = node.path("category").asText("");
 				String name = node.path("name").asText("");
 				if (!id.isBlank()) {
-					items.add(new ProductCatalogItem(id, name.isBlank() ? id : name));
+					items.add(new ProductCatalogItem(id, category.isBlank() ? "uncategorized" : category, name.isBlank() ? id : name));
 				}
 			}
 			return items;

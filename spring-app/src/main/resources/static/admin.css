@@ -421,6 +421,44 @@ body.admin-body {
   background: var(--admin-main);
 }
 
+.admin-modal[hidden] {
+  display: none;
+}
+
+.admin-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+}
+
+.admin-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(52, 35, 24, 0.42);
+}
+
+.admin-modal-dialog {
+  position: relative;
+  width: min(520px, calc(100% - 28px));
+  margin: 12vh auto 0;
+  padding: 22px;
+  border: 1px solid var(--admin-border);
+  border-radius: 18px;
+  background: #fffdfa;
+  box-shadow: 0 20px 50px rgba(70, 45, 29, 0.2);
+}
+
+.admin-modal-dialog h3 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+}
+
+.admin-modal-dialog p {
+  margin: 0 0 16px;
+  color: var(--admin-text-soft);
+  line-height: 1.7;
+}
+
 .admin-shift-pill:hover {
   background: var(--admin-main-deep);
 }
@@ -888,6 +926,14 @@ body.admin-body {
   font-size: 0.85rem;
 }
 
+.admin-shift-month-label {
+  margin: 8px 0 12px;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--admin-main-deep);
+}
+
 .admin-detail-grid {
   display: grid;
   gap: 20px;
@@ -964,6 +1010,39 @@ body.admin-body {
 
 .admin-history-item--self .admin-message-box {
   background: rgba(185, 139, 102, 0.16);
+}
+
+.admin-cafe-active-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-auto-flow: dense;
+  gap: 10px;
+}
+
+.admin-cafe-active-card {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  background: rgba(255, 253, 250, 0.9);
+}
+
+.admin-cafe-active-qr {
+  display: grid;
+  align-content: start;
+  justify-content: start;
+}
+
+.admin-cafe-active-meta {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+.admin-cafe-active-meta p {
+  margin: 0;
 }
 
 .admin-textarea {
@@ -1092,6 +1171,10 @@ body.admin-body {
 
   .admin-inline-form input {
     width: 100%;
+  }
+
+  .admin-cafe-active-card {
+    grid-template-columns: 1fr;
   }
 
   .admin-summary-grid,

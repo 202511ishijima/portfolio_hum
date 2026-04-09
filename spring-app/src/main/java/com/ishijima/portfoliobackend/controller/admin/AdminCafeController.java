@@ -25,10 +25,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/cafe")
@@ -51,6 +55,16 @@ public class AdminCafeController {
 			autoForm.setGuestCount(1);
 			model.addAttribute("cafeAutoAssignForm", autoForm);
 		}
+		List<ReceptionSessionView> activeSessionViews = new ArrayList<>();
+		for (CafeVisitSession session : cafeOrderService.findActiveSessions()) {
+			String orderUrl = buildOrderUrl(session.getSessionToken());
+			activeSessionViews.add(new ReceptionSessionView(
+				session,
+				orderUrl,
+				buildQrImageUrl(orderUrl)
+			));
+		}
+		model.addAttribute("activeSessionViews", activeSessionViews);
 		model.addAttribute("seatMap", cafeOrderService.buildSeatMap());
 		model.addAttribute("adminSection", "cafe-reception");
 		return "admin/cafe-reception";
@@ -186,29 +200,83 @@ public class AdminCafeController {
 	}
 
 	@GetMapping("/orders")
-	public String orders(
-		@RequestParam(value = "status", required = false) String status,
-		Model model
-	) {
-		List<CafeOrder> orders = cafeOrderService.findAllOrders();
-		if (status != null && !status.isBlank()) {
-			try {
-				CafeOrderStatus selected = CafeOrderStatus.valueOf(status.trim().toUpperCase());
-				orders = orders.stream()
-					.filter(order -> order.getStatus() == selected)
-					.toList();
-			} catch (IllegalArgumentException ignored) {
-				// ignore invalid filter and show all
-			}
-		}
+	public String orders(Model model) {
+		List<CafeOrder> allOrders = cafeOrderService.findAllOrders();
+		List<CafeOrder> activeOrders = allOrders.stream()
+			.filter(order -> order.getStatus() == CafeOrderStatus.NEW || order.getStatus() == CafeOrderStatus.PREPARING)
+			.toList();
+		List<CafeOrder> historyOrders = allOrders.stream()
+			.filter(order -> order.getStatus() != CafeOrderStatus.NEW && order.getStatus() != CafeOrderStatus.PREPARING)
+			.toList();
 
-		model.addAttribute("orders", orders);
-		model.addAttribute("orderItemsMap", cafeOrderService.findOrderItemsMap(orders));
-		model.addAttribute("statusOptions", CafeOrderStatus.values());
-		model.addAttribute("selectedStatus", status != null ? status.toUpperCase() : "");
+		Map<Long, String> elapsedMap = activeOrders.stream()
+			.collect(java.util.stream.Collectors.toMap(
+				CafeOrder::getId,
+				order -> formatElapsed(order.getCreatedAt()),
+				(existing, replacement) -> existing,
+				java.util.LinkedHashMap::new
+			));
+
+		Map<Long, Long> pendingCountBySessionId = activeOrders.stream()
+			.filter(order -> order.getVisitSessionId() != null)
+			.collect(Collectors.groupingBy(CafeOrder::getVisitSessionId, Collectors.counting()));
+
+		List<CheckoutSessionRow> checkoutSessionRows = cafeOrderService.findActiveSessions().stream()
+			.map(session -> new CheckoutSessionRow(
+				session.getSessionToken(),
+				session.getSeatNo(),
+				session.getGuestCount(),
+				session.getExpiresAt(),
+				pendingCountBySessionId.getOrDefault(session.getId(), 0L).intValue()
+			))
+			.toList();
+
+		model.addAttribute("activeOrders", activeOrders);
+		model.addAttribute("historyOrders", historyOrders);
+		model.addAttribute("orderItemsMap", cafeOrderService.findOrderItemsMap(allOrders));
+		model.addAttribute("elapsedMap", elapsedMap);
+		model.addAttribute("checkoutSessionRows", checkoutSessionRows);
 		model.addAttribute("salesDaily", cafeOrderService.findRecentDailySales(14));
 		model.addAttribute("adminSection", "cafe-orders");
 		return "admin/cafe-orders";
+	}
+
+	@PostMapping("/orders/sessions/{token}/checkout")
+	public String checkoutFromOrders(
+		@PathVariable String token,
+		Authentication authentication,
+		RedirectAttributes redirectAttributes
+	) {
+		if (!canManage(authentication)) {
+			redirectAttributes.addFlashAttribute("cafeError", "会計処理の権限がありません。");
+			return "redirect:/admin/cafe/orders";
+		}
+		try {
+			cafeOrderService.completeCheckout(token);
+			redirectAttributes.addFlashAttribute("cafeMessage", "会計を確定しました。");
+		} catch (IllegalArgumentException ex) {
+			redirectAttributes.addFlashAttribute("cafeError", ex.getMessage());
+		}
+		return "redirect:/admin/cafe/orders";
+	}
+
+	@PostMapping("/orders/{id}/serve")
+	public String serveOrder(
+		@PathVariable Long id,
+		Authentication authentication,
+		RedirectAttributes redirectAttributes
+	) {
+		if (!canManage(authentication)) {
+			redirectAttributes.addFlashAttribute("cafeError", "提供処理の権限がありません。");
+			return "redirect:/admin/cafe/orders";
+		}
+		try {
+			cafeOrderService.updateOrderStatus(id, CafeOrderStatus.SERVED);
+			redirectAttributes.addFlashAttribute("cafeMessage", "提供済みに更新しました。");
+		} catch (IllegalArgumentException ex) {
+			redirectAttributes.addFlashAttribute("cafeError", ex.getMessage());
+		}
+		return "redirect:/admin/cafe/orders";
 	}
 
 	@PostMapping("/orders/{id}/status")
@@ -351,6 +419,33 @@ public class AdminCafeController {
 		String encoded = URLEncoder.encode(text, StandardCharsets.UTF_8);
 		return "https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=8&data=" + encoded;
 	}
+
+	private String formatElapsed(LocalDateTime createdAt) {
+		if (createdAt == null) {
+			return "-";
+		}
+		long minutes = Math.max(0, Duration.between(createdAt, LocalDateTime.now()).toMinutes());
+		long hours = minutes / 60;
+		long remain = minutes % 60;
+		if (hours > 0) {
+			return hours + "時間" + remain + "分";
+		}
+		return remain + "分";
+	}
+
+	private record ReceptionSessionView(
+		CafeVisitSession session,
+		String orderUrl,
+		String qrDataUrl
+	) {}
+
+	private record CheckoutSessionRow(
+		String sessionToken,
+		String seatNo,
+		Integer guestCount,
+		LocalDateTime expiresAt,
+		int pendingCount
+	) {}
 
 	@ExceptionHandler(Exception.class)
 	public String handleReceptionException(Exception ex, RedirectAttributes redirectAttributes) {

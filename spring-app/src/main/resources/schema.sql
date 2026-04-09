@@ -160,12 +160,15 @@ ALTER TABLE product_stocks ADD COLUMN IF NOT EXISTS recommended_stock INT NOT NU
 
 CREATE TABLE IF NOT EXISTS product_orders (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	order_group_id VARCHAR(64),
 	product_id VARCHAR(100) NOT NULL,
 	quantity INT NOT NULL,
 	note VARCHAR(300),
 	ordered_by VARCHAR(255) NOT NULL,
 	created_at DATETIME NOT NULL
 );
+
+ALTER TABLE product_orders ADD COLUMN IF NOT EXISTS order_group_id VARCHAR(64);
 
 ALTER TABLE hamsters ADD COLUMN IF NOT EXISTS birth_date DATE;
 ALTER TABLE hamsters ADD COLUMN IF NOT EXISTS health_condition VARCHAR(255) DEFAULT '店頭で個別管理';

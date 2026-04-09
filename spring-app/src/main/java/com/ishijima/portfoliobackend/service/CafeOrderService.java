@@ -26,6 +26,10 @@ public interface CafeOrderService {
 
 	CafeVisitSession getVisitSession(String sessionToken);
 
+	CafeVisitSession findLatestActiveSession();
+
+	List<CafeVisitSession> findActiveSessions();
+
 	List<CafeSeatView> buildSeatMap();
 
 	CafeOrder createOrder(CafeOrderCreateForm form);

@@ -31,22 +31,95 @@
 		<section class="admin-card">
 			<div class="admin-card-header">
 				<div>
-					<h2>注文一覧</h2>
-					<p>会計時はステータスを「PAID」に変更すると売上に自動反映されます。</p>
+					<h2>会計確定</h2>
+					<p>未提供の注文が残っている場合は、確認モーダルを表示してから会計確定します。</p>
 				</div>
-				<form class="admin-inline-form" method="get" th:action="@{/admin/cafe/orders}">
-					<select name="status">
-						<option value="">全ステータス</option>
-						<option th:each="status : ${statusOptions}"
-						        th:value="${status.name()}"
-						        th:text="${status.name()}"
-						        th:selected="${selectedStatus == status.name()}">NEW</option>
-					</select>
-					<button class="admin-button admin-button--ghost" type="submit">絞り込み</button>
-				</form>
+			</div>
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(checkoutSessionRows)}">
+				<table class="admin-table">
+					<thead>
+						<tr>
+							<th>座席</th>
+							<th>人数</th>
+							<th>期限</th>
+							<th>未提供件数</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="row : ${checkoutSessionRows}">
+							<td th:text="${row.seatNo}">S1</td>
+							<td th:text="${row.guestCount + '名'}">2名</td>
+							<td th:text="${row.expiresAt != null ? #temporals.format(row.expiresAt, 'yyyy/MM/dd HH:mm') : '-'}">2026/04/09 15:30</td>
+							<td th:text="${row.pendingCount + '件'}">0件</td>
+							<td>
+								<form class="admin-inline-form js-checkout-form"
+								      th:action="@{/admin/cafe/orders/sessions/{token}/checkout(token=${row.sessionToken})}"
+								      method="post"
+								      th:attr="data-seat=${row.seatNo},data-pending=${row.pendingCount}">
+									<button class="admin-button admin-button--ghost" th:if="${canManageCafe}" type="submit">お会計確定</button>
+								</form>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p th:if="${#lists.isEmpty(checkoutSessionRows)}">会計対象のセッションはありません。</p>
+		</section>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>注文一覧（未提供）</h2>
+					<p>提供ボタンを押すと上の一覧から消え、下の履歴一覧に移動します。10秒ごとに自動更新されます。</p>
+				</div>
 			</div>
 
-			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(orders)}">
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(activeOrders)}">
+				<table class="admin-table">
+					<thead>
+						<tr>
+							<th>注文ID</th>
+							<th>座席</th>
+							<th>明細</th>
+							<th>経過時間</th>
+							<th>注文時刻</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="order : ${activeOrders}">
+							<td th:text="${order.id}">1</td>
+							<td th:text="${order.seatNo}">A-01</td>
+							<td>
+								<div th:if="${orderItemsMap[order.id] != null}">
+									<div th:each="item : ${orderItemsMap[order.id]}">
+										<span th:text="${item.menuName}">メニュー名</span>
+										<span th:text="' x ' + ${item.quantity}">x 1</span>
+									</div>
+								</div>
+							</td>
+							<td th:text="${elapsedMap[order.id]}">12分</td>
+							<td th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'yyyy/MM/dd HH:mm') : '-'}">2026/03/30 12:30</td>
+							<td>
+								<form class="admin-inline-form" th:action="@{/admin/cafe/orders/{id}/serve(id=${order.id})}" method="post">
+									<button class="admin-button" th:if="${canManageCafe}" type="submit">提供</button>
+								</form>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p th:if="${#lists.isEmpty(activeOrders)}">未提供の注文はありません。</p>
+		</section>
+
+		<section class="admin-card">
+			<div class="admin-card-header">
+				<div>
+					<h2>注文履歴一覧</h2>
+				</div>
+			</div>
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(historyOrders)}">
 				<table class="admin-table">
 					<thead>
 						<tr>
@@ -59,7 +132,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="order : ${orders}">
+						<tr th:each="order : ${historyOrders}">
 							<td th:text="${order.id}">1</td>
 							<td th:text="${order.seatNo}">A-01</td>
 							<td>
@@ -71,23 +144,17 @@
 								</div>
 							</td>
 							<td th:text="${order.total} + ' 円'">1000 円</td>
-							<td>
-								<form class="admin-inline-form" th:action="@{/admin/cafe/orders/{id}/status(id=${order.id})}" method="post">
-									<select name="status">
-										<option th:each="status : ${statusOptions}"
-										        th:value="${status.name()}"
-										        th:text="${status.name()}"
-										        th:selected="${order.status == status}">NEW</option>
-									</select>
-									<button class="admin-button admin-button--ghost" th:if="${canManageCafe}" type="submit">更新</button>
-								</form>
-							</td>
+							<td th:text="${
+								order.status.name() == 'SERVED' ? '提供済み' :
+								(order.status.name() == 'PAID' ? '会計済み' :
+								(order.status.name() == 'CANCELLED' ? 'キャンセル' : order.status.name()))
+							}">提供済み</td>
 							<td th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'yyyy/MM/dd HH:mm') : '-'}">2026/03/30 12:30</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
-			<p th:if="${#lists.isEmpty(orders)}">注文データはまだありません。</p>
+			<p th:if="${#lists.isEmpty(historyOrders)}">履歴はまだありません。</p>
 		</section>
 
 		<section class="admin-card">
@@ -117,6 +184,84 @@
 			<p th:if="${#lists.isEmpty(salesDaily)}">売上データはまだありません。</p>
 		</section>
 	</div>
+	<div id="checkout-confirm-modal" class="admin-modal" hidden>
+		<div class="admin-modal-backdrop" data-modal-close></div>
+		<div class="admin-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-confirm-title">
+			<h3 id="checkout-confirm-title">お会計確定の確認</h3>
+			<p id="checkout-confirm-message">この内容で会計を確定しますか？</p>
+			<div class="admin-header-actions">
+				<button id="checkout-confirm-cancel" class="admin-button admin-button--ghost" type="button">キャンセル</button>
+				<button id="checkout-confirm-ok" class="admin-button" type="button">確定する</button>
+			</div>
+		</div>
+	</div>
+	<script>
+		(function () {
+			if (window.location.pathname !== "/admin/cafe/orders") {
+				return;
+			}
+			const modal = document.getElementById("checkout-confirm-modal");
+			const modalMessage = document.getElementById("checkout-confirm-message");
+			const modalOk = document.getElementById("checkout-confirm-ok");
+			const modalCancel = document.getElementById("checkout-confirm-cancel");
+			let pendingSubmitForm = null;
+
+			const closeModal = function () {
+				if (!modal) return;
+				modal.hidden = true;
+				pendingSubmitForm = null;
+			};
+
+			const openModal = function (form, seat, pendingCount) {
+				if (!modal || !modalMessage) {
+					form.submit();
+					return;
+				}
+				const count = Number(pendingCount || 0);
+				if (count > 0) {
+					modalMessage.textContent = `座席 ${seat} は未提供の注文が ${count} 件あります。このまま会計を確定しますか？`;
+				} else {
+					modalMessage.textContent = `座席 ${seat} の会計を確定しますか？`;
+				}
+				pendingSubmitForm = form;
+				modal.hidden = false;
+			};
+
+			document.querySelectorAll(".js-checkout-form").forEach(function (form) {
+				form.addEventListener("submit", function (event) {
+					event.preventDefault();
+					openModal(form, form.dataset.seat || "-", form.dataset.pending || "0");
+				});
+			});
+
+			modalOk?.addEventListener("click", function () {
+				if (pendingSubmitForm) {
+					pendingSubmitForm.submit();
+				}
+			});
+			modalCancel?.addEventListener("click", closeModal);
+			modal?.querySelector("[data-modal-close]")?.addEventListener("click", closeModal);
+
+			const isEditing = function () {
+				const active = document.activeElement;
+				if (!active) return false;
+				const tag = active.tagName;
+				return tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA" || active.isContentEditable;
+			};
+			setInterval(function () {
+				if (modal && !modal.hidden) {
+					return;
+				}
+				if (document.visibilityState !== "visible") {
+					return;
+				}
+				if (isEditing()) {
+					return;
+				}
+				window.location.reload();
+			}, 10000);
+		})();
+	</script>
 </body>
 </html>
 

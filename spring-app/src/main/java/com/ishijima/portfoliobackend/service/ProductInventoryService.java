@@ -23,5 +23,9 @@ public interface ProductInventoryService {
 
 	List<ProductOrder> findRecentOrders();
 
+	List<ProductOrder> findOrdersByGroupId(String orderGroupId);
+
+	ProductOrder findOrderById(Long id);
+
 	Map<String, Integer> purchase(List<ProductPurchaseItemForm> items);
 }

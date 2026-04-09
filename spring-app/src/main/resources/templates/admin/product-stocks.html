@@ -68,31 +68,36 @@
 					<h2>発注履歴（最新100件）</h2>
 				</div>
 			</div>
-			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(recentOrders)}">
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(recentOrderGroups)}">
 				<table class="admin-table">
 					<thead>
 						<tr>
-							<th>ID</th>
-							<th>商品ID</th>
-							<th>発注数</th>
+							<th>発注ID</th>
+							<th>商品カテゴリー</th>
+							<th>発注数（合計）</th>
 							<th>発注者</th>
 							<th>備考</th>
 							<th>登録日時</th>
+							<th>詳細</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="order : ${recentOrders}">
-							<td th:text="${order.id}">1</td>
-							<td th:text="${order.productId}">cage-01</td>
-							<td th:text="${order.quantity}">10</td>
-							<td th:text="${order.orderedBy}">admin</td>
-							<td th:text="${order.note != null && !order.note.isBlank() ? order.note : '-'}">追加発注</td>
-							<td th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'yyyy/MM/dd HH:mm') : '-'}">2026/03/27 16:00</td>
+						<tr th:each="group : ${recentOrderGroups}">
+							<td th:text="${group.groupKey}">0d22...</td>
+							<td th:text="${group.categoryLabel}">フード</td>
+							<td th:text="${group.totalQuantity}">10</td>
+							<td th:text="${group.orderedBy}">admin</td>
+							<td th:text="${group.note != null && !group.note.isBlank() ? group.note : '-'}">追加発注</td>
+							<td th:text="${group.createdAt != null ? #temporals.format(group.createdAt, 'yyyy/MM/dd HH:mm') : '-'}">2026/03/27 16:00</td>
+							<td>
+								<a class="admin-link-button admin-button--ghost"
+								   th:href="@{/admin/products/orders/{groupKey}(groupKey=${group.groupKey})}">詳細</a>
+							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
-			<p th:if="${#lists.isEmpty(recentOrders)}">発注履歴はまだありません。</p>
+			<p th:if="${#lists.isEmpty(recentOrderGroups)}">発注履歴はまだありません。</p>
 		</section>
 	</div>
 </body>

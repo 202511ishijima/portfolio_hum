@@ -17,7 +17,8 @@
 				<h1>シフト希望</h1>
 				<p class="admin-lead" th:text="${monthLabel + ' の希望シフトを登録します。'}">月間希望シフト登録</p>
 			</div>
-			<div class="admin-header-actions">
+					<p class="admin-help-text" th:text="${monthLabel + ' の希望を保存します。'}">2026年5月 の希望を保存します。</p>
+					<div class="admin-header-actions">
 				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/shifts(year=${targetYear},month=${targetMonth})}">シフト一覧へ戻る</a>
 				<form th:action="@{/admin/logout}" method="post">
 					<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
@@ -89,7 +90,8 @@
 					<button class="admin-button admin-button--ghost" type="button" id="target-clear">対象: 解除</button>
 				</div>
 
-				<div class="admin-shift-request-calendar">
+					<p class="admin-help-text admin-shift-month-label" th:text="${monthLabel}">2026年5月</p>
+					<div class="admin-shift-request-calendar">
 					<div class="admin-shift-request-weekday">月</div>
 					<div class="admin-shift-request-weekday">火</div>
 					<div class="admin-shift-request-weekday">水</div>

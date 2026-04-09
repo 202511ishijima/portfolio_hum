@@ -1,6 +1,7 @@
 package com.ishijima.portfoliobackend.controller.admin;
 
 import com.ishijima.portfoliobackend.dto.ProductCatalogItem;
+import com.ishijima.portfoliobackend.entity.ProductOrder;
 import com.ishijima.portfoliobackend.entity.ProductStock;
 import com.ishijima.portfoliobackend.form.ProductOrderBulkForm;
 import com.ishijima.portfoliobackend.form.ProductOrderLineForm;
@@ -22,9 +23,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -38,10 +44,71 @@ public class AdminProductInventoryController {
 	@GetMapping("/stocks")
 	public String stocks(Model model, Authentication authentication) {
 		populateProductTableModel(model);
-		model.addAttribute("recentOrders", productInventoryService.findRecentOrders());
+		Map<String, ProductCatalogItem> catalogMap = productCatalogService.findAll().stream()
+			.collect(Collectors.toMap(ProductCatalogItem::id, item -> item, (left, right) -> left, LinkedHashMap::new));
+		model.addAttribute("recentOrderGroups", buildRecentOrderGroups(productInventoryService.findRecentOrders(), catalogMap));
 		model.addAttribute("canManageProductStock", canManage(authentication));
 		model.addAttribute("adminSection", "products");
 		return "admin/product-stocks";
+	}
+
+	@GetMapping("/orders/{groupKey}")
+	public String orderDetail(
+		@PathVariable String groupKey,
+		Model model,
+		Authentication authentication,
+		RedirectAttributes redirectAttributes
+	) {
+		if (!canManage(authentication)) {
+			redirectAttributes.addFlashAttribute("productError", "発注履歴の閲覧権限がありません。");
+			return "redirect:/admin/products/stocks";
+		}
+
+		List<ProductOrderRowView> rows;
+		if (groupKey != null && groupKey.startsWith("legacy-")) {
+			rows = productInventoryService.findRecentOrders().stream()
+				.map(ProductOrderRowView::from)
+				.filter(row -> groupKey.equals(row.groupKey()))
+				.toList();
+		} else {
+			try {
+				rows = productInventoryService.findOrdersByGroupId(groupKey).stream()
+					.map(ProductOrderRowView::from)
+					.toList();
+			} catch (Exception ex) {
+				rows = List.of();
+			}
+		}
+
+		if (rows.isEmpty()) {
+			redirectAttributes.addFlashAttribute("productError", "指定した発注履歴が見つかりません。");
+			return "redirect:/admin/products/stocks";
+		}
+
+		Map<String, ProductCatalogItem> catalogMap = productCatalogService.findAll().stream()
+			.collect(Collectors.toMap(ProductCatalogItem::id, item -> item, (left, right) -> left, LinkedHashMap::new));
+		Map<String, String> productNames = rows.stream()
+			.collect(Collectors.toMap(
+				ProductOrderRowView::productId,
+				row -> catalogMap.containsKey(row.productId()) ? catalogMap.get(row.productId()).name() : row.productId(),
+				(left, right) -> left,
+				LinkedHashMap::new
+			));
+		Map<String, String> productCategories = rows.stream()
+			.collect(Collectors.toMap(
+				ProductOrderRowView::productId,
+				row -> toCategoryLabel(catalogMap.containsKey(row.productId()) ? catalogMap.get(row.productId()).category() : ""),
+				(left, right) -> left,
+				LinkedHashMap::new
+			));
+
+		ProductOrderGroupView group = buildOrderGroupView(rows, catalogMap);
+		model.addAttribute("group", group);
+		model.addAttribute("rows", rows);
+		model.addAttribute("productNames", productNames);
+		model.addAttribute("productCategories", productCategories);
+		model.addAttribute("adminSection", "products");
+		return "admin/product-order-detail";
 	}
 
 	@GetMapping("/inventory")
@@ -238,6 +305,96 @@ public class AdminProductInventoryController {
 		form.setItems(lines);
 		return form;
 	}
+
+	private List<ProductOrderGroupView> buildRecentOrderGroups(List<ProductOrder> recentOrders, Map<String, ProductCatalogItem> catalogMap) {
+		Map<String, List<ProductOrderRowView>> grouped = recentOrders.stream()
+			.map(ProductOrderRowView::from)
+			.collect(Collectors.groupingBy(
+				row -> row.groupKey(),
+				LinkedHashMap::new,
+				Collectors.toList()
+			));
+
+		return grouped.values().stream()
+			.map(rows -> buildOrderGroupView(rows, catalogMap))
+			.sorted(Comparator.comparing(ProductOrderGroupView::createdAt).reversed().thenComparing(ProductOrderGroupView::groupKey))
+			.limit(100)
+			.toList();
+	}
+
+	private ProductOrderGroupView buildOrderGroupView(List<ProductOrderRowView> rows, Map<String, ProductCatalogItem> catalogMap) {
+		ProductOrderRowView first = rows.get(0);
+		int totalQuantity = rows.stream().mapToInt(ProductOrderRowView::quantity).sum();
+		Set<String> categories = rows.stream()
+			.map(row -> catalogMap.containsKey(row.productId()) ? catalogMap.get(row.productId()).category() : "")
+			.map(this::toCategoryLabel)
+			.collect(Collectors.toCollection(LinkedHashSet::new));
+		String categoryLabel = String.join(" / ", categories);
+		return new ProductOrderGroupView(
+			first.groupKey(),
+			categoryLabel.isBlank() ? "-" : categoryLabel,
+			totalQuantity,
+			first.orderedBy(),
+			first.note(),
+			first.createdAt()
+		);
+	}
+
+	private String toCategoryLabel(String category) {
+		if (category == null || category.isBlank()) {
+			return "未分類";
+		}
+		return switch (category.trim().toLowerCase()) {
+			case "cage" -> "ケージ";
+			case "food" -> "フード";
+			case "toy" -> "おもちゃ";
+			case "care" -> "ケア用品";
+			case "starter" -> "スターターセット";
+			default -> category;
+		};
+	}
+
+	public static record ProductOrderRowView(
+		Long id,
+		String groupKey,
+		String productId,
+		Integer quantity,
+		String orderedBy,
+		String note,
+		LocalDateTime createdAt
+	) {
+		static ProductOrderRowView from(ProductOrder order) {
+			String groupKey = (order.getOrderGroupId() != null && !order.getOrderGroupId().isBlank())
+				? order.getOrderGroupId()
+				: buildLegacyGroupKey(order);
+			return new ProductOrderRowView(
+				order.getId(),
+				groupKey,
+				order.getProductId(),
+				order.getQuantity() == null ? 0 : order.getQuantity(),
+				order.getOrderedBy(),
+				order.getNote() == null ? "" : order.getNote(),
+				order.getCreatedAt()
+			);
+		}
+
+		private static String buildLegacyGroupKey(ProductOrder order) {
+			LocalDateTime secondPrecision = order.getCreatedAt() == null ? null : order.getCreatedAt().withNano(0);
+			String orderedBy = order.getOrderedBy() == null ? "" : order.getOrderedBy().trim();
+			String note = order.getNote() == null ? "" : order.getNote().trim();
+			int hash = Objects.hash(secondPrecision, orderedBy, note);
+			return "legacy-" + Integer.toUnsignedString(hash, 16);
+		}
+	}
+
+	public static record ProductOrderGroupView(
+		String groupKey,
+		String categoryLabel,
+		Integer totalQuantity,
+		String orderedBy,
+		String note,
+		LocalDateTime createdAt
+	) {}
 
 	private boolean canManage(Authentication authentication) {
 		if (authentication == null || authentication.getAuthorities() == null) {
