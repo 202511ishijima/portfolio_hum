@@ -1,88 +1,95 @@
-# はむのくらし（Portfolio）
+# portfolio-templates
 
-ハムスターカフェを題材にした学習用ポートフォリオです。  
-フロントは静的ページ、バックエンドは `spring-app/` の Spring Boot + MyBatis + H2 で構成しています。
+This repository contains:
+- a Spring Boot backend (`spring-app`) using MyBatis + Thymeleaf
+- static frontend files served locally with VS Code Live Server
 
-## 主な機能
+## Project Structure
 
-### フロントエンド
-- トップページ、ハムスター紹介、商品一覧
-- 会員ページ（ログイン/マイページ）
-- お問い合わせページ
-- カフェ注文専用ページ（セッショントークン付きURL）
+- `spring-app/` : backend application (Maven)
+- `pages/`, `products/`, `assets/` : static frontend
+- `Dockerfile` : Render-ready multi-stage Docker build
+- `.dockerignore` : Docker build exclusions
 
-### バックエンド（管理画面）
-- 管理者ログイン
-- お問い合わせ管理
-- 会員管理
-- 従業員管理（役職/権限）
-- シフト管理（希望入力/月間表/自動作成）
-- ハムスター管理
-- 商品在庫管理
-- カフェ受付発行/注文一覧/メニュー価格設定
+## Local Development
 
-## ディレクトリ（主要）
-
-```text
-portfolio-templates/
-├─ assets/
-├─ pages/
-├─ hamsters/
-├─ products/
-├─ docs/
-├─ design/
-├─ spring-app/
-└─ README.md
-```
-
-## 動作環境
-
-- Java 17
-- Maven Wrapper（`spring-app/mvnw.cmd`）
-- VS Code Live Server（推奨）
-
-## 起動方法
-
-### 1. フロント（推奨: Live Server）
-
-VS Codeで `index.html` を開き、`Open with Live Server` を実行してください。  
-通常は `http://127.0.0.1:3000` などで確認できます。
-
-補足: Python がある場合は `python -m http.server 3000` でも配信可能ですが、このリポジトリは Live Server 運用を前提にしています。
-
-### 2. バックエンド
+### 1. Start backend
 
 ```powershell
-cd c:\academia\portfolio-templates\spring-app
+cd spring-app
 .\mvnw.cmd spring-boot:run
 ```
 
-## 主要URL
+- Backend URL: `http://localhost:8080`
+- Root `/` redirects to `/admin/dashboard`
 
-### フロント
-- トップ: `http://127.0.0.1:3000/index.html`
-- ハムスター一覧: `http://127.0.0.1:3000/hamsters/index.html`
-- 商品一覧: `http://127.0.0.1:3000/products/index.html`
-- お問い合わせ: `http://127.0.0.1:3000/pages/contact.html`
-- カフェ注文専用: `http://127.0.0.1:3000/pages/cafe-order.html?session=<token>`
+### 2. Start frontend
 
-### バックエンド
-- アプリ: `http://localhost:8080`
-- 管理ログイン: `http://localhost:8080/admin/login`
-- ダッシュボード: `http://localhost:8080/admin/dashboard`
-- シフト管理: `http://localhost:8080/admin/shifts`
-- カフェ受付発行: `http://localhost:8080/admin/cafe/reception`
+This project does not require a Python HTTP server.
+Use VS Code Live Server for static files.
+
+Examples:
+- `http://127.0.0.1:3000/index.html`
+- `http://127.0.0.1:3000/pages/cafe-order.html?session=<session-id>`
+
+## Main Admin URLs
+
+- `http://localhost:8080/admin/dashboard`
+- `http://localhost:8080/admin/employees`
+- `http://localhost:8080/admin/shifts`
+- `http://localhost:8080/admin/products/stocks`
+- `http://localhost:8080/admin/cafe/reception`
+- `http://localhost:8080/admin/cafe/customer-screen`
+- `http://localhost:8080/admin/cafe/orders`
+
+## Database (default)
+
+Defined in `spring-app/src/main/resources/application.yml`:
+
+- DB: H2 file database
+- URL: `jdbc:h2:file:./data/portfolio_backend;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE`
 - H2 Console: `http://localhost:8080/h2-console`
 
-## DB情報（H2）
+Environment variables supported:
+- `DB_URL`
+- `DB_USERNAME`
+- `DB_PASSWORD`
 
-- JDBC URL: `jdbc:h2:file:./data/portfolio_backend;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE`
-- User: `sa`
-- Password: 空
+## Test
 
-`spring-app/src/main/resources/schema.sql` でテーブル作成・差分反映を行います。
+```powershell
+cd spring-app
+.\mvnw.cmd test
+```
 
-## 注意
+## Render Deployment (Docker)
 
-- `*.mv.db` はローカル開発用データです。
-- GitHub Pages は静的ファイル配信のみのため、Spring Boot側のDB保存/API機能は反映されません。
+Render deployment is prepared in this repository:
+- Multi-stage build (`build` + `runtime`)
+- Maven Wrapper build
+- `chmod +x ./spring-app/mvnw` included for Linux permission safety
+- Runtime port fixed to `10000` with `-Dserver.port=10000`
+
+### Local Docker build check
+
+```powershell
+docker build -t portfolio-render-test .
+```
+
+If Docker Desktop/daemon is not running, this command fails.
+
+### Render settings
+
+- Environment: `Docker`
+- Root directory: repository root (where `Dockerfile` exists)
+- Port: `10000`
+- Optional environment variables:
+  - `DB_URL`
+  - `DB_USERNAME`
+  - `DB_PASSWORD`
+
+## Notes
+
+- If `mvnw Permission denied` occurs, check Dockerfile includes `chmod +x`.
+- To avoid BOM compile errors (`illegal character: '\ufeff'`), keep Java files as UTF-8 without BOM.
+- Local `*.mv.db` / `*.trace.db` files are development data.
