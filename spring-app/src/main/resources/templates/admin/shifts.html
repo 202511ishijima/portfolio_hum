@@ -15,7 +15,7 @@
 			<div>
 				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>シフト管理</h1>
-				<p class="admin-lead">当日予定を上段、月間シフトを下段に表示しています。</p>
+				<p class="admin-lead">本日シフトと月間シフト表を表示します。</p>
 			</div>
 			<form th:action="@{/admin/logout}" method="post">
 				<button class="admin-button admin-button--ghost" type="submit">ログアウト</button>
@@ -25,13 +25,13 @@
 		<div th:replace="~{admin/fragments :: adminNav(${adminSection})}"></div>
 
 		<p class="admin-alert admin-alert--success" th:if="${shiftMessage}" th:text="${shiftMessage}">更新しました。</p>
-		<p class="admin-alert admin-alert--error" th:if="${shiftError}" th:text="${shiftError}">エラーがあります。</p>
+		<p class="admin-alert admin-alert--error" th:if="${shiftError}" th:text="${shiftError}">エラーがありました。</p>
 
 		<section class="admin-card">
 			<div class="admin-card-header">
 				<div>
 					<h2 th:text="${#temporals.format(today, 'yyyy/MM/dd') + ' のシフト'}">本日のシフト</h2>
-					<p>本日分のみを表示します。</p>
+					<p>当日分のみ表示します。</p>
 				</div>
 				<div class="admin-header-actions">
 					<a class="admin-link-button admin-button--ghost"
@@ -51,8 +51,8 @@
 					</thead>
 					<tbody>
 						<tr th:each="shift : ${todayShifts}">
-							<td th:text="${shift.employeeName}">山田 花子</td>
-							<td th:text="${shift.shiftSlotLabel}">終日</td>
+							<td th:text="${shift.employeeName}">山田 太郎</td>
+							<td th:text="${shift.shiftSlotLabel}">早番</td>
 							<td th:text="${#temporals.format(shift.startTime, 'HH:mm') + ' - ' + #temporals.format(shift.endTime, 'HH:mm')}">10:00 - 21:00</td>
 							<td th:text="${#strings.isEmpty(shift.note) ? '-' : shift.note}">-</td>
 							<td>
@@ -93,28 +93,29 @@
 							    th:classappend="${holidayMap[#temporals.format(day, 'yyyy-MM-dd')]} ? ' admin-day-holiday' : (${day.dayOfWeek.value == 6} ? ' admin-day-sat' : (${day.dayOfWeek.value == 7} ? ' admin-day-sun' : ' admin-day-weekday'))">
 								<div class="admin-day-header">
 									<span th:text="${day.dayOfMonth}">1</span>
-									<small th:text="${#temporals.format(day, 'E')}">月</small>
+									<small th:text="${#temporals.format(day, 'E')}">水</small>
 								</div>
 							</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:if="${#lists.isEmpty(employees)}">
+						<tr th:if="${#lists.isEmpty(shiftRows)}">
 							<td class="admin-shift-empty" th:colspan="${#lists.size(monthDays) + 1}">表示できる従業員がいません。</td>
 						</tr>
-						<tr th:each="employee : ${employees}">
+						<tr th:each="row : ${shiftRows}">
 							<td class="admin-shift-sticky-col"
-							    th:text="${employee.name + '（' + (shiftCountByEmployee[employee.id] != null ? shiftCountByEmployee[employee.id] : 0) + '件）'}">山田 花子（12件）</td>
-							<td th:each="day : ${monthDays}" th:with="dayKey=${#temporals.format(day, 'yyyy-MM-dd')}, employeeRow=${shiftMatrix.get(employee.id)}, dayShifts=${employeeRow != null ? employeeRow.get(dayKey) : null}">
+							    th:text="${row.employee.name + '（' + row.shiftCount + '件）'}">山田 太郎（12件）</td>
+							<td th:each="cell : ${row.dayCells}" th:with="dayShifts=${cell.shifts}">
 								<div class="admin-shift-cell"
 								     th:if="${dayShifts != null and !#lists.isEmpty(dayShifts)}">
 									<a class="admin-shift-pill"
 									   th:each="shift : ${dayShifts}"
+									   th:classappend="${shift.shiftSlot == 'EARLY'} ? ' admin-shift-pill--early' : (${shift.shiftSlot == 'LATE'} ? ' admin-shift-pill--late' : ' admin-shift-pill--full')"
 									   th:href="@{/admin/shifts/{id}/edit(id=${shift.id})}"
 									   th:title="${shift.shiftSlotLabel}"
 									   th:text="${shift.shiftSlotShortLabel}">早</a>
 								</div>
-								<span class="admin-shift-empty-marker"
+								<span class="admin-shift-empty-marker admin-shift-empty-marker--off"
 								      th:if="${dayShifts == null or #lists.isEmpty(dayShifts)}">-</span>
 							</td>
 						</tr>

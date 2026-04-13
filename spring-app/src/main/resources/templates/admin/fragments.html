@@ -30,7 +30,7 @@
 	   th:classappend="${section == 'products'} ? ' is-active' : ''"
 	   th:href="@{/admin/products/stocks}">商品在庫管理</a>
 	<a class="admin-nav-link"
-	   th:if="${canViewCafe}"
+	   th:if="${canViewCafeCustomer}"
 	   th:classappend="${section == 'cafe-customer'} ? ' is-active' : ''"
 	   th:href="@{/admin/cafe/customer-screen}">顧客操作画面</a>
 	<a class="admin-nav-link"

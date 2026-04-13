@@ -421,6 +421,21 @@ body.admin-body {
   background: var(--admin-main);
 }
 
+.admin-shift-pill--early {
+  background: #f4cf4f;
+  color: #3a2d00;
+}
+
+.admin-shift-pill--late {
+  background: #4b84d9;
+  color: #ffffff;
+}
+
+.admin-shift-pill--full {
+  background: #222222;
+  color: #ffffff;
+}
+
 .admin-modal[hidden] {
   display: none;
 }
@@ -466,6 +481,20 @@ body.admin-body {
 .admin-shift-empty-marker {
   color: var(--admin-text-soft);
   opacity: 0.7;
+}
+
+.admin-shift-empty-marker--off {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #d9d9d9;
+  background: #ffffff;
+  color: #8a8a8a;
+  opacity: 1;
 }
 
 .admin-shift-empty {

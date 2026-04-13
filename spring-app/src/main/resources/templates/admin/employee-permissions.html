@@ -15,7 +15,7 @@
 			<div>
 				<p class="admin-eyebrow">HAMU NO KURASHI</p>
 				<h1>役職権限変更</h1>
-				<p class="admin-lead">役職ごとのデフォルトロールと、管理メニューへのアクセス権限を細かく編集できます。</p>
+				<p class="admin-lead">役職ごとの管理メニューへのアクセス権限を変更できます。</p>
 			</div>
 			<div class="admin-header-actions">
 				<a class="admin-link-button admin-button--ghost" th:href="@{/admin/employees}">従業員一覧へ戻る</a>
@@ -28,13 +28,13 @@
 		<div th:replace="~{admin/fragments :: adminNav(${adminSection})}"></div>
 
 		<p class="admin-alert admin-alert--success" th:if="${employeeMessage}" th:text="${employeeMessage}">更新しました。</p>
-		<p class="admin-alert admin-alert--error" th:if="${employeeError}" th:text="${employeeError}">エラーがあります。</p>
+		<p class="admin-alert admin-alert--error" th:if="${employeeError}" th:text="${employeeError}">エラーが発生しました。</p>
 
 		<section class="admin-card">
 			<div class="admin-card-header">
 				<div>
 					<h2>役職ごとの権限設定</h2>
-					<p>チェックを入れたメニューが表示され、対応URLにもアクセス可能になります。</p>
+					<p>ナビの表示項目に合わせてチェックを設定してください。</p>
 				</div>
 				<div class="admin-header-actions">
 					<form id="permissions-batch-form" th:action="@{/admin/employees/permissions/apply}" method="post">
@@ -54,12 +54,13 @@
 						<tr>
 							<th>役職</th>
 							<th>ダッシュボード</th>
-							<th>お問い合わせ</th>
+							<th>お問い合わせ一覧</th>
 							<th>会員管理</th>
 							<th>従業員管理</th>
 							<th>シフト管理</th>
 							<th>ハムスター管理</th>
 							<th>商品在庫管理</th>
+							<th>顧客操作画面</th>
 							<th>カフェ注文</th>
 						</tr>
 					</thead>
@@ -73,6 +74,7 @@
 							<td><input type="checkbox" data-perm-key="canShifts" th:checked="${permission.canShifts}"></td>
 							<td><input type="checkbox" data-perm-key="canHamsters" th:checked="${permission.canHamsters}"></td>
 							<td><input type="checkbox" data-perm-key="canProducts" th:checked="${permission.canProducts}"></td>
+							<td><input type="checkbox" data-perm-key="canCafeCustomer" th:checked="${permission.canCafeCustomer}"></td>
 							<td><input type="checkbox" data-perm-key="canCafe" th:checked="${permission.canCafe}"></td>
 						</tr>
 					</tbody>
@@ -86,7 +88,7 @@
 			<div class="admin-card-header">
 				<div>
 					<h2>変更ログ</h2>
-					<p>誰がどの役職権限を変更したかを記録します。</p>
+					<p>誰がどの役職権限を更新したかを確認できます。</p>
 				</div>
 			</div>
 			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(permissionLogs)}">
@@ -102,9 +104,9 @@
 					<tbody>
 						<tr th:each="log : ${permissionLogs}">
 							<td th:text="${log.changedAt != null ? #temporals.format(log.changedAt, 'yyyy/MM/dd HH:mm:ss') : '-'}">2026/04/02 14:10:00</td>
-							<td th:text="${log.changedBy}">店長</td>
+							<td th:text="${log.changedBy}">本部</td>
 							<td th:text="${log.position}">一般従業員</td>
-							<td th:text="${log.summary}">商品在庫管理: OFF→ON</td>
+							<td th:text="${log.summary}">商品在庫管理 OFF→ON</td>
 						</tr>
 					</tbody>
 				</table>

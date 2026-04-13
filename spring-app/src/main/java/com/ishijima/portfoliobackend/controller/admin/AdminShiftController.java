@@ -54,10 +54,17 @@ public class AdminShiftController {
 		LocalDate today = LocalDate.now();
 
 		List<Employee> employees = employeeService.findAll().stream()
+			.filter(employee -> Boolean.TRUE.equals(employee.getActive()))
+			.filter(employee -> !isCustomerEmployee(employee))
 			.sorted(Comparator.comparing(Employee::getName))
 			.toList();
+		Set<Long> employeeIds = employees.stream()
+			.map(Employee::getId)
+			.collect(Collectors.toSet());
 
-		List<Shift> monthShifts = shiftService.findByWorkDateBetween(firstDay, lastDay);
+		List<Shift> monthShifts = shiftService.findByWorkDateBetween(firstDay, lastDay).stream()
+			.filter(shift -> employeeIds.contains(shift.getEmployeeId()))
+			.toList();
 		Map<Long, Long> shiftCountByEmployee = monthShifts.stream()
 			.collect(Collectors.groupingBy(Shift::getEmployeeId, Collectors.counting()));
 		List<Shift> todayShifts = monthShifts.stream()
@@ -66,11 +73,11 @@ public class AdminShiftController {
 			.toList();
 
 		List<LocalDate> monthDays = firstDay.datesUntil(lastDay.plusDays(1)).toList();
-		Map<Long, Map<String, List<Shift>>> shiftMatrix = createMatrix(employees, monthDays);
+		Map<Long, Map<LocalDate, List<Shift>>> shiftMatrix = createMatrix(employees, monthDays);
 		for (Shift shift : monthShifts) {
-			Map<String, List<Shift>> employeeRow = shiftMatrix.get(shift.getEmployeeId());
+			Map<LocalDate, List<Shift>> employeeRow = shiftMatrix.get(shift.getEmployeeId());
 			if (employeeRow != null) {
-				employeeRow.computeIfAbsent(shift.getWorkDate().toString(), key -> new ArrayList<>()).add(shift);
+				employeeRow.computeIfAbsent(shift.getWorkDate(), key -> new ArrayList<>()).add(shift);
 			}
 		}
 		shiftMatrix.values().forEach(dayMap ->
@@ -78,13 +85,23 @@ public class AdminShiftController {
 				list.sort(Comparator.comparing(Shift::getStartTime).thenComparing(Shift::getId))
 			)
 		);
+		List<ShiftEmployeeRow> shiftRows = employees.stream()
+			.map(employee -> {
+				Map<LocalDate, List<Shift>> rowMap = shiftMatrix.getOrDefault(employee.getId(), Map.of());
+				List<ShiftDayCell> dayCells = monthDays.stream()
+					.map(day -> new ShiftDayCell(day, rowMap.getOrDefault(day, List.of())))
+					.toList();
+				long shiftCount = shiftCountByEmployee.getOrDefault(employee.getId(), 0L);
+				return new ShiftEmployeeRow(employee, shiftCount, dayCells);
+			})
+			.toList();
 
 		YearMonth prevMonth = currentMonth.minusMonths(1);
 		YearMonth nextMonth = currentMonth.plusMonths(1);
 
 		model.addAttribute("employees", employees);
 		model.addAttribute("monthDays", monthDays);
-		model.addAttribute("shiftMatrix", shiftMatrix);
+		model.addAttribute("shiftRows", shiftRows);
 		model.addAttribute("shiftCountByEmployee", shiftCountByEmployee);
 		model.addAttribute("monthShiftCount", monthShifts.size());
 		model.addAttribute("todayShifts", todayShifts);
@@ -115,6 +132,7 @@ public class AdminShiftController {
 
 		List<Employee> employees = employeeService.findAll().stream()
 			.filter(employee -> Boolean.TRUE.equals(employee.getActive()))
+			.filter(employee -> !isCustomerEmployee(employee))
 			.sorted(Comparator.comparing(Employee::getName))
 			.toList();
 
@@ -315,16 +333,28 @@ public class AdminShiftController {
 		}
 	}
 
-	private Map<Long, Map<String, List<Shift>>> createMatrix(List<Employee> employees, List<LocalDate> monthDays) {
-		Map<Long, Map<String, List<Shift>>> matrix = new LinkedHashMap<>();
+	private boolean isCustomerEmployee(Employee employee) {
+		String role = employee.getRole() == null ? "" : employee.getRole().trim();
+		String position = employee.getPosition() == null ? "" : employee.getPosition().trim();
+		return "CUSTOMER".equalsIgnoreCase(role) || "顧客".equals(position);
+	}
+
+	private Map<Long, Map<LocalDate, List<Shift>>> createMatrix(List<Employee> employees, List<LocalDate> monthDays) {
+		Map<Long, Map<LocalDate, List<Shift>>> matrix = new LinkedHashMap<>();
 		for (Employee employee : employees) {
-			Map<String, List<Shift>> row = new LinkedHashMap<>();
+			Map<LocalDate, List<Shift>> row = new LinkedHashMap<>();
 			for (LocalDate day : monthDays) {
-				row.put(day.toString(), new ArrayList<>());
+				row.put(day, new ArrayList<>());
 			}
 			matrix.put(employee.getId(), row);
 		}
 		return matrix;
+	}
+
+	private record ShiftDayCell(LocalDate day, List<Shift> shifts) {
+	}
+
+	private record ShiftEmployeeRow(Employee employee, long shiftCount, List<ShiftDayCell> dayCells) {
 	}
 
 	private Map<String, Boolean> buildHolidayMap(List<LocalDate> monthDays) {

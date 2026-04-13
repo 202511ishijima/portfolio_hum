@@ -4,13 +4,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+
+	private final AdminLoginSuccessHandler adminLoginSuccessHandler;
+
+	public SecurityConfig(AdminLoginSuccessHandler adminLoginSuccessHandler) {
+		this.adminLoginSuccessHandler = adminLoginSuccessHandler;
+	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -44,7 +49,7 @@ public class SecurityConfig {
 			.formLogin(form -> form
 				.loginPage("/admin/login")
 				.loginProcessingUrl("/admin/login")
-				.successHandler(this::loginSuccessHandler)
+				.successHandler(adminLoginSuccessHandler)
 				.failureUrl("/admin/login?error")
 				.permitAll()
 			)
@@ -55,22 +60,6 @@ public class SecurityConfig {
 			.httpBasic(Customizer.withDefaults());
 
 		return http.build();
-	}
-
-	private void loginSuccessHandler(
-		jakarta.servlet.http.HttpServletRequest request,
-		jakarta.servlet.http.HttpServletResponse response,
-		Authentication authentication
-	) throws java.io.IOException {
-		boolean isStaffOnly = authentication.getAuthorities().stream()
-			.map(authority -> authority.getAuthority())
-			.anyMatch("ROLE_STAFF"::equals);
-
-		if (isStaffOnly) {
-			response.sendRedirect("/staff/shifts/mine");
-			return;
-		}
-		response.sendRedirect("/admin/dashboard");
 	}
 
 	@Bean

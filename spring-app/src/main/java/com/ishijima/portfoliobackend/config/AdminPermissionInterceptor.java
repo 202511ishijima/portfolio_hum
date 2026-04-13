@@ -48,7 +48,8 @@ public class AdminPermissionInterceptor implements HandlerInterceptor {
 			case "shifts" -> Boolean.TRUE.equals(permission.getCanShifts());
 			case "hamsters" -> Boolean.TRUE.equals(permission.getCanHamsters());
 			case "products" -> Boolean.TRUE.equals(permission.getCanProducts());
-			case "cafe" -> Boolean.TRUE.equals(permission.getCanCafe());
+			case "cafeCustomer" -> Boolean.TRUE.equals(permission.getCanCafeCustomer());
+			case "cafeOrder" -> Boolean.TRUE.equals(permission.getCanCafe());
 			default -> true;
 		};
 
@@ -66,7 +67,8 @@ public class AdminPermissionInterceptor implements HandlerInterceptor {
 		if (uri.startsWith("/admin/shifts")) return "shifts";
 		if (uri.startsWith("/admin/hamsters")) return "hamsters";
 		if (uri.startsWith("/admin/products")) return "products";
-		if (uri.startsWith("/admin/cafe")) return "cafe";
+		if (uri.startsWith("/admin/cafe/customer-screen")) return "cafeCustomer";
+		if (uri.startsWith("/admin/cafe")) return "cafeOrder";
 		return "";
 	}
 }

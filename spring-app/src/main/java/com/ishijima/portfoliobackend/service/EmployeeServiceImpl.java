@@ -33,6 +33,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		POSITION_RANK.put("リーダー", 2);
 		POSITION_RANK.put("一般従業員", 1);
 
+		POSITION_RANK.put("顧客", 0);
 		ROLE_RANK.put("ADMIN", 4);
 		ROLE_RANK.put("STAFF_MANAGER", 3);
 		ROLE_RANK.put("STAFF", 2);

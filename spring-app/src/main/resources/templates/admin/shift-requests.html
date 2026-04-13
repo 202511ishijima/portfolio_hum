@@ -56,7 +56,9 @@
 					</select>
 				</label>
 			</form>
+		</section>
 
+		<section class="admin-card" th:if="${!#lists.isEmpty(employees)}">
 			<form class="admin-form" th:action="@{/admin/shifts/requests/save}" method="post">
 				<input type="hidden" name="year" th:value="${targetYear}">
 				<input type="hidden" name="month" th:value="${targetMonth}">

@@ -14,6 +14,7 @@
 		<result property="canShifts" column="can_shifts"/>
 		<result property="canHamsters" column="can_hamsters"/>
 		<result property="canProducts" column="can_products"/>
+		<result property="canCafeCustomer" column="can_cafe_customer"/>
 		<result property="canCafe" column="can_cafe"/>
 		<result property="updatedAt" column="updated_at"/>
 	</resultMap>
@@ -29,6 +30,7 @@
 			can_shifts,
 			can_hamsters,
 			can_products,
+			can_cafe_customer,
 			can_cafe,
 			updated_at
 		FROM position_permissions
@@ -39,6 +41,7 @@
 				WHEN '副店長' THEN 3
 				WHEN 'リーダー' THEN 4
 				WHEN '一般従業員' THEN 5
+				WHEN '顧客' THEN 6
 				ELSE 99
 			END
 	</select>
@@ -54,6 +57,7 @@
 			can_shifts,
 			can_hamsters,
 			can_products,
+			can_cafe_customer,
 			can_cafe,
 			updated_at
 		FROM position_permissions
@@ -71,6 +75,7 @@
 			can_shifts,
 			can_hamsters,
 			can_products,
+			can_cafe_customer,
 			can_cafe,
 			updated_at
 		) KEY(position)
@@ -84,6 +89,7 @@
 			#{canShifts},
 			#{canHamsters},
 			#{canProducts},
+			#{canCafeCustomer},
 			#{canCafe},
 			#{updatedAt}
 		)

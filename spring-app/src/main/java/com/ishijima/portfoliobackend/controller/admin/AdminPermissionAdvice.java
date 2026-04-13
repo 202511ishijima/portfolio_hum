@@ -74,6 +74,11 @@ public class AdminPermissionAdvice {
 		return canAccess(authentication, PositionPermission::getCanProducts);
 	}
 
+	@ModelAttribute("canViewCafeCustomer")
+	public boolean canViewCafeCustomer(Authentication authentication) {
+		return canAccess(authentication, PositionPermission::getCanCafeCustomer);
+	}
+
 	@ModelAttribute("canViewCafe")
 	public boolean canViewCafe(Authentication authentication) {
 		return canAccess(authentication, PositionPermission::getCanCafe);

@@ -21,6 +21,7 @@ public class PositionPermission {
 	private Boolean canShifts;
 	private Boolean canHamsters;
 	private Boolean canProducts;
+	private Boolean canCafeCustomer;
 	private Boolean canCafe;
 	private LocalDateTime updatedAt;
 }

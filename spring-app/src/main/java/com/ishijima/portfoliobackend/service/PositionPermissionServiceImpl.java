@@ -96,6 +96,7 @@ public class PositionPermissionServiceImpl implements PositionPermissionService 
 			case "本部" -> "ADMIN";
 			case "店長", "副店長" -> "STAFF_MANAGER";
 			case "リーダー", "一般従業員" -> "STAFF";
+			case "顧客" -> "VIEWER";
 			default -> "STAFF";
 		};
 	}
@@ -111,6 +112,7 @@ public class PositionPermissionServiceImpl implements PositionPermissionService 
 			.canShifts(Boolean.TRUE.equals(permission.getCanShifts()))
 			.canHamsters(Boolean.TRUE.equals(permission.getCanHamsters()))
 			.canProducts(Boolean.TRUE.equals(permission.getCanProducts()))
+			.canCafeCustomer(Boolean.TRUE.equals(permission.getCanCafeCustomer()))
 			.canCafe(Boolean.TRUE.equals(permission.getCanCafe()))
 			.updatedAt(LocalDateTime.now())
 			.build();
@@ -124,6 +126,7 @@ public class PositionPermissionServiceImpl implements PositionPermissionService 
 			|| !Boolean.TRUE.equals(before.getCanShifts()) == Boolean.TRUE.equals(after.getCanShifts())
 			|| !Boolean.TRUE.equals(before.getCanHamsters()) == Boolean.TRUE.equals(after.getCanHamsters())
 			|| !Boolean.TRUE.equals(before.getCanProducts()) == Boolean.TRUE.equals(after.getCanProducts())
+			|| !Boolean.TRUE.equals(before.getCanCafeCustomer()) == Boolean.TRUE.equals(after.getCanCafeCustomer())
 			|| !Boolean.TRUE.equals(before.getCanCafe()) == Boolean.TRUE.equals(after.getCanCafe());
 	}
 
@@ -139,6 +142,7 @@ public class PositionPermissionServiceImpl implements PositionPermissionService 
 		appendChange(changes, "シフト管理", before.getCanShifts(), after.getCanShifts());
 		appendChange(changes, "ハムスター管理", before.getCanHamsters(), after.getCanHamsters());
 		appendChange(changes, "商品在庫管理", before.getCanProducts(), after.getCanProducts());
+		appendChange(changes, "顧客操作画面", before.getCanCafeCustomer(), after.getCanCafeCustomer());
 		appendChange(changes, "カフェ注文", before.getCanCafe(), after.getCanCafe());
 		return changes.isEmpty() ? "変更なし" : String.join(" / ", changes);
 	}

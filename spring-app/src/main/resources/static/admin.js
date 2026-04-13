@@ -115,7 +115,14 @@ function initPermissionBatchApply() {
 
 	rows.forEach((row) => {
 		row.querySelectorAll('input[type="checkbox"][data-perm-key]').forEach((checkbox) => {
-			checkbox.addEventListener('change', refreshApplyState);
+			checkbox.addEventListener('change', () => {
+				const key = checkbox.dataset.permKey;
+				const checked = checkbox.checked;
+				row.querySelectorAll(`input[type="checkbox"][data-perm-key="${key}"]`).forEach((peer) => {
+					if (peer !== checkbox) peer.checked = checked;
+				});
+				refreshApplyState();
+			});
 		});
 	});
 
@@ -135,8 +142,8 @@ function initPermissionBatchApply() {
 function collectPermissions(rows) {
 	return rows.map((row) => {
 		const get = (key) => {
-			const checkbox = row.querySelector(`input[data-perm-key="${key}"]`);
-			return !!(checkbox && checkbox.checked);
+			const checkboxes = Array.from(row.querySelectorAll(`input[data-perm-key="${key}"]`));
+			return checkboxes.some((checkbox) => checkbox.checked);
 		};
 		return {
 			position: row.dataset.position || '',
@@ -147,6 +154,7 @@ function collectPermissions(rows) {
 			canShifts: get('canShifts'),
 			canHamsters: get('canHamsters'),
 			canProducts: get('canProducts'),
+			canCafeCustomer: get('canCafeCustomer'),
 			canCafe: get('canCafe')
 		};
 	});
