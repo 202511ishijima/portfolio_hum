@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -38,8 +39,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/admin/cafe")
 @RequiredArgsConstructor
 public class AdminCafeController {
-
-	private static final String FRONT_ORDER_BASE_URL = "/pages/cafe-order.html?session=";
 
 	private final CafeOrderService cafeOrderService;
 
@@ -412,7 +411,10 @@ public class AdminCafeController {
 	}
 
 	private String buildOrderUrl(String token) {
-		return FRONT_ORDER_BASE_URL + token;
+		String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+			.build()
+			.toUriString();
+		return baseUrl + "/pages/cafe-order.html?session=" + token;
 	}
 
 	private String buildQrImageUrl(String text) {
