@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminCafeController {
 
-	private static final String FRONT_ORDER_BASE_URL = "http://127.0.0.1:3000/pages/cafe-order.html?session=";
+	private static final String FRONT_ORDER_BASE_URL = "/pages/cafe-order.html?session=";
 
 	private final CafeOrderService cafeOrderService;
 

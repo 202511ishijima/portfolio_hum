@@ -27,7 +27,7 @@ public class SecurityConfig {
 				.frameOptions(frame -> frame.sameOrigin())
 			)
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/", "/error", "/admin.css", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+				.requestMatchers("/", "/error", "/admin.css", "/css/**", "/js/**", "/images/**", "/image/**", "/assets/**", "/pages/**", "/webjars/**").permitAll()
 				.requestMatchers("/admin/login").permitAll()
 				.requestMatchers("/h2-console/**").permitAll()
 				.requestMatchers("/api/hamsters/summary").permitAll()
