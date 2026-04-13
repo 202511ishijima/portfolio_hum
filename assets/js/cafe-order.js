@@ -1,33 +1,26 @@
 window.CafeOrderPage = (function () {
+  const warningThresholdSeconds = 5 * 60;
   const backendBaseUrl = (function resolveBackendBaseUrl() {
     const params = new URLSearchParams(window.location.search);
     const apiBase = params.get("apiBase");
     if (apiBase && apiBase.trim()) {
       return apiBase.trim().replace(/\/+$/, "");
     }
-
     const { hostname, port, origin } = window.location;
     if ((hostname === "127.0.0.1" || hostname === "localhost") && port === "3000") {
       return "http://localhost:8080";
     }
     return origin;
   })();
-  const warningThresholdSeconds = 5 * 60;
 
   let selectedCounts = {};
   let sessionToken = "";
   let sessionInfo = null;
+  let latestGrandTotal = 0;
   let statusTimer = null;
   let clockTimer = null;
   let historyTimer = null;
-  let latestGrandTotal = 0;
-
-  let infoModal = null;
-  let infoMessage = null;
-  let checkoutModal = null;
   let checkoutConfirmAction = null;
-  let finishedScreen = null;
-  let finishedTotal = null;
 
   function yen(value) {
     return "¥" + Number(value || 0).toLocaleString("ja-JP");
@@ -41,27 +34,32 @@ window.CafeOrderPage = (function () {
   }
 
   function showInfoModal(message) {
-    if (!infoModal || !infoMessage) return;
-    infoMessage.textContent = message || "";
-    infoModal.hidden = false;
+    const modal = document.getElementById("cafe-order-modal");
+    const msg = document.getElementById("cafe-order-modal-message");
+    if (!modal || !msg) return;
+    msg.textContent = message || "";
+    modal.hidden = false;
   }
 
   function closeInfoModal() {
-    if (infoModal) infoModal.hidden = true;
+    const modal = document.getElementById("cafe-order-modal");
+    if (modal) modal.hidden = true;
   }
 
   function showCheckoutModal(action) {
-    if (!checkoutModal) {
+    const modal = document.getElementById("cafe-checkout-confirm-modal");
+    if (!modal) {
       if (typeof action === "function") action();
       return;
     }
     checkoutConfirmAction = action || null;
-    checkoutModal.hidden = false;
+    modal.hidden = false;
   }
 
   function closeCheckoutModal() {
-    if (!checkoutModal) return;
-    checkoutModal.hidden = true;
+    const modal = document.getElementById("cafe-checkout-confirm-modal");
+    if (!modal) return;
+    modal.hidden = true;
     checkoutConfirmAction = null;
   }
 
@@ -118,8 +116,8 @@ window.CafeOrderPage = (function () {
   }
 
   function setFinishedScreen(visible) {
-    if (!finishedScreen) return;
-    finishedScreen.hidden = !visible;
+    const screen = document.getElementById("cafe-finished-screen");
+    if (screen) screen.hidden = !visible;
   }
 
   function updateSessionSummary() {
@@ -127,8 +125,7 @@ window.CafeOrderPage = (function () {
     if (!summary) return;
 
     if (!sessionInfo) {
-      summary.textContent = "セッション情報を読み込み中です…";
-      setStatus("", false);
+      summary.textContent = "セッション情報を読み込み中です...";
       setOrderEnabled(false);
       setFinishedScreen(false);
       return;
@@ -143,7 +140,8 @@ window.CafeOrderPage = (function () {
     if (sessionInfo.status === "CHECKED_OUT") {
       setOrderEnabled(false);
       setStatus("", false);
-      if (finishedTotal) finishedTotal.textContent = "合計金額 " + yen(latestGrandTotal);
+      const finishedTotal = document.getElementById("cafe-finished-total");
+      if (finishedTotal) finishedTotal.textContent = "合計金額: " + yen(latestGrandTotal);
       setFinishedScreen(true);
       return;
     }
@@ -160,7 +158,6 @@ window.CafeOrderPage = (function () {
     } else {
       setStatus("", false);
     }
-
     setOrderEnabled(true);
     setFinishedScreen(false);
   }
@@ -168,32 +165,32 @@ window.CafeOrderPage = (function () {
   async function fetchJson(url, options) {
     const res = await fetch(url, options);
     const payload = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(payload.message || ("通信に失敗しました (" + res.status + ")"));
+    if (!res.ok) {
+      throw new Error(payload.message || ("通信に失敗しました (" + res.status + ")"));
+    }
     return payload;
   }
 
   function renderMenuCard(item) {
     const imageUrl = item.image ? (SiteRouter.getBasePath() + "image/" + item.image) : "";
     const media = imageUrl
-      ? `<figure class="media-photo"><img src="${imageUrl}" alt="${item.name}"></figure>`
-      : `<div class="media-placeholder"></div>`;
+      ? '<figure class="media-photo"><img src="' + imageUrl + '" alt="' + item.name + '"></figure>'
+      : '<div class="media-placeholder"></div>';
 
-    return `
-      <article class="menu-card cafe-order-card" data-order-card="${item.id}" role="button" tabindex="0" aria-label="${item.name}を追加">
-        ${media}
-        <div class="cafe-order-card__body">
-          <div class="cafe-order-card__row">
-            <h3>${item.name}</h3>
-            <div class="cafe-order-card__counter">
-              <button class="cafe-order-card__step" type="button" data-order-minus="${item.id}" aria-label="${item.name}を1つ減らす">-</button>
-              <span class="cafe-order-card__count" data-order-count="${item.id}">0</span>
-              <button class="cafe-order-card__step" type="button" data-order-plus="${item.id}" aria-label="${item.name}を1つ増やす">+</button>
-            </div>
-          </div>
-          <p class="price">${yen(item.price)}</p>
-        </div>
-      </article>
-    `;
+    return (
+      '<article class="menu-card cafe-order-card" data-order-card="' + item.id + '" role="button" tabindex="0" aria-label="' + item.name + 'を追加">' +
+      media +
+      '<div class="cafe-order-card__body">' +
+      '<div class="cafe-order-card__row">' +
+      "<h3>" + item.name + "</h3>" +
+      '<div class="cafe-order-card__counter">' +
+      '<button class="cafe-order-card__step" type="button" data-order-minus="' + item.id + '" aria-label="' + item.name + 'を1つ減らす">-</button>' +
+      '<span class="cafe-order-card__count" data-order-count="' + item.id + '">0</span>' +
+      '<button class="cafe-order-card__step" type="button" data-order-plus="' + item.id + '" aria-label="' + item.name + 'を1つ増やす">+</button>' +
+      "</div></div>" +
+      '<p class="price">' + yen(item.price) + "</p>" +
+      "</div></article>"
+    );
   }
 
   function refreshOrderCounts() {
@@ -233,12 +230,14 @@ window.CafeOrderPage = (function () {
         }
       });
     });
+
     document.querySelectorAll("[data-order-plus]").forEach((btn) => {
       btn.addEventListener("click", (event) => {
         event.stopPropagation();
         increment(btn.dataset.orderPlus);
       });
     });
+
     document.querySelectorAll("[data-order-minus]").forEach((btn) => {
       btn.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -258,8 +257,14 @@ window.CafeOrderPage = (function () {
       return c === "FOOD" || c === "TREAT";
     });
 
-    drinkTarget.innerHTML = drinks.length ? drinks.map(renderMenuCard).join("") : "<p>ドリンクメニューはありません。</p>";
-    foodTarget.innerHTML = foods.length ? foods.map(renderMenuCard).join("") : "<p>フードメニューはありません。</p>";
+    drinkTarget.innerHTML = drinks.length
+      ? drinks.map(renderMenuCard).join("")
+      : "<p>ドリンクメニューはありません。</p>";
+
+    foodTarget.innerHTML = foods.length
+      ? foods.map(renderMenuCard).join("")
+      : "<p>フードメニューはありません。</p>";
+
     bindCardEvents();
     refreshOrderCounts();
   }
@@ -272,68 +277,52 @@ window.CafeOrderPage = (function () {
     latestGrandTotal = Number(payload.grandTotal || 0);
 
     if (!orders.length) {
-      target.innerHTML = `<p>注文履歴はまだありません。</p><p class="price">合計金額 ${yen(0)}</p>`;
-      if (finishedTotal) finishedTotal.textContent = "合計金額 " + yen(0);
+      target.innerHTML = '<p>注文履歴はまだありません。</p><p class="price">合計金額: ' + yen(0) + "</p>";
       return;
     }
 
     const body = orders.map((order) => {
       const cls = order.status === "SERVED" ? "panel cafe-order-history-item--served" : "panel";
       const lines = (order.items || [])
-        .map((item) => `<li>${item.menuName} ×${item.quantity} / ${yen(item.lineTotal)}</li>`)
+        .map((item) => "<li>" + item.menuName + " ×" + item.quantity + " / " + yen(item.lineTotal) + "</li>")
         .join("");
-      return `
-        <article class="${cls}">
-          <p class="text-soft">${formatDateTime(order.createdAt)}</p>
-          <ul class="check-list">${lines}</ul>
-        </article>
-      `;
+      return (
+        '<article class="' + cls + '">' +
+        '<p class="text-soft">' + formatDateTime(order.createdAt) + "</p>" +
+        '<ul class="check-list">' + lines + "</ul>" +
+        "</article>"
+      );
     }).join("");
 
-    target.innerHTML = `
-      <p class="text-soft">座席: ${payload.seatNo || "-"} / 注文件数: ${payload.orderCount || 0}件</p>
-      <div class="section-stack">${body}</div>
-      <p class="price">合計金額 ${yen(payload.grandTotal || 0)}</p>
-    `;
-    if (finishedTotal) finishedTotal.textContent = "合計金額 " + yen(latestGrandTotal);
+    target.innerHTML =
+      '<p class="text-soft">座席: ' + (payload.seatNo || "-") + " / 注文件数: " + (payload.orderCount || 0) + "件</p>" +
+      '<div class="section-stack">' + body + "</div>" +
+      '<p class="price">合計金額: ' + yen(payload.grandTotal || 0) + "</p>";
   }
 
   function collectItems() {
     return Object.entries(selectedCounts)
-      .filter(([, quantity]) => Number(quantity) > 0)
-      .map(([menuId, quantity]) => ({ menuId, quantity: Number(quantity) }));
+      .filter(([, qty]) => Number(qty) > 0)
+      .map(([menuId, qty]) => ({ menuId, quantity: Number(qty) }));
   }
 
   async function refreshHistory() {
     if (!sessionToken) return;
-    const payload = await fetchJson(
-      backendBaseUrl + "/api/cafe/orders/history?session=" + encodeURIComponent(sessionToken)
-    );
+    const payload = await fetchJson(backendBaseUrl + "/api/cafe/orders/history?session=" + encodeURIComponent(sessionToken));
     renderHistory(payload);
   }
 
   async function checkoutSession() {
-    if (!sessionToken) {
-      setStatus("セッションが見つかりません。", true);
-      return;
-    }
-
+    if (!sessionToken) return;
     showCheckoutModal(async function () {
       try {
         const result = await fetchJson(
           backendBaseUrl + "/api/cafe/sessions/" + encodeURIComponent(sessionToken) + "/checkout",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json; charset=UTF-8" }
-          }
+          { method: "POST", headers: { "Content-Type": "application/json; charset=UTF-8" } }
         );
         sessionInfo = result.session || sessionInfo;
         updateSessionSummary();
-        try {
-          await refreshHistory();
-        } catch (historyError) {
-          console.warn("Failed to refresh order history after checkout.", historyError);
-        }
+        await refreshHistory();
       } catch (error) {
         setStatus(error.message || "お会計の確定に失敗しました。", true);
       }
@@ -364,7 +353,6 @@ window.CafeOrderPage = (function () {
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify({ sessionToken, items })
       });
-
       selectedCounts = {};
       refreshOrderCounts();
       setStatus("注文を受け付けました。", false);
@@ -377,13 +365,11 @@ window.CafeOrderPage = (function () {
 
   async function refreshSessionStatus() {
     try {
-      sessionInfo = await fetchJson(
-        backendBaseUrl + "/api/cafe/sessions/" + encodeURIComponent(sessionToken)
-      );
+      sessionInfo = await fetchJson(backendBaseUrl + "/api/cafe/sessions/" + encodeURIComponent(sessionToken));
       updateSessionSummary();
     } catch (error) {
       setOrderEnabled(false);
-      setStatus(error.message || "セッション更新に失敗しました。", true);
+      setStatus(error.message || "セッション情報の取得に失敗しました。", true);
     }
   }
 
@@ -400,18 +386,10 @@ window.CafeOrderPage = (function () {
   }
 
   async function init() {
-    infoModal = document.getElementById("cafe-order-modal");
-    infoMessage = document.getElementById("cafe-order-modal-message");
-    checkoutModal = document.getElementById("cafe-checkout-confirm-modal");
-    finishedScreen = document.getElementById("cafe-finished-screen");
-    finishedTotal = document.getElementById("cafe-finished-total");
-
     document.getElementById("cafe-order-modal-ok")?.addEventListener("click", closeInfoModal);
-    infoModal?.querySelector("[data-order-modal-close]")?.addEventListener("click", closeInfoModal);
-
-    document.getElementById("cafe-checkout-modal-cancel")?.addEventListener("click", function () {
-      closeCheckoutModal();
-    });
+    document.querySelector("[data-order-modal-close]")?.addEventListener("click", closeInfoModal);
+    document.getElementById("cafe-checkout-modal-cancel")?.addEventListener("click", closeCheckoutModal);
+    document.querySelector("[data-checkout-modal-close]")?.addEventListener("click", closeCheckoutModal);
     document.getElementById("cafe-checkout-modal-ok")?.addEventListener("click", async function () {
       const action = checkoutConfirmAction;
       closeCheckoutModal();
@@ -419,7 +397,6 @@ window.CafeOrderPage = (function () {
         await action();
       }
     });
-    checkoutModal?.querySelector("[data-checkout-modal-close]")?.addEventListener("click", closeCheckoutModal);
 
     const form = document.getElementById("cafe-order-form");
     if (!form) return;
@@ -429,7 +406,7 @@ window.CafeOrderPage = (function () {
     sessionToken = getSessionTokenFromQuery();
     if (!sessionToken) {
       setOrderEnabled(false);
-      setStatus("セッションが見つかりません。", true);
+      setStatus("セッショントークンがありません。", true);
       return;
     }
 
