@@ -24,6 +24,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,7 @@ public class CafeOrderApiController {
 				"orderId", order.getId(),
 				"status", order.getStatus(),
 				"createdAt", order.getCreatedAt(),
+				"createdAtEpochMs", order.getCreatedAt() == null ? 0L : order.getCreatedAt().toInstant(ZoneOffset.UTC).toEpochMilli(),
 				"total", order.getTotal(),
 				"items", itemMap.getOrDefault(order.getId(), List.of()).stream()
 					.map(item -> Map.of(

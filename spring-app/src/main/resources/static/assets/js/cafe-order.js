@@ -89,7 +89,19 @@ window.CafeOrderPage = (function () {
     }
   }
 
-  function formatDateTime(value) {
+  function formatDateTime(value, epochMs) {
+    if (Number.isFinite(Number(epochMs)) && Number(epochMs) > 0) {
+      const byEpoch = new Date(Number(epochMs));
+      if (!Number.isNaN(byEpoch.getTime())) {
+        return byEpoch.toLocaleString("ja-JP", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      }
+    }
     if (!value) return "-";
     let normalized = value;
     if (typeof value === "string") {
@@ -341,7 +353,7 @@ window.CafeOrderPage = (function () {
         .join("");
       return (
         '<article class="' + cls + '">' +
-        '<p class="text-soft">' + formatDateTime(order.createdAt) + "</p>" +
+        '<p class="text-soft">' + formatDateTime(order.createdAt, order.createdAtEpochMs) + "</p>" +
         '<ul class="check-list">' + lines + "</ul>" +
         "</article>"
       );
