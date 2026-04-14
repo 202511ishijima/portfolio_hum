@@ -125,7 +125,11 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
 		}
 
 		Map<Long, Integer> weeklyDaysMap = shiftRequestMapper.findAllSettingsByMonth(targetYear, targetMonth).stream()
-			.collect(Collectors.toMap(ShiftRequestSetting::getEmployeeId, ShiftRequestSetting::getWeeklyDays, (a, b) -> b));
+			.collect(Collectors.toMap(
+				ShiftRequestSetting::getEmployeeId,
+				setting -> setting.getWeeklyDays() == null ? 3 : setting.getWeeklyDays(),
+				(a, b) -> b
+			));
 
 		List<Employee> activeEmployees = employeeService.findAll().stream()
 			.filter(employee -> Boolean.TRUE.equals(employee.getActive()))
@@ -135,6 +139,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
 			.collect(Collectors.toMap(Employee::getId, e -> e));
 
 		Map<Long, List<ShiftRequestDay>> byEmployee = shiftRequestMapper.findAllDaysByMonth(targetYear, targetMonth).stream()
+			.filter(day -> day.getEmployeeId() != null && day.getRequestDate() != null)
 			.collect(Collectors.groupingBy(ShiftRequestDay::getEmployeeId));
 
 		Map<WeekKey, List<LocalDate>> monthDatesByWeek = from.datesUntil(to.plusDays(1))
@@ -176,6 +181,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
 				}
 
 				List<ShiftRequestDay> weekRequests = byWeek.getOrDefault(week, Collections.emptyList()).stream()
+					.filter(day -> day.getRequestDate() != null)
 					.filter(day -> {
 						ShiftRequestSlot slot = ShiftRequestSlot.from(day.getRequestSlot());
 						return slot != ShiftRequestSlot.OFF && slot != ShiftRequestSlot.NONE;
