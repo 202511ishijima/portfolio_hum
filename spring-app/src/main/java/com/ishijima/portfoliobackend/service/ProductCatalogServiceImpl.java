@@ -42,6 +42,7 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
 
 	private List<ProductCatalogItem> loadFromClasspath() {
 		List<String> candidates = List.of(
+			"product-catalog.json",
 			"static/assets/data/products.json",
 			"assets/data/products.json"
 		);
