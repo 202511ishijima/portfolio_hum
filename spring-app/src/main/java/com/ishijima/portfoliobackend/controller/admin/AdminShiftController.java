@@ -219,6 +219,27 @@ public class AdminShiftController {
 		return "redirect:/admin/shifts/requests?year=" + currentMonth.getYear() + "&month=" + currentMonth.getMonthValue() + "&employeeId=" + employeeId;
 	}
 
+	// legacy handler kept temporarily for reference
+	public String autoGenerateLegacy(
+		@RequestParam Integer year,
+		@RequestParam Integer month,
+		RedirectAttributes redirectAttributes
+	) {
+		YearMonth currentMonth = resolveYearMonth(year, month);
+		try {
+			try {
+				int safeCount = shiftRequestService.autoGenerateShifts(currentMonth.getYear(), currentMonth.getMonthValue());
+				redirectAttributes.addFlashAttribute("shiftMessage", "自動作成が完了しました。件数: " + safeCount);
+			} catch (Throwable ex) {
+				redirectAttributes.addFlashAttribute("shiftError", "自動作成でエラーが発生しました: " + ex.getClass().getSimpleName() + " / " + ex.getMessage());
+			}
+			return "redirect:/admin/shifts?year=" + currentMonth.getYear() + "&month=" + currentMonth.getMonthValue();
+		}
+		int count = 0;
+		redirectAttributes.addFlashAttribute("shiftMessage", "希望から " + count + " 件のシフトを自動作成しました。");
+		return "redirect:/admin/shifts?year=" + currentMonth.getYear() + "&month=" + currentMonth.getMonthValue();
+	}
+
 	@PostMapping("/auto-generate")
 	public String autoGenerate(
 		@RequestParam Integer year,
@@ -226,8 +247,15 @@ public class AdminShiftController {
 		RedirectAttributes redirectAttributes
 	) {
 		YearMonth currentMonth = resolveYearMonth(year, month);
-		int count = shiftRequestService.autoGenerateShifts(currentMonth.getYear(), currentMonth.getMonthValue());
-		redirectAttributes.addFlashAttribute("shiftMessage", "希望から " + count + " 件のシフトを自動作成しました。");
+		try {
+			int count = shiftRequestService.autoGenerateShifts(currentMonth.getYear(), currentMonth.getMonthValue());
+			redirectAttributes.addFlashAttribute("shiftMessage", "希望から " + count + " 件のシフトを自動作成しました。");
+		} catch (Exception ex) {
+			redirectAttributes.addFlashAttribute(
+				"shiftError",
+				"自動作成でエラーが発生しました: " + ex.getClass().getSimpleName() + " / " + ex.getMessage()
+			);
+		}
 		return "redirect:/admin/shifts?year=" + currentMonth.getYear() + "&month=" + currentMonth.getMonthValue();
 	}
 
