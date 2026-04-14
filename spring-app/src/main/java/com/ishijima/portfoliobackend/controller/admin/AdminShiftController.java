@@ -234,6 +234,8 @@ public class AdminShiftController {
 				redirectAttributes.addFlashAttribute("shiftError", "自動作成でエラーが発生しました: " + ex.getClass().getSimpleName() + " / " + ex.getMessage());
 			}
 			return "redirect:/admin/shifts?year=" + currentMonth.getYear() + "&month=" + currentMonth.getMonthValue();
+		} catch (Throwable ignore) {
+			return "redirect:/admin/shifts?year=" + currentMonth.getYear() + "&month=" + currentMonth.getMonthValue();
 		}
 		int count = 0;
 		redirectAttributes.addFlashAttribute("shiftMessage", "希望から " + count + " 件のシフトを自動作成しました。");
