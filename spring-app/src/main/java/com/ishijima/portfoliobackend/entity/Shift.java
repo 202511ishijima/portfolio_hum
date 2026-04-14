@@ -26,18 +26,31 @@ public class Shift {
 	private LocalDateTime updatedAt;
 
 	public ShiftSlot getShiftSlotEnum() {
-		return ShiftSlot.from(shiftSlot);
+		return resolveShiftSlotSafely();
 	}
 
 	public String getShiftSlotLabel() {
-		return getShiftSlotEnum().getLabel();
+		ShiftSlot slot = resolveShiftSlotSafely();
+		return slot != null ? slot.getLabel() : (shiftSlot == null || shiftSlot.isBlank() ? "-" : shiftSlot);
 	}
 
 	public String getShiftSlotShortLabel() {
-		return switch (getShiftSlotEnum()) {
+		ShiftSlot slot = resolveShiftSlotSafely();
+		if (slot == null) {
+			return "?";
+		}
+		return switch (slot) {
 			case EARLY -> "早";
 			case LATE -> "遅";
 			case FULL -> "終";
 		};
+	}
+
+	private ShiftSlot resolveShiftSlotSafely() {
+		try {
+			return ShiftSlot.from(shiftSlot);
+		} catch (RuntimeException ex) {
+			return null;
+		}
 	}
 }
