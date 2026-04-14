@@ -91,7 +91,16 @@ window.CafeOrderPage = (function () {
 
   function formatDateTime(value) {
     if (!value) return "-";
-    const d = new Date(value);
+    let normalized = value;
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      // Backend sends LocalDateTime without zone on some endpoints.
+      // Treat timezone-less ISO-like strings as UTC so JST clients display expected local time.
+      if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?$/.test(trimmed)) {
+        normalized = trimmed + "Z";
+      }
+    }
+    const d = new Date(normalized);
     if (Number.isNaN(d.getTime())) return String(value);
     return d.toLocaleString("ja-JP", {
       year: "numeric",
