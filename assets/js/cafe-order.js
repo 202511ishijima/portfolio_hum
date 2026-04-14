@@ -28,6 +28,8 @@ window.CafeOrderPage = (function () {
   let clockTimer = null;
   let historyTimer = null;
   let checkoutConfirmAction = null;
+  let remainingBaseSeconds = null;
+  let remainingCapturedAtMs = null;
 
   function yen(value) {
     return "¥" + Number(value || 0).toLocaleString("ja-JP");
@@ -75,6 +77,18 @@ window.CafeOrderPage = (function () {
     return token ? String(token).trim() : "";
   }
 
+  function captureRemainingBase(info) {
+    if (!info) return;
+    const remain = Number(info.remainingSeconds);
+    if (Number.isFinite(remain)) {
+      remainingBaseSeconds = Math.max(0, Math.floor(remain));
+      remainingCapturedAtMs = Date.now();
+    } else {
+      remainingBaseSeconds = null;
+      remainingCapturedAtMs = null;
+    }
+  }
+
   function formatDateTime(value) {
     if (!value) return "-";
     const d = new Date(value);
@@ -96,10 +110,21 @@ window.CafeOrderPage = (function () {
   }
 
   function getRemainingSecondsLocal() {
+    if (remainingBaseSeconds != null && remainingCapturedAtMs != null) {
+      const elapsed = Math.floor((Date.now() - remainingCapturedAtMs) / 1000);
+      return Math.max(0, remainingBaseSeconds - Math.max(0, elapsed));
+    }
     if (!sessionInfo || !sessionInfo.expiresAt) return 0;
     const expires = new Date(sessionInfo.expiresAt).getTime();
     if (!Number.isFinite(expires)) return 0;
     return Math.max(0, Math.floor((expires - Date.now()) / 1000));
+  }
+
+  function getDisplayExpiresAt() {
+    if (remainingBaseSeconds != null && remainingCapturedAtMs != null) {
+      return new Date(remainingCapturedAtMs + remainingBaseSeconds * 1000);
+    }
+    return sessionInfo ? sessionInfo.expiresAt : null;
   }
 
   function isSessionOrderable() {
@@ -141,7 +166,7 @@ window.CafeOrderPage = (function () {
     const remain = getRemainingSecondsLocal();
     summary.textContent =
       "座席: " + sessionInfo.seatNo +
-      " / 有効期限: " + formatDateTime(sessionInfo.expiresAt) +
+      " / 有効期限: " + formatDateTime(getDisplayExpiresAt()) +
       " / 残り: " + formatRemaining(remain) + "まで注文できます";
 
     if (sessionInfo.status === "CHECKED_OUT") {
@@ -333,6 +358,7 @@ window.CafeOrderPage = (function () {
           { method: "POST", headers: { "Content-Type": "application/json; charset=UTF-8" } }
         );
         sessionInfo = result.session || sessionInfo;
+        captureRemainingBase(sessionInfo);
         updateSessionSummary();
         await refreshHistory();
       } catch (error) {
@@ -378,6 +404,7 @@ window.CafeOrderPage = (function () {
   async function refreshSessionStatus() {
     try {
       sessionInfo = await fetchJson(backendBaseUrl + "/api/cafe/sessions/" + encodeURIComponent(sessionToken));
+      captureRemainingBase(sessionInfo);
       updateSessionSummary();
     } catch (error) {
       setOrderEnabled(false);
@@ -427,6 +454,7 @@ window.CafeOrderPage = (function () {
         backendBaseUrl + "/api/cafe/order-menu?session=" + encodeURIComponent(sessionToken)
       );
       sessionInfo = payload.session;
+      captureRemainingBase(sessionInfo);
       renderMenus(Array.isArray(payload.menus) ? payload.menus : []);
       await refreshHistory();
       updateSessionSummary();
