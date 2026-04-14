@@ -30,13 +30,13 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
 
 		Path filePath = resolveProductsJsonPath();
 		if (filePath == null) {
-			return List.of();
+			return defaultCatalog();
 		}
 
 		try {
 			return parseCatalog(objectMapper.readTree(filePath.toFile()));
 		} catch (IOException ex) {
-			return List.of();
+			return defaultCatalog();
 		}
 	}
 
@@ -94,5 +94,36 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
 			}
 		}
 		return null;
+	}
+
+	private List<ProductCatalogItem> defaultCatalog() {
+		return List.of(
+			new ProductCatalogItem("cage-01", "cage", "ケージ 01"),
+			new ProductCatalogItem("cage-02", "cage", "ケージ 02"),
+			new ProductCatalogItem("cage-03", "cage", "ケージ 03"),
+			new ProductCatalogItem("cage-04", "cage", "ケージ 04"),
+			new ProductCatalogItem("cage-05", "cage", "ケージ 05"),
+			new ProductCatalogItem("cage-06", "cage", "ケージ 06"),
+			new ProductCatalogItem("food-01", "food", "フード 01"),
+			new ProductCatalogItem("food-02", "food", "フード 02"),
+			new ProductCatalogItem("food-03", "food", "フード 03"),
+			new ProductCatalogItem("food-04", "food", "フード 04"),
+			new ProductCatalogItem("food-05", "food", "フード 05"),
+			new ProductCatalogItem("food-06", "food", "フード 06"),
+			new ProductCatalogItem("toy-01", "toy", "おもちゃ 01"),
+			new ProductCatalogItem("toy-02", "toy", "おもちゃ 02"),
+			new ProductCatalogItem("toy-03", "toy", "おもちゃ 03"),
+			new ProductCatalogItem("toy-04", "toy", "おもちゃ 04"),
+			new ProductCatalogItem("toy-05", "toy", "おもちゃ 05"),
+			new ProductCatalogItem("toy-06", "toy", "おもちゃ 06"),
+			new ProductCatalogItem("care-01", "care", "ケア用品 01"),
+			new ProductCatalogItem("care-02", "care", "ケア用品 02"),
+			new ProductCatalogItem("care-03", "care", "ケア用品 03"),
+			new ProductCatalogItem("care-04", "care", "ケア用品 04"),
+			new ProductCatalogItem("care-05", "care", "ケア用品 05"),
+			new ProductCatalogItem("starter-01", "starter", "スターターセット 01"),
+			new ProductCatalogItem("starter-02", "starter", "スターターセット 02"),
+			new ProductCatalogItem("starter-03", "starter", "スターターセット 03")
+		);
 	}
 }
