@@ -164,12 +164,17 @@ window.CafeOrderPage = (function () {
     }
 
     const remain = getRemainingSecondsLocal();
+    const baseSummary =
+      "座席: " + sessionInfo.seatNo +
+      " / 有効期限: " + formatDateTime(getDisplayExpiresAt()) +
+      " / 残り: " + formatRemaining(remain);
     summary.textContent =
       "座席: " + sessionInfo.seatNo +
       " / 有効期限: " + formatDateTime(getDisplayExpiresAt()) +
       " / 残り: " + formatRemaining(remain) + "まで注文できます";
 
     if (sessionInfo.status === "CHECKED_OUT") {
+      summary.textContent = baseSummary + " / 会計済み";
       setOrderEnabled(false);
       setStatus("", false);
       const finishedTotal = document.getElementById("cafe-finished-total");
@@ -179,12 +184,14 @@ window.CafeOrderPage = (function () {
     }
 
     if (sessionInfo.status === "EXPIRED" || remain <= 0) {
+      summary.textContent = baseSummary + " / 注文受付終了";
       setOrderEnabled(false);
       setStatus("注文可能時間が終了しました。", true);
       setFinishedScreen(false);
       return;
     }
 
+    summary.textContent = baseSummary + "まで注文できます";
     if (remain <= warningThresholdSeconds) {
       setStatus("ラストオーダー5分前です。", true);
     } else {
