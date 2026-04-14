@@ -17,7 +17,8 @@ RUN ./mvnw -B -DskipTests clean package
 FROM eclipse-temurin:17-jre AS runtime
 
 WORKDIR /app
+ENV TZ=Asia/Tokyo
 COPY --from=build /workspace/spring-app/target/*.jar /app/app.jar
 
 EXPOSE 10000
-ENTRYPOINT ["java", "-Dserver.port=10000", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Tokyo", "-Dserver.port=10000", "-jar", "/app/app.jar"]

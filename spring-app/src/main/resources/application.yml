@@ -3,6 +3,8 @@ spring:
     name: portfolio-backend
   thymeleaf:
     cache: false
+  jackson:
+    time-zone: Asia/Tokyo
   datasource:
     url: ${DB_URL:jdbc:h2:file:./data/portfolio_backend;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE}
     username: ${DB_USERNAME:sa}
