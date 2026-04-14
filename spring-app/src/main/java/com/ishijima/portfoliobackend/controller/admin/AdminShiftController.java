@@ -463,8 +463,8 @@ public class AdminShiftController {
 	private record ShiftSlotOption(String value, String label) {
 	}
 
-	@ExceptionHandler(RuntimeException.class)
-	public String handleShiftRuntimeError(RuntimeException ex, RedirectAttributes redirectAttributes) {
+	@ExceptionHandler(Throwable.class)
+	public String handleShiftRuntimeError(Throwable ex, RedirectAttributes redirectAttributes) {
 		redirectAttributes.addFlashAttribute("shiftError", "シフト処理でエラーが発生しました: " + ex.getMessage());
 		return "redirect:/admin/shifts";
 	}
