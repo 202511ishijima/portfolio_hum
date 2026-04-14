@@ -1,4 +1,10 @@
-const HAMSTER_SUMMARY_API = "http://localhost:8080/api/hamsters/summary";
+const HAMSTER_SUMMARY_API = (() => {
+  const { hostname, port, origin } = window.location;
+  if (hostname.endsWith("github.io")) return "https://portfolio-hum.onrender.com/api/hamsters/summary";
+  if (hostname.endsWith("onrender.com")) return origin + "/api/hamsters/summary";
+  if ((hostname === "127.0.0.1" || hostname === "localhost") && port === "3000") return "http://localhost:8080/api/hamsters/summary";
+  return origin + "/api/hamsters/summary";
+})();
 
 async function getHamsterMetadata() {
   const basePath =

@@ -4,7 +4,13 @@ window.Cart = (function () {
   const checkoutProfileKey = "hamu_checkout_profile";
   const lastOrderTotalKey = "hamu_last_order_total";
   const lastOrderPointsKey = "hamu_last_order_points";
-  const backendBaseUrl = "http://localhost:8080";
+  const backendBaseUrl = (() => {
+    const { hostname, port, origin } = window.location;
+    if (hostname.endsWith("github.io")) return "https://portfolio-hum.onrender.com";
+    if (hostname.endsWith("onrender.com")) return origin;
+    if ((hostname === "127.0.0.1" || hostname === "localhost") && port === "3000") return "http://localhost:8080";
+    return origin;
+  })();
 
   function getCart() {
     return JSON.parse(localStorage.getItem(storageKey) || "[]");

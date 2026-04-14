@@ -17,7 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  const endpoint = form.dataset.endpoint || "http://localhost:8080/api/inquiries";
+  const endpoint =
+    form.dataset.endpoint ||
+    (window.location.hostname.endsWith("github.io")
+      ? "https://portfolio-hum.onrender.com/api/inquiries"
+      : "/api/inquiries");
   const statusBox = document.querySelector("[data-contact-status]");
   const submitButton = form.querySelector('button[type="submit"]');
 

@@ -7,6 +7,8 @@ window.CafeOrderPage = (function () {
       return apiBase.trim().replace(/\/+$/, "");
     }
     const { hostname, port, origin } = window.location;
+    if (hostname.endsWith("github.io")) return "https://portfolio-hum.onrender.com";
+    if (hostname.endsWith("onrender.com")) return origin;
     if ((hostname === "127.0.0.1" || hostname === "localhost") && port === "3000") {
       return "http://localhost:8080";
     }
