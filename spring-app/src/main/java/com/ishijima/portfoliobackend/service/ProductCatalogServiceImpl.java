@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ishijima.portfoliobackend.dto.ProductCatalogItem;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,29 +23,63 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
 
 	@Override
 	public List<ProductCatalogItem> findAll() {
+		List<ProductCatalogItem> fromClasspath = loadFromClasspath();
+		if (!fromClasspath.isEmpty()) {
+			return fromClasspath;
+		}
+
 		Path filePath = resolveProductsJsonPath();
 		if (filePath == null) {
 			return List.of();
 		}
 
 		try {
-			JsonNode root = objectMapper.readTree(filePath.toFile());
-			if (root == null || !root.isArray()) {
-				return List.of();
-			}
-			List<ProductCatalogItem> items = new ArrayList<>();
-			for (JsonNode node : root) {
-				String id = node.path("id").asText("");
-				String category = node.path("category").asText("");
-				String name = node.path("name").asText("");
-				if (!id.isBlank()) {
-					items.add(new ProductCatalogItem(id, category.isBlank() ? "uncategorized" : category, name.isBlank() ? id : name));
-				}
-			}
-			return items;
+			return parseCatalog(objectMapper.readTree(filePath.toFile()));
 		} catch (IOException ex) {
 			return List.of();
 		}
+	}
+
+	private List<ProductCatalogItem> loadFromClasspath() {
+		List<String> candidates = List.of(
+			"static/assets/data/products.json",
+			"assets/data/products.json"
+		);
+		for (String candidate : candidates) {
+			ClassPathResource resource = new ClassPathResource(candidate);
+			if (!resource.exists()) {
+				continue;
+			}
+			try (InputStream in = resource.getInputStream()) {
+				List<ProductCatalogItem> parsed = parseCatalog(objectMapper.readTree(in));
+				if (!parsed.isEmpty()) {
+					return parsed;
+				}
+			} catch (IOException ignored) {
+				// Try next candidate.
+			}
+		}
+		return List.of();
+	}
+
+	private List<ProductCatalogItem> parseCatalog(JsonNode root) {
+		if (root == null || !root.isArray()) {
+			return List.of();
+		}
+		List<ProductCatalogItem> items = new ArrayList<>();
+		for (JsonNode node : root) {
+			String id = node.path("id").asText("");
+			String category = node.path("category").asText("");
+			String name = node.path("name").asText("");
+			if (!id.isBlank()) {
+				items.add(new ProductCatalogItem(
+					id,
+					category.isBlank() ? "uncategorized" : category,
+					name.isBlank() ? id : name
+				));
+			}
+		}
+		return items;
 	}
 
 	private Path resolveProductsJsonPath() {
