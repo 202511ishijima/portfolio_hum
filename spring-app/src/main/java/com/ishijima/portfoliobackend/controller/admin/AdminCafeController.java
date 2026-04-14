@@ -11,6 +11,7 @@ import com.ishijima.portfoliobackend.form.CafeSessionCreateForm;
 import com.ishijima.portfoliobackend.service.CafeOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +43,8 @@ import java.util.stream.Collectors;
 public class AdminCafeController {
 
 	private final CafeOrderService cafeOrderService;
+	@Value("${app.frontend-base-url:}")
+	private String frontendBaseUrl;
 
 	@GetMapping("/reception")
 	public String reception(Model model) {
@@ -411,10 +415,18 @@ public class AdminCafeController {
 	}
 
 	private String buildOrderUrl(String token) {
-		String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+		String backendBaseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
 			.build()
 			.toUriString();
-		return baseUrl + "/pages/cafe-order.html?session=" + token;
+		String frontBase = (frontendBaseUrl != null && !frontendBaseUrl.isBlank())
+			? frontendBaseUrl.trim().replaceAll("/+$", "")
+			: backendBaseUrl;
+		return UriComponentsBuilder
+			.fromUriString(frontBase + "/pages/cafe-order.html")
+			.queryParam("session", token)
+			.queryParam("apiBase", backendBaseUrl)
+			.build()
+			.toUriString();
 	}
 
 	private String buildQrImageUrl(String text) {

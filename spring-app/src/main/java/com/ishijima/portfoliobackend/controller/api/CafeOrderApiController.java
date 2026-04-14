@@ -10,6 +10,7 @@ import com.ishijima.portfoliobackend.form.CafeOrderCreateForm;
 import com.ishijima.portfoliobackend.service.CafeOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 public class CafeOrderApiController {
 
 	private final CafeOrderService cafeOrderService;
+	@Value("${app.frontend-base-url:}")
+	private String frontendBaseUrl;
 
 	@GetMapping("/menu")
 	public ResponseEntity<Object> menu() {
@@ -160,9 +164,17 @@ public class CafeOrderApiController {
 	}
 
 	private String buildOrderUrl(String token) {
-		String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+		String backendBaseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
 			.build()
 			.toUriString();
-		return baseUrl + "/pages/cafe-order.html?session=" + token;
+		String frontBase = (frontendBaseUrl != null && !frontendBaseUrl.isBlank())
+			? frontendBaseUrl.trim().replaceAll("/+$", "")
+			: backendBaseUrl;
+		return UriComponentsBuilder
+			.fromUriString(frontBase + "/pages/cafe-order.html")
+			.queryParam("session", token)
+			.queryParam("apiBase", backendBaseUrl)
+			.build()
+			.toUriString();
 	}
 }
