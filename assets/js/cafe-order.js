@@ -15,9 +15,9 @@ window.CafeOrderPage = (function () {
     if (hostname.endsWith("github.io")) return renderBackendBaseUrl;
     if (hostname.endsWith("onrender.com")) return origin;
     if ((hostname === "127.0.0.1" || hostname === "localhost") && port === "3000") {
-      return "http://localhost:8080";
+      return renderBackendBaseUrl;
     }
-    return origin;
+    return renderBackendBaseUrl;
   })();
 
   let selectedCounts = {};
