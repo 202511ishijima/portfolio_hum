@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -37,7 +38,7 @@ public class ChatServiceImpl implements ChatService {
 			.roomId(roomId)
 			.senderEmployeeId(senderEmployeeId)
 			.body(body.trim())
-			.sentAt(LocalDateTime.now())
+			.sentAt(LocalDateTime.now(ZoneOffset.UTC))
 			.build();
 		chatMessageMapper.insert(message);
 	}
@@ -49,7 +50,7 @@ public class ChatServiceImpl implements ChatService {
 				ChatRoom room = ChatRoom.builder()
 					.name("General")
 					.roomType("GENERAL")
-					.createdAt(LocalDateTime.now())
+					.createdAt(LocalDateTime.now(ZoneOffset.UTC))
 					.build();
 				chatRoomMapper.insert(room);
 				return room.getId();

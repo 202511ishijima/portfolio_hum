@@ -52,7 +52,7 @@
 					<article class="admin-history-item"
 					         th:each="message : ${messages}"
 					         th:classappend="${currentEmployeeId != null and message.senderEmployeeId == currentEmployeeId} ? ' admin-history-item--self' : ' admin-history-item--other'">
-						<p class="admin-help-text" th:text="${message.senderName + ' / ' + #temporals.format(message.sentAt, 'yyyy/MM/dd HH:mm')}">sender</p>
+						<p class="admin-help-text" th:text="${message.senderName + ' / ' + @dateTimeViewHelper.formatUtcToJst(message.sentAt, 'yyyy/MM/dd HH:mm')}">sender</p>
 						<div class="admin-message-box" th:text="${message.body}">message</div>
 					</article>
 				</div>

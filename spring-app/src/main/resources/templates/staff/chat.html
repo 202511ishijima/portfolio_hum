@@ -30,7 +30,7 @@
 		<section class="admin-card">
 			<div class="admin-history-list" th:if="${!#lists.isEmpty(messages)}">
 				<article class="admin-history-item" th:each="message : ${messages}">
-					<p class="admin-help-text" th:text="${message.senderName + ' / ' + #temporals.format(message.sentAt, 'yyyy/MM/dd HH:mm')}">sender</p>
+					<p class="admin-help-text" th:text="${message.senderName + ' / ' + @dateTimeViewHelper.formatUtcToJst(message.sentAt, 'yyyy/MM/dd HH:mm')}">sender</p>
 					<div class="admin-message-box" th:text="${message.body}">message</div>
 				</article>
 			</div>
