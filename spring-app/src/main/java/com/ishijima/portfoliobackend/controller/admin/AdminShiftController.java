@@ -250,7 +250,7 @@ public class AdminShiftController {
 		try {
 			int count = shiftRequestService.autoGenerateShifts(currentMonth.getYear(), currentMonth.getMonthValue());
 			redirectAttributes.addFlashAttribute("shiftMessage", "希望から " + count + " 件のシフトを自動作成しました。");
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			redirectAttributes.addFlashAttribute(
 				"shiftError",
 				"自動作成でエラーが発生しました: " + ex.getClass().getSimpleName() + " / " + ex.getMessage()
