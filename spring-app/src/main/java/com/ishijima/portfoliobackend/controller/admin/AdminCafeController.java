@@ -45,6 +45,8 @@ public class AdminCafeController {
 	private final CafeOrderService cafeOrderService;
 	@Value("${app.frontend-base-url:}")
 	private String frontendBaseUrl;
+	@Value("${app.backend-base-url:}")
+	private String backendBaseUrlProperty;
 
 	@GetMapping("/reception")
 	public String reception(Model model) {
@@ -415,9 +417,9 @@ public class AdminCafeController {
 	}
 
 	private String buildOrderUrl(String token) {
-		String backendBaseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-			.build()
-			.toUriString();
+		String backendBaseUrl = (backendBaseUrlProperty != null && !backendBaseUrlProperty.isBlank())
+			? backendBaseUrlProperty.trim().replaceAll("/+$", "")
+			: ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
 		String frontBase = (frontendBaseUrl != null && !frontendBaseUrl.isBlank())
 			? frontendBaseUrl.trim().replaceAll("/+$", "")
 			: backendBaseUrl;

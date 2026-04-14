@@ -32,3 +32,4 @@ logging:
 
 app:
   frontend-base-url: ${FRONTEND_BASE_URL:https://202511ishijima.github.io/portfolio_hum}
+  backend-base-url: ${BACKEND_BASE_URL:https://portfolio-hum.onrender.com}
