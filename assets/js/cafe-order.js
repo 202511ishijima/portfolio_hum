@@ -1,13 +1,18 @@
 window.CafeOrderPage = (function () {
   const warningThresholdSeconds = 5 * 60;
+  const renderBackendBaseUrl = "https://portfolio-hum.onrender.com";
   const backendBaseUrl = (function resolveBackendBaseUrl() {
     const params = new URLSearchParams(window.location.search);
     const apiBase = params.get("apiBase");
-    if (apiBase && apiBase.trim()) {
-      return apiBase.trim().replace(/\/+$/, "");
-    }
     const { hostname, port, origin } = window.location;
-    if (hostname.endsWith("github.io")) return "https://portfolio-hum.onrender.com";
+    if (apiBase && apiBase.trim()) {
+      const normalized = apiBase.trim().replace(/\/+$/, "");
+      if (hostname.endsWith("github.io") && /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(normalized)) {
+        return renderBackendBaseUrl;
+      }
+      return normalized;
+    }
+    if (hostname.endsWith("github.io")) return renderBackendBaseUrl;
     if (hostname.endsWith("onrender.com")) return origin;
     if ((hostname === "127.0.0.1" || hostname === "localhost") && port === "3000") {
       return "http://localhost:8080";
@@ -165,7 +170,12 @@ window.CafeOrderPage = (function () {
   }
 
   async function fetchJson(url, options) {
-    const res = await fetch(url, options);
+    let res;
+    try {
+      res = await fetch(url, options);
+    } catch (error) {
+      throw new Error("通信に失敗しました。ネットワーク接続かAPI接続先を確認してください。(" + backendBaseUrl + ")");
+    }
     const payload = await res.json().catch(() => ({}));
     if (!res.ok) {
       throw new Error(payload.message || ("通信に失敗しました (" + res.status + ")"));
