@@ -41,7 +41,7 @@ public class SecurityConfig {
 					"/api/cafe/sessions/*",
 					"/api/cafe/sessions/*/checkout"
 				).permitAll()
-				.requestMatchers("/api/inquiries", "/api/inquiries/replies", "/api/inquiries/thread", "/api/members/register", "/api/members/points", "/api/members/status").permitAll()
+				.requestMatchers("/api/inquiries", "/api/inquiries/replies", "/api/inquiries/thread", "/api/members/register", "/api/members/login", "/api/members/points", "/api/members/status").permitAll()
 				.requestMatchers("/admin/**", "/api/admin/**").hasAnyRole("ADMIN", "STAFF_MANAGER", "STAFF", "VIEWER")
 				.requestMatchers("/staff/**").hasAnyRole("ADMIN", "STAFF_MANAGER", "STAFF", "VIEWER")
 				.anyRequest().authenticated()

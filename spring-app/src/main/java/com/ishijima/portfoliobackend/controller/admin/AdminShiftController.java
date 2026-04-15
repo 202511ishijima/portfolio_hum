@@ -226,6 +226,7 @@ public class AdminShiftController {
 		RedirectAttributes redirectAttributes
 	) {
 		YearMonth currentMonth = resolveYearMonth(year, month);
+		int count = 0;
 		try {
 			try {
 				int safeCount = shiftRequestService.autoGenerateShifts(currentMonth.getYear(), currentMonth.getMonthValue());
@@ -235,9 +236,8 @@ public class AdminShiftController {
 			}
 			return "redirect:/admin/shifts?year=" + currentMonth.getYear() + "&month=" + currentMonth.getMonthValue();
 		} catch (Throwable ignore) {
-			return "redirect:/admin/shifts?year=" + currentMonth.getYear() + "&month=" + currentMonth.getMonthValue();
+			// fall through
 		}
-		int count = 0;
 		redirectAttributes.addFlashAttribute("shiftMessage", "希望から " + count + " 件のシフトを自動作成しました。");
 		return "redirect:/admin/shifts?year=" + currentMonth.getYear() + "&month=" + currentMonth.getMonthValue();
 	}

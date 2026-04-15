@@ -16,6 +16,8 @@ public interface MemberService {
 
 	Member findByEmail(String email);
 
+	Member authenticate(String email, String rawPassword);
+
 	void toggleStatus(Long id);
 
 	void adjustPoints(Long id, Integer delta);

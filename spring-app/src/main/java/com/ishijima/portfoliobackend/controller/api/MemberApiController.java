@@ -2,6 +2,7 @@ package com.ishijima.portfoliobackend.controller.api;
 
 import com.ishijima.portfoliobackend.entity.Member;
 import com.ishijima.portfoliobackend.form.MemberCreateForm;
+import com.ishijima.portfoliobackend.form.MemberLoginForm;
 import com.ishijima.portfoliobackend.form.MemberPointSyncForm;
 import com.ishijima.portfoliobackend.service.MemberService;
 import jakarta.validation.Valid;
@@ -34,6 +35,19 @@ public class MemberApiController {
 			"points", member.getPoints(),
 			"status", member.getStatus(),
 			"message", "アカウントを作成しました。"
+		));
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody MemberLoginForm form) {
+		Member member = memberService.authenticate(form.email(), form.password());
+		return ResponseEntity.ok(Map.of(
+			"id", member.getId(),
+			"name", member.getName(),
+			"email", member.getEmail(),
+			"points", member.getPoints(),
+			"status", member.getStatus(),
+			"message", "ログインしました。"
 		));
 	}
 

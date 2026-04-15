@@ -5,6 +5,7 @@ import com.ishijima.portfoliobackend.form.MemberCreateForm;
 import com.ishijima.portfoliobackend.form.MemberUpdateForm;
 import com.ishijima.portfoliobackend.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,18 +17,19 @@ import java.util.List;
 public class MemberServiceImpl implements MemberService {
 
 	private final MemberMapper memberMapper;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	@Transactional
 	public Member create(MemberCreateForm form) {
 		memberMapper.findByEmail(form.email()).ifPresent(member -> {
-			throw new IllegalArgumentException("このメールアドレスはすでに登録されています。");
+			throw new IllegalArgumentException("このメールアドレスは既に登録されています。");
 		});
 
 		Member member = Member.builder()
 			.name(form.name())
 			.email(form.email())
-			.password(form.password())
+			.password(passwordEncoder.encode(form.password()))
 			.status("ACTIVE")
 			.points(0)
 			.createdAt(LocalDateTime.now())
@@ -53,6 +55,30 @@ public class MemberServiceImpl implements MemberService {
 	public Member findByEmail(String email) {
 		return memberMapper.findByEmail(email)
 			.orElseThrow(() -> new IllegalArgumentException("会員が見つかりません。email=" + email));
+	}
+
+	@Override
+	@Transactional
+	public Member authenticate(String email, String rawPassword) {
+		Member member = findByEmail(email);
+		String storedPassword = member.getPassword() == null ? "" : member.getPassword();
+
+		boolean matched;
+		if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$")) {
+			matched = passwordEncoder.matches(rawPassword, storedPassword);
+		} else {
+			matched = storedPassword.equals(rawPassword);
+			if (matched) {
+				member.setPassword(passwordEncoder.encode(rawPassword));
+				member.setUpdatedAt(LocalDateTime.now());
+				memberMapper.updateMember(member);
+			}
+		}
+
+		if (!matched) {
+			throw new IllegalArgumentException("メールアドレスまたはパスワードが正しくありません。");
+		}
+		return member;
 	}
 
 	@Override
@@ -97,14 +123,14 @@ public class MemberServiceImpl implements MemberService {
 
 		memberMapper.findByEmail(form.email()).ifPresent(existingMember -> {
 			if (!existingMember.getId().equals(id)) {
-				throw new IllegalArgumentException("このメールアドレスはすでに登録されています。");
+				throw new IllegalArgumentException("このメールアドレスは既に登録されています。");
 			}
 		});
 
 		member.setName(form.name());
 		member.setEmail(form.email());
 		if (form.password() != null && !form.password().isBlank()) {
-			member.setPassword(form.password());
+			member.setPassword(passwordEncoder.encode(form.password()));
 		}
 		member.setUpdatedAt(LocalDateTime.now());
 

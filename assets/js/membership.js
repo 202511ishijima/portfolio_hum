@@ -419,6 +419,52 @@ window.MembershipPage = (function () {
     target.className = isError ? "form-message error" : "form-message success";
   }
 
+  async function submitLoginForm(form) {
+    const status = document.getElementById("login-status");
+    const formData = new FormData(form);
+    const payload = {
+      email: String(formData.get("email") || "").trim(),
+      password: String(formData.get("password") || "")
+    };
+
+    if (!payload.email || !payload.password) {
+      showFormMessage(status, "メールアドレスとパスワードを入力してください。", true);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendBaseUrl}/api/members/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=UTF-8" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.message || "ログインに失敗しました。");
+      }
+
+      saveMember({
+        name: result.name || payload.email.split("@")[0],
+        email: result.email || payload.email,
+        points: Number(result.points || 0),
+        loggedIn: true,
+        status: result.status || "ACTIVE"
+      });
+
+      if ((result.status || "ACTIVE") === "SUSPENDED") {
+        window.location.href = getSuspendedPagePath();
+        return;
+      }
+
+      showFormMessage(status, "ログインしました。", false);
+      setTimeout(() => {
+        window.location.href = "mypage.html";
+      }, 400);
+    } catch (error) {
+      showFormMessage(status, error.message || "ログインに失敗しました。", true);
+    }
+  }
+
   async function submitRegisterForm(form) {
     const status = document.getElementById("register-status");
     const formData = new FormData(form);
@@ -478,33 +524,7 @@ window.MembershipPage = (function () {
 
     login?.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const formData = new FormData(login);
-      const email = String(formData.get("email") || "").trim();
-      const current = getMember();
-      const status = await fetchMemberStatus(email);
-
-      if (status?.status === "SUSPENDED") {
-        saveMember({
-          ...current,
-          name: status.name || email.split("@")[0],
-          email,
-          points: Number(status.points || 0),
-          loggedIn: true,
-          status: "SUSPENDED"
-        });
-        window.location.href = getSuspendedPagePath();
-        return;
-      }
-
-      saveMember({
-        ...current,
-        name: status?.name || (current.loggedIn && current.email === email ? current.name : email.split("@")[0]),
-        email,
-        points: Number(status?.points ?? current.points ?? 0),
-        loggedIn: true,
-        status: status?.status || "ACTIVE"
-      });
-      window.location.href = "mypage.html";
+      await submitLoginForm(login);
     });
   }
 
