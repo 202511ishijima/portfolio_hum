@@ -53,6 +53,23 @@
   <div id="site-footer"></div>
   <script src="../assets/js/common.js"></script>
   <script src="../assets/js/router.js"></script>
-  <script src="../assets/js/membership.js?v=660770c"></script>
+  <script src="../assets/js/membership.js?v=660770d"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const status = document.getElementById("login-status");
+      if (!status) return;
+      const normalizeLoginError = () => {
+        if (status.textContent && status.textContent.includes("会員が見つかりません")) {
+          status.textContent = "メールアドレスまたはパスワードが違います";
+        }
+      };
+      new MutationObserver(normalizeLoginError).observe(status, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+      normalizeLoginError();
+    });
+  </script>
 </body>
 </html>
