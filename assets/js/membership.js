@@ -440,6 +440,9 @@ window.MembershipPage = (function () {
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) {
+        throw new Error("メールアドレスまたはパスワードが違います");
+      }
+      if (!response.ok) {
         throw new Error(result.message || "ログインに失敗しました。");
       }
 
