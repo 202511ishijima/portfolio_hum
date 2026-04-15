@@ -60,7 +60,8 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public Member authenticate(String email, String rawPassword) {
-		Member member = findByEmail(email);
+		Member member = memberMapper.findByEmail(email)
+			.orElseThrow(() -> new IllegalArgumentException("メールアドレスまたはパスワードが違います"));
 		String storedPassword = member.getPassword() == null ? "" : member.getPassword();
 
 		boolean matched;
@@ -76,7 +77,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		if (!matched) {
-			throw new IllegalArgumentException("メールアドレスまたはパスワードが正しくありません。");
+			throw new IllegalArgumentException("メールアドレスまたはパスワードが違います");
 		}
 		return member;
 	}
