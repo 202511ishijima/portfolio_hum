@@ -253,7 +253,7 @@ window.MembershipPage = (function () {
 
   function renderThreadBubbles(messages) {
     return messages.map((item) => {
-      const isAdmin = item.sender === "admin";
+      const isAdmin = String(item.sender || "").toLowerCase() === "admin";
       const senderLabel = isAdmin ? "運営" : "あなた";
       const subjectHtml = !isAdmin && item.subject ? `<p class="chat-message__subject">${escapeHtml(item.subject)}</p>` : "";
       const bodyHtml = escapeHtml(item.body).replaceAll("\n", "<br>");

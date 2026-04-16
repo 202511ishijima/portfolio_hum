@@ -376,9 +376,23 @@
   justify-items: end;
 }
 
+.chat-message--admin {
+  justify-items: start;
+}
+
+.chat-message--admin .chat-message__meta {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
 .chat-message--member .chat-message__bubble {
   background: #f7eadf;
   border-color: rgba(185, 144, 108, 0.38);
+}
+
+.chat-message--member .chat-message__meta {
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .chat-compose {

@@ -114,7 +114,7 @@ public class AdminCafeController {
 		Authentication authentication,
 		RedirectAttributes redirectAttributes
 	) {
-		if (!canManage(authentication)) {
+		if (!canIssueFromCustomerScreen(authentication)) {
 			redirectAttributes.addFlashAttribute("cafeError", "受付発行の権限がありません。");
 			return "redirect:/admin/cafe/customer-screen";
 		}
@@ -414,6 +414,11 @@ public class AdminCafeController {
 				"ROLE_ADMIN".equals(authority.getAuthority()) ||
 				"ROLE_STAFF_MANAGER".equals(authority.getAuthority())
 			);
+	}
+
+	private boolean canIssueFromCustomerScreen(Authentication authentication) {
+		// 顧客操作画面は AdminPermissionInterceptor(canCafeCustomer) でアクセス制御する。
+		return authentication != null;
 	}
 
 	private String buildOrderUrl(String token) {
