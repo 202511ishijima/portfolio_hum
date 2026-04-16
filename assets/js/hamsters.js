@@ -60,14 +60,14 @@ async function getHamsters() {
 
   try {
     const summaries = await getHamsterSummaries();
-    if (Array.isArray(summaries) && summaries.length > 0) {
+    if (Array.isArray(summaries)) {
       return mergeHamsterData(metadata.items, summaries);
     }
   } catch (error) {
-    console.warn("Hamster summary API unavailable, fallback to static data.", error);
+    console.warn("Hamster summary API unavailable.", error);
   }
 
-  return metadata.items;
+  return [];
 }
 
 function imageHtml(src, alt) {
@@ -169,6 +169,10 @@ async function renderFeatured() {
   if (!section) return;
   try {
     const hamsters = await getHamsters();
+    if (!hamsters.length) {
+      section.innerHTML = `<p class="text-soft">現在ご紹介できるハムスターはいません。</p>`;
+      return;
+    }
     const slides = chunkItems(hamsters, 3)
       .map(
         (group) => `
@@ -206,6 +210,10 @@ async function renderIndex() {
 
   try {
     const hamsters = await getHamsters();
+    if (!hamsters.length) {
+      list.innerHTML = `<p class="text-soft">現在ご紹介できるハムスターはいません。</p>`;
+      return;
+    }
     list.innerHTML = hamsters.map(hamsterCard).join("");
   } catch (error) {
     list.innerHTML = `<p class="text-soft">ハムスター情報を表示できませんでした。</p>`;
