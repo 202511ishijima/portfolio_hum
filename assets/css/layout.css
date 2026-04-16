@@ -164,6 +164,11 @@ body.has-fixed-header {
   background: #fff;
 }
 
+.notification-item-link[data-unread="true"] {
+  border-color: #d68f59;
+  background: #fff6ef;
+}
+
 .notification-item-link:hover {
   background: #fdf2e8;
 }
