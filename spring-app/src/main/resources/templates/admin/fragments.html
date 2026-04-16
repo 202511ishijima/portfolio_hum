@@ -3,6 +3,7 @@
 <body>
 <nav class="admin-nav" aria-label="管理メニュー" th:fragment="adminNav(section)">
 	<a class="admin-nav-link"
+	   th:if="${section != 'cafe-customer'}"
 	   th:classappend="${section == 'dashboard'} ? ' is-active' : ''"
 	   th:href="@{/admin/dashboard}">ダッシュボード</a>
 	<a class="admin-nav-link"
