@@ -37,8 +37,8 @@
 			<section class="admin-card">
 				<div class="admin-card-header">
 					<div>
-						<h2>内容</h2>
-						<p>受信した情報を確認できます。</p>
+						<h2>お問い合わせチャット</h2>
+						<p>会員ページと同じ見え方で、やり取りを確認できます。</p>
 					</div>
 				</div>
 
@@ -65,16 +65,33 @@
 					</div>
 				</dl>
 
-				<section class="admin-message-box" th:text="${inquiry.message}">
-					お問い合わせ本文
-				</section>
+				<section class="admin-chat-panel">
+					<div class="admin-chat-thread">
+						<article class="admin-chat-message admin-chat-message--member">
+							<div class="admin-chat-message__meta">
+								<span th:text="${inquiry.name}">会員</span>
+								<span th:text="${#temporals.format(inquiry.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/18 10:00</span>
+							</div>
+							<div class="admin-chat-message__bubble">
+								<p class="admin-chat-message__subject" th:text="${inquiry.subject}">件名</p>
+								<p th:text="${inquiry.message}">お問い合わせ本文</p>
+							</div>
+						</article>
 
-				<section class="admin-card-section" th:if="${!#lists.isEmpty(replyHistory)}">
-					<h3>返信履歴</h3>
-					<div class="admin-history-list">
-						<article class="admin-history-item" th:each="reply : ${replyHistory}">
-							<p class="admin-help-text" th:text="${#temporals.format(reply.sentAt, 'yyyy/MM/dd HH:mm') + ' に送信'}">2026/03/18 10:00 に送信</p>
-							<div class="admin-message-box" th:text="${reply.reply}">返信内容</div>
+						<article class="admin-chat-message"
+						         th:each="reply : ${replyHistory}">
+							<div class="admin-chat-message__meta">
+								<span>管理者</span>
+								<span th:text="${#temporals.format(reply.sentAt, 'yyyy/MM/dd HH:mm')}">2026/03/18 10:10</span>
+							</div>
+							<div class="admin-chat-message__bubble">
+								<p th:text="${reply.reply}">返信内容</p>
+							</div>
+						</article>
+
+						<article class="admin-chat-empty"
+						         th:if="${#lists.isEmpty(replyHistory)}">
+							<p>まだ返信はありません。</p>
 						</article>
 					</div>
 				</section>
