@@ -85,12 +85,12 @@ public class AdminInquiryController {
 	) {
 		if (bindingResult.hasErrors()) {
 			redirectAttributes.addFlashAttribute("statusError", "対応状況の更新に失敗しました。");
-			return "redirect:/admin/inquiries";
+			return "redirect:/admin/inquiries/" + id;
 		}
 
 		inquiryService.updateStatus(id, form.status());
 		redirectAttributes.addFlashAttribute("statusMessage", "対応状況を更新しました。");
-		return "redirect:/admin/inquiries";
+		return "redirect:/admin/inquiries/" + id;
 	}
 
 	@PostMapping("/inquiries/{id}/reply")

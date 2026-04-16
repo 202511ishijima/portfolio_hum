@@ -105,16 +105,20 @@
 					</div>
 				</div>
 
-				<form class="admin-form" th:action="@{/admin/inquiries/{id}/status(id=${inquiry.id})}" th:object="${statusForm}" method="post">
+				<form class="admin-form"
+				      id="status-form"
+				      th:action="@{/admin/inquiries/{id}/status(id=${inquiry.id})}"
+				      th:object="${statusForm}"
+				      method="post">
 					<label class="admin-field">
 						<span>現在の対応状況</span>
-						<select th:field="*{status}">
+						<select id="status-select" th:field="*{status}">
 							<option value="NEW">未対応</option>
 							<option value="IN_PROGRESS">対応中</option>
 							<option value="COMPLETED">完了</option>
 						</select>
 					</label>
-					<button class="admin-button" type="submit">更新する</button>
+					<p class="admin-help-text">選択すると自動で保存されます。</p>
 				</form>
 
 				<section class="admin-card-section">
@@ -135,6 +139,16 @@
 			</section>
 		</div>
 	</div>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			const form = document.getElementById("status-form");
+			const select = document.getElementById("status-select");
+			if (!form || !select) return;
+			select.addEventListener("change", () => {
+				form.requestSubmit();
+			});
+		});
+	</script>
 </body>
 </html>
 
