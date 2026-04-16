@@ -218,8 +218,11 @@
   }
 
   function updateNotificationBadge(toggle, badge, unreadCount) {
-    badge.hidden = unreadCount === 0;
-    toggle.setAttribute("aria-label", unreadCount > 0 ? `通知 ${unreadCount}件` : "通知");
+    const count = Number(unreadCount) || 0;
+    const hidden = count <= 0;
+    badge.hidden = hidden;
+    badge.classList.toggle("is-hidden", hidden);
+    toggle.setAttribute("aria-label", hidden ? "通知" : `通知 ${count}件`);
   }
 
   async function setupNotifications() {

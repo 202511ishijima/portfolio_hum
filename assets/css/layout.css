@@ -126,6 +126,10 @@ body.has-fixed-header {
   font-weight: 700;
 }
 
+.notification-badge.is-hidden {
+  display: none !important;
+}
+
 .notification-panel {
   position: absolute;
   right: 0;
