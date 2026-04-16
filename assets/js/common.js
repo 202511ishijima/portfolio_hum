@@ -1,6 +1,7 @@
 (function () {
   let lastCartCount = null;
   const memberKey = "hamu_member";
+  const notificationSeenKey = "hamu_seen_notifications";
   const backendBaseUrl = (() => {
     const { hostname, port, origin } = window.location;
     if (hostname.endsWith("github.io")) return "https://portfolio-hum.onrender.com";
@@ -53,6 +54,19 @@
   function saveMember(member) {
     localStorage.setItem(memberKey, JSON.stringify(member));
     document.dispatchEvent(new Event("member:updated"));
+  }
+
+  function loadSeenNotifications() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(notificationSeenKey) || "[]");
+      return Array.isArray(parsed) ? new Set(parsed) : new Set();
+    } catch (error) {
+      return new Set();
+    }
+  }
+
+  function saveSeenNotifications(seen) {
+    localStorage.setItem(notificationSeenKey, JSON.stringify(Array.from(seen)));
   }
 
   function updateMemberLink() {
@@ -128,6 +142,94 @@
     updateVisibility();
   }
 
+  function createNotificationId(item) {
+    return `${item.date || ""}|${item.title || ""}`;
+  }
+
+  async function setupNotifications() {
+    const toggle = document.querySelector("[data-notification-toggle]");
+    const panel = document.querySelector("[data-notification-panel]");
+    const badge = document.querySelector("[data-notification-badge]");
+    const list = document.querySelector("[data-notification-list]");
+    if (!toggle || !panel || !badge || !list) return;
+
+    let notifications = [];
+    try {
+      const response = await fetch(`${document.body.dataset.basePath || "./"}assets/data/news.json`);
+      if (response.ok) {
+        const data = await response.json();
+        notifications = Array.isArray(data) ? data.slice(0, 8) : [];
+      }
+    } catch (error) {
+      notifications = [];
+    }
+
+    const seen = loadSeenNotifications();
+    const unreadCount = notifications.filter((item) => !seen.has(createNotificationId(item))).length;
+
+    badge.hidden = unreadCount === 0;
+    toggle.setAttribute("aria-label", unreadCount > 0 ? `通知 ${unreadCount}件` : "通知");
+
+    if (!notifications.length) {
+      list.innerHTML = '<li class="notification-empty">お知らせはありません。</li>';
+    } else {
+      const basePath = document.body.dataset.basePath || "./";
+      list.innerHTML = notifications.map((item) => {
+        const id = createNotificationId(item);
+        const href = item.link ? `${basePath}${String(item.link).replace(/^\/+/, "")}` : `${basePath}pages/news.html`;
+        const title = String(item.title || "お知らせ");
+        const date = String(item.date || "");
+        const unread = seen.has(id) ? "" : "data-unread=\"true\"";
+        return `
+          <li>
+            <a class="notification-item-link" href="${href}" ${unread}>
+              <span class="notification-item-title">${title}</span>
+              <span class="notification-item-date">${date}</span>
+            </a>
+          </li>
+        `;
+      }).join("");
+    }
+
+    const closePanel = () => {
+      panel.hidden = true;
+      toggle.setAttribute("aria-expanded", "false");
+    };
+
+    const openPanel = () => {
+      panel.hidden = false;
+      toggle.setAttribute("aria-expanded", "true");
+      const seenNow = loadSeenNotifications();
+      notifications.forEach((item) => seenNow.add(createNotificationId(item)));
+      saveSeenNotifications(seenNow);
+      badge.hidden = true;
+    };
+
+    toggle.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (panel.hidden) {
+        openPanel();
+      } else {
+        closePanel();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (panel.hidden) return;
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (!panel.contains(target) && !toggle.contains(target)) {
+        closePanel();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closePanel();
+      }
+    });
+  }
+
   async function fetchMemberStatus(email) {
     if (!email) return null;
 
@@ -175,6 +277,7 @@
     setupYear();
     setupFavicon();
     setupPageTopButton();
+    await setupNotifications();
     updateCartCount();
     updateMemberLink();
     document.addEventListener("cart:updated", updateCartCount);
