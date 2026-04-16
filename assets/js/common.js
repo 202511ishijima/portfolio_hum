@@ -14,7 +14,6 @@
   async function injectPartial(targetId, fileName) {
     const target = document.getElementById(targetId);
     if (!target) return;
-
     const basePath = document.body.dataset.basePath || "./";
     const response = await fetch(`${basePath}assets/partials/${fileName}`);
     const html = await response.text();
@@ -28,7 +27,6 @@
     document.querySelectorAll("[data-cart-count]").forEach((node) => {
       node.textContent = String(count);
     });
-
     document.querySelectorAll(".icon-link--cart").forEach((link) => {
       link.setAttribute("aria-label", count > 0 ? `カート 件数 ${count}点` : "カート");
     });
@@ -46,7 +44,7 @@
   function getMember() {
     try {
       return JSON.parse(localStorage.getItem(memberKey) || "null");
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -64,7 +62,6 @@
     document.querySelectorAll("[data-member-label]").forEach((node) => {
       node.textContent = isLoggedIn ? member.name : "会員";
     });
-
     document.querySelectorAll("[data-member-link]").forEach((node) => {
       node.setAttribute("href", isLoggedIn ? `${basePath}pages/mypage.html` : `${basePath}pages/login.html`);
       node.setAttribute("aria-label", isLoggedIn ? `${member.name} さんのマイページ` : "会員ページ");
@@ -83,7 +80,6 @@
     const toggle = document.querySelector(".menu-toggle");
     const nav = document.querySelector(".global-nav");
     if (!toggle || !nav) return;
-
     toggle.addEventListener("click", () => {
       const isOpen = nav.classList.toggle("is-open");
       toggle.setAttribute("aria-expanded", String(isOpen));
@@ -111,16 +107,11 @@
   function setupPageTopButton() {
     const button = document.querySelector("[data-page-top]");
     if (!button) return;
-
     function updateVisibility() {
-      const threshold = window.innerHeight / 2;
-      button.classList.toggle("is-visible", window.scrollY > threshold);
+      button.classList.toggle("is-visible", window.scrollY > window.innerHeight / 2);
     }
-
     window.addEventListener("scroll", updateVisibility, { passive: true });
-    button.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+    button.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
     updateVisibility();
   }
 
@@ -128,7 +119,7 @@
     try {
       const parsed = JSON.parse(localStorage.getItem(notificationSeenKey) || "[]");
       return Array.isArray(parsed) ? new Set(parsed) : new Set();
-    } catch (error) {
+    } catch {
       return new Set();
     }
   }
@@ -139,23 +130,20 @@
 
   function normalizePath(urlLike) {
     try {
-      const url = new URL(urlLike, window.location.origin);
-      return url.pathname.replace(/\/+$/, "");
-    } catch (error) {
+      return new URL(urlLike, window.location.origin).pathname.replace(/\/+$/, "");
+    } catch {
       return "";
     }
   }
 
   function createNotificationId(item) {
-    if (item.type === "reply") {
-      return `reply|${item.replyId || item.inquiryId || ""}|${item.sentAt || ""}`;
-    }
+    if (item.type === "reply") return `reply|${item.replyId || item.inquiryId || ""}|${item.sentAt || ""}`;
     return `news|${item.date || ""}|${item.title || ""}`;
   }
 
   function parseTime(value) {
-    const time = new Date(value || "").getTime();
-    return Number.isNaN(time) ? 0 : time;
+    const t = new Date(value || "").getTime();
+    return Number.isNaN(t) ? 0 : t;
   }
 
   async function fetchInquiryThread(email) {
@@ -165,7 +153,7 @@
       if (!response.ok) return [];
       const data = await response.json();
       return Array.isArray(data) ? data : [];
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -198,8 +186,7 @@
     const currentPath = normalizePath(window.location.href);
     let changed = false;
     items.forEach((item) => {
-      const itemPath = normalizePath(item.href);
-      if (itemPath && itemPath === currentPath) {
+      if (normalizePath(item.href) === currentPath) {
         const id = createNotificationId(item);
         if (!seenSet.has(id)) {
           seenSet.add(id);
@@ -210,24 +197,29 @@
     if (changed) saveSeenNotifications(seenSet);
   }
 
-  function renderNotificationList(listEl, items, seenSet) {
-    if (!items.length) {
-      listEl.innerHTML = '<li class="notification-empty">お知らせはありません。</li>';
-      return;
+  function renderUnreadNotificationList(listEl, items, seenSet) {
+    const unreadItems = items.filter((item) => !seenSet.has(createNotificationId(item)));
+    if (!unreadItems.length) {
+      listEl.innerHTML = '<li class="notification-empty">未読の通知はありません。</li>';
+      return 0;
     }
-
-    listEl.innerHTML = items.map((item) => {
+    listEl.innerHTML = unreadItems.map((item) => {
       const id = createNotificationId(item);
-      const unread = seenSet.has(id) ? "" : 'data-unread="true"';
       return `
         <li>
-          <a class="notification-item-link" href="${item.href}" data-notification-id="${id}" ${unread}>
+          <a class="notification-item-link" href="${item.href}" data-notification-id="${id}" data-unread="true">
             <span class="notification-item-title">${item.title}</span>
             <span class="notification-item-date">${item.date}</span>
           </a>
         </li>
       `;
     }).join("");
+    return unreadItems.length;
+  }
+
+  function updateNotificationBadge(toggle, badge, unreadCount) {
+    badge.hidden = unreadCount === 0;
+    toggle.setAttribute("aria-label", unreadCount > 0 ? `通知 ${unreadCount}件` : "通知");
   }
 
   async function setupNotifications() {
@@ -247,7 +239,7 @@
         const data = await response.json();
         news = Array.isArray(data) ? data.slice(0, 8) : [];
       }
-    } catch (error) {
+    } catch {
       news = [];
     }
 
@@ -255,11 +247,9 @@
     const items = buildNotificationItems(news, replies, basePath);
     const seen = loadSeenNotifications();
     markCurrentPageAsSeen(items, seen);
-    renderNotificationList(list, items, seen);
 
-    const unreadCount = items.filter((item) => !seen.has(createNotificationId(item))).length;
-    badge.hidden = unreadCount === 0;
-    toggle.setAttribute("aria-label", unreadCount > 0 ? `通知 ${unreadCount}件` : "通知");
+    let unreadCount = renderUnreadNotificationList(list, items, seen);
+    updateNotificationBadge(toggle, badge, unreadCount);
 
     const closePanel = () => {
       panel.hidden = true;
@@ -282,25 +272,29 @@
       if (!(target instanceof Element)) return;
       const link = target.closest(".notification-item-link");
       if (!link) return;
+
       const id = link.getAttribute("data-notification-id");
       if (!id) return;
 
       const seenNow = loadSeenNotifications();
       seenNow.add(id);
       saveSeenNotifications(seenNow);
-      link.removeAttribute("data-unread");
 
-      const remain = Array.from(list.querySelectorAll(".notification-item-link[data-unread='true']")).length;
-      badge.hidden = remain === 0;
+      const li = link.closest("li");
+      if (li) li.remove();
+
+      unreadCount = Array.from(list.querySelectorAll(".notification-item-link[data-unread='true']")).length;
+      if (unreadCount === 0) {
+        list.innerHTML = '<li class="notification-empty">未読の通知はありません。</li>';
+      }
+      updateNotificationBadge(toggle, badge, unreadCount);
     });
 
     document.addEventListener("click", (event) => {
       if (panel.hidden) return;
       const target = event.target;
       if (!(target instanceof Node)) return;
-      if (!panel.contains(target) && !toggle.contains(target)) {
-        closePanel();
-      }
+      if (!panel.contains(target) && !toggle.contains(target)) closePanel();
     });
 
     document.addEventListener("keydown", (event) => {
@@ -314,14 +308,13 @@
       const response = await fetch(`${backendBaseUrl}/api/members/status?email=${encodeURIComponent(email)}`);
       if (!response.ok) return null;
       return await response.json();
-    } catch (error) {
+    } catch {
       return null;
     }
   }
 
   async function enforceMemberGuard() {
     if (document.body.dataset.memberGuard !== "active") return;
-
     const member = getMember();
     if (!member?.loggedIn || !member?.email) return;
 
