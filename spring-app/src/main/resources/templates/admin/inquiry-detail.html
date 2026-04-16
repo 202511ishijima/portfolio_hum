@@ -67,7 +67,7 @@
 
 				<section class="admin-chat-panel">
 					<div class="admin-chat-thread">
-						<article class="admin-chat-message admin-chat-message--member">
+						<article class="admin-chat-message admin-chat-message--other">
 							<div class="admin-chat-message__meta">
 								<span th:text="${inquiry.name}">会員</span>
 								<span th:text="${#temporals.format(inquiry.createdAt, 'yyyy/MM/dd HH:mm')}">2026/03/18 10:00</span>
@@ -78,7 +78,7 @@
 							</div>
 						</article>
 
-						<article class="admin-chat-message"
+						<article class="admin-chat-message admin-chat-message--self"
 						         th:each="reply : ${replyHistory}">
 							<div class="admin-chat-message__meta">
 								<span>管理者</span>

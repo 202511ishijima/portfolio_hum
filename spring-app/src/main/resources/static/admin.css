@@ -1093,13 +1093,17 @@ body.admin-body {
   color: var(--admin-text-soft);
 }
 
-.admin-chat-message--member {
+.admin-chat-message--self {
   justify-items: end;
 }
 
-.admin-chat-message--member .admin-chat-message__bubble {
+.admin-chat-message--self .admin-chat-message__bubble {
   background: #f7eadf;
   border-color: rgba(185, 144, 108, 0.38);
+}
+
+.admin-chat-message--other {
+  justify-items: start;
 }
 
 .admin-chat-empty p {
