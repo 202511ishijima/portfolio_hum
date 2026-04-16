@@ -22,7 +22,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin/hamsters")
@@ -65,11 +67,13 @@ public class AdminHamsterController {
 		Model model
 	) {
 		List<Hamster> hamsters = hamsterService.findAll(species, sex, status);
+		List<HamsterGroupedRow> groupedRows = buildGroupedRows(hamsters);
 		long availableCount = hamsters.stream().filter(hamster -> hamster.getStatus() == HamsterStatus.AVAILABLE).count();
 		long negotiatingCount = hamsters.stream().filter(hamster -> hamster.getStatus() == HamsterStatus.NEGOTIATING).count();
 		long adoptedCount = hamsters.stream().filter(hamster -> hamster.getStatus() == HamsterStatus.ADOPTED).count();
 
 		model.addAttribute("hamsters", hamsters);
+		model.addAttribute("hamsterRows", groupedRows);
 		model.addAttribute("speciesOptions", hamsterService.findSpeciesOptions());
 		model.addAttribute("selectedSpecies", normalize(species));
 		model.addAttribute("selectedSex", sex);
@@ -215,5 +219,60 @@ public class AdminHamsterController {
 			return null;
 		}
 		return value.trim();
+	}
+
+	private List<HamsterGroupedRow> buildGroupedRows(List<Hamster> hamsters) {
+		Map<HamsterGroupKey, List<Hamster>> grouped = new LinkedHashMap<>();
+		for (Hamster hamster : hamsters) {
+			HamsterGroupKey key = new HamsterGroupKey(
+				normalize(hamster.getSpecies()),
+				hamster.getSex(),
+				hamster.getBirthDate(),
+				hamster.getArrivalDate(),
+				hamster.getStatus()
+			);
+			grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(hamster);
+		}
+
+		return grouped.values().stream()
+			.map(group -> {
+				Hamster first = group.get(0);
+				Long representativeId = group.stream()
+					.map(Hamster::getId)
+					.filter(id -> id != null)
+					.min(Long::compareTo)
+					.orElse(first.getId());
+				return new HamsterGroupedRow(
+					representativeId,
+					first.getSpecies(),
+					first.getSex(),
+					first.getBirthDate(),
+					first.getArrivalDate(),
+					first.getStatus(),
+					group.size()
+				);
+			})
+			.sorted(Comparator.comparing(HamsterGroupedRow::representativeId, Comparator.nullsLast(Long::compareTo)))
+			.toList();
+	}
+
+	private record HamsterGroupKey(
+		String species,
+		HamsterSex sex,
+		java.time.LocalDate birthDate,
+		java.time.LocalDate arrivalDate,
+		HamsterStatus status
+	) {
+	}
+
+	public record HamsterGroupedRow(
+		Long representativeId,
+		String species,
+		HamsterSex sex,
+		java.time.LocalDate birthDate,
+		java.time.LocalDate arrivalDate,
+		HamsterStatus status,
+		int count
+	) {
 	}
 }

@@ -103,24 +103,25 @@
 				</div>
 			</div>
 
-			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(hamsters)}">
+			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(hamsterRows)}">
 				<table class="admin-table admin-table--hamsters" data-sortable="true">
 					<thead>
 						<tr>
-							<th data-sort-type="number">ID</th>
+							<th data-sort-type="number">代表ID</th>
 							<th data-sort-type="text">種類</th>
 							<th data-sort-type="text">性別</th>
 							<th data-sort-type="date">生年月日</th>
 							<th data-sort-type="date">入荷日</th>
 							<th data-sort-type="text">在籍状況</th>
+							<th data-sort-type="number">匹数</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="hamster : ${hamsters}"
+						<tr th:each="hamster : ${hamsterRows}"
 						    class="admin-table-row-link"
-						    th:data-href="@{/admin/hamsters/{id}/edit(id=${hamster.id})}"
+						    th:data-href="@{/admin/hamsters/{id}/edit(id=${hamster.representativeId})}"
 						    tabindex="0">
-							<td th:text="${hamster.id}">1</td>
+							<td th:text="${hamster.representativeId}">1</td>
 							<td th:text="${hamster.species != null && !hamster.species.isBlank() ? hamster.species : '-'}">ゴールデンハムスター</td>
 							<td th:text="${hamster.sex != null ? (hamster.sex.name() == 'MALE' ? 'オス' : 'メス') : '-'}">オス</td>
 							<td th:text="${hamster.birthDate != null ? #temporals.format(hamster.birthDate, 'yyyy/MM/dd') : '-'}">2026/03/20</td>
@@ -130,12 +131,13 @@
 								      th:classappend="${hamster.status != null && hamster.status.name() == 'AVAILABLE' ? ' admin-status--done' : (hamster.status != null && hamster.status.name() == 'NEGOTIATING' ? ' admin-status--progress' : ' admin-status--new')}"
 								      th:text="${hamster.status != null ? (hamster.status.name() == 'AVAILABLE' ? '在籍中' : (hamster.status.name() == 'NEGOTIATING' ? '商談中' : 'お迎え済み')) : '-'}">在籍中</span>
 							</td>
+							<td th:text="${hamster.count}">1</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 
-			<p class="admin-empty" th:if="${#lists.isEmpty(hamsters)}">該当するハムスターはいません。</p>
+			<p class="admin-empty" th:if="${#lists.isEmpty(hamsterRows)}">該当するハムスターはいません。</p>
 		</section>
 	</div>
 
