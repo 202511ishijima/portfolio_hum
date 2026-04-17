@@ -232,35 +232,47 @@
 				</table>
 			</div>
 
-			<form th:action="@{/admin/cafe/orders/sales-target}" method="post">
-				<div class="admin-summary-grid admin-summary-grid--compact" style="margin-top: 12px;">
-					<article class="admin-summary-card">
-						<h2>日次目標</h2>
-						<div th:if="${canManageCafe}">
-							<input type="number" name="dailyTarget" min="0" step="100" th:value="${dailySalesTarget}" style="width:100%;max-width:180px;">
-							<p class="admin-help-text">円</p>
-						</div>
-						<p th:if="${!canManageCafe}" class="admin-summary-number" th:text="${dailySalesTarget} + ' 円'">50000 円</p>
-					</article>
-					<article class="admin-summary-card">
-						<h2>日次平均（過去1か月）</h2>
-						<p class="admin-summary-number" th:text="${pastMonthAverageDaily} + ' 円'">0 円</p>
-					</article>
-					<article class="admin-summary-card">
-						<h2>月次目標</h2>
-						<div th:if="${canManageCafe}">
-							<input type="number" name="monthlyTarget" min="0" step="1000" th:value="${monthlySalesTarget}" style="width:100%;max-width:180px;">
-							<p class="admin-help-text">円</p>
-						</div>
-						<p th:if="${!canManageCafe}" class="admin-summary-number" th:text="${monthlySalesTarget} + ' 円'">1500000 円</p>
-					</article>
-					<article class="admin-summary-card">
-						<h2>月次実績（過去1か月）</h2>
-						<p class="admin-summary-number" th:text="${pastMonthTotal} + ' 円'">0 円</p>
-					</article>
+			<div class="admin-summary-grid admin-summary-grid--compact" style="margin-top: 12px;">
+				<article class="admin-summary-card">
+					<h2>日次目標</h2>
+					<p class="admin-summary-number" th:text="${dailySalesTarget} + ' 円'">50000 円</p>
+				</article>
+				<article class="admin-summary-card">
+					<h2>日次平均（過去1か月）</h2>
+					<p class="admin-summary-number" th:text="${pastMonthAverageDaily} + ' 円'">0 円</p>
+				</article>
+				<article class="admin-summary-card">
+					<h2>月次目標</h2>
+					<p class="admin-summary-number" th:text="${monthlySalesTarget} + ' 円'">1500000 円</p>
+				</article>
+				<article class="admin-summary-card">
+					<h2>月次実績（過去1か月）</h2>
+					<p class="admin-summary-number" th:text="${pastMonthTotal} + ' 円'">0 円</p>
+				</article>
+			</div>
+
+			<div class="admin-header-actions" style="margin-top:8px;" th:if="${canManageCafe}">
+				<button id="sales-target-edit-open" class="admin-button admin-button--ghost" type="button">目標値を編集</button>
+			</div>
+			<form id="sales-target-editor"
+			      th:if="${canManageCafe}"
+			      th:action="@{/admin/cafe/orders/sales-target}"
+			      method="post"
+			      hidden
+			      style="margin-top:8px;">
+				<div class="admin-filter-grid">
+					<label class="admin-field">
+						<span>日次目標（円）</span>
+						<input type="number" name="dailyTarget" min="0" step="100" th:value="${dailySalesTarget}" required>
+					</label>
+					<label class="admin-field">
+						<span>月次目標（円）</span>
+						<input type="number" name="monthlyTarget" min="0" step="1000" th:value="${monthlySalesTarget}" required>
+					</label>
 				</div>
-				<div class="admin-header-actions" style="margin-top:8px;" th:if="${canManageCafe}">
-					<button class="admin-button" type="submit">目標値を保存</button>
+				<div class="admin-header-actions" style="margin-top:8px;">
+					<button class="admin-button" type="submit">保存する</button>
+					<button id="sales-target-edit-cancel" class="admin-button admin-button--ghost" type="button">キャンセル</button>
 				</div>
 			</form>
 
@@ -297,6 +309,9 @@
 
 			const modeButtons = Array.from(document.querySelectorAll(".js-sales-mode"));
 			const modeTables = Array.from(document.querySelectorAll(".js-sales-table"));
+			const editOpenButton = document.getElementById("sales-target-edit-open");
+			const editCancelButton = document.getElementById("sales-target-edit-cancel");
+			const targetEditor = document.getElementById("sales-target-editor");
 			const canvas = document.getElementById("sales-mixed-chart");
 			if (!canvas || typeof Chart === "undefined") {
 				return;
@@ -371,6 +386,16 @@
 
 			modeButtons.forEach((button) => {
 				button.addEventListener("click", () => applyMode(button.dataset.mode || "daily"));
+			});
+			editOpenButton?.addEventListener("click", () => {
+				if (targetEditor) {
+					targetEditor.hidden = false;
+				}
+			});
+			editCancelButton?.addEventListener("click", () => {
+				if (targetEditor) {
+					targetEditor.hidden = true;
+				}
 			});
 			applyMode("daily");
 		})();
