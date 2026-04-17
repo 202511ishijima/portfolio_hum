@@ -47,15 +47,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminCafeController {
 
+	private static final int DEFAULT_DAILY_SALES_TARGET = 50000;
+	private static final int DEFAULT_MONTHLY_SALES_TARGET = 1500000;
+
 	private final CafeOrderService cafeOrderService;
 	@Value("${app.frontend-base-url:}")
 	private String frontendBaseUrl;
 	@Value("${app.backend-base-url:}")
 	private String backendBaseUrlProperty;
-	@Value("${app.cafe.sales.target.daily:50000}")
-	private int dailySalesTarget;
-	@Value("${app.cafe.sales.target.monthly:1500000}")
-	private int monthlySalesTarget;
 
 	@GetMapping("/reception")
 	public String reception(Model model) {
@@ -253,6 +252,13 @@ public class AdminCafeController {
 		List<Map<String, Object>> salesDailyRaw = cafeOrderService.findRecentDailySales(400);
 		List<Map<String, Object>> salesDaily = salesDailyRaw.stream().limit(31).toList();
 		List<Map<String, Object>> salesMonthly = buildMonthlySales(salesDailyRaw, 12);
+		Map<String, Object> salesTarget = cafeOrderService.findSalesTarget();
+		int dailySalesTarget = salesTarget == null
+			? DEFAULT_DAILY_SALES_TARGET
+			: toInt(salesTarget.getOrDefault("dailyTarget", DEFAULT_DAILY_SALES_TARGET));
+		int monthlySalesTarget = salesTarget == null
+			? DEFAULT_MONTHLY_SALES_TARGET
+			: toInt(salesTarget.getOrDefault("monthlyTarget", DEFAULT_MONTHLY_SALES_TARGET));
 
 		int todayTotal = sumSalesByDate(salesDailyRaw, LocalDate.now());
 		int todayOrders = countOrdersByDate(salesDailyRaw, LocalDate.now());
@@ -317,6 +323,26 @@ public class AdminCafeController {
 		model.addAttribute("salesMonthlyAverageLine", monthlyAverageLine);
 		model.addAttribute("adminSection", "cafe-orders");
 		return "admin/cafe-orders";
+	}
+
+	@PostMapping("/orders/sales-target")
+	public String updateSalesTarget(
+		@RequestParam("dailyTarget") Integer dailyTarget,
+		@RequestParam("monthlyTarget") Integer monthlyTarget,
+		Authentication authentication,
+		RedirectAttributes redirectAttributes
+	) {
+		if (!canManage(authentication)) {
+			redirectAttributes.addFlashAttribute("cafeError", "売上目標の更新権限がありません。");
+			return "redirect:/admin/cafe/orders";
+		}
+		try {
+			cafeOrderService.updateSalesTarget(dailyTarget, monthlyTarget);
+			redirectAttributes.addFlashAttribute("cafeMessage", "売上目標を更新しました。");
+		} catch (IllegalArgumentException ex) {
+			redirectAttributes.addFlashAttribute("cafeError", ex.getMessage());
+		}
+		return "redirect:/admin/cafe/orders";
 	}
 
 	private List<Map<String, Object>> buildMonthlySales(List<Map<String, Object>> dailyRows, int limit) {

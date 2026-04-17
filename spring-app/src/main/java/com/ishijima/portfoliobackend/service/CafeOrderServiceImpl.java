@@ -292,6 +292,23 @@ public class CafeOrderServiceImpl implements CafeOrderService {
 		return cafeSalesMapper.findDailySalesRecent(limit);
 	}
 
+	@Override
+	public Map<String, Object> findSalesTarget() {
+		return cafeSalesMapper.findSalesTarget();
+	}
+
+	@Override
+	@Transactional
+	public void updateSalesTarget(Integer dailyTarget, Integer monthlyTarget) {
+		if (dailyTarget == null || monthlyTarget == null) {
+			throw new IllegalArgumentException("目標値を入力してください。");
+		}
+		if (dailyTarget < 0 || monthlyTarget < 0) {
+			throw new IllegalArgumentException("目標値は0以上で入力してください。");
+		}
+		cafeSalesMapper.upsertSalesTarget(dailyTarget, monthlyTarget);
+	}
+
 	private CafeVisitSession ensureOrderAllowed(String sessionToken) {
 		CafeVisitSession session = findSessionOrThrow(sessionToken);
 		session = applyExpiryIfNeeded(session);

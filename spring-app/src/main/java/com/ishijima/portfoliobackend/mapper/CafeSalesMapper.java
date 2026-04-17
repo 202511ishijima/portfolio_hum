@@ -23,5 +23,11 @@ public interface CafeSalesMapper {
 	);
 
 	List<Map<String, Object>> findDailySalesRecent(@Param("limit") Integer limit);
-}
 
+	Map<String, Object> findSalesTarget();
+
+	void upsertSalesTarget(
+		@Param("dailyTarget") Integer dailyTarget,
+		@Param("monthlyTarget") Integer monthlyTarget
+	);
+}

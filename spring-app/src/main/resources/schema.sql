@@ -226,6 +226,15 @@ CREATE TABLE IF NOT EXISTS cafe_sales_daily (
 	updated_at DATETIME NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS cafe_sales_targets (
+	id INT PRIMARY KEY,
+	daily_target INT NOT NULL,
+	monthly_target INT NOT NULL,
+	updated_at DATETIME NOT NULL
+);
+
+MERGE INTO cafe_sales_targets KEY(id) VALUES (1, 50000, 1500000, CURRENT_TIMESTAMP());
+
 CREATE TABLE IF NOT EXISTS cafe_visit_sessions (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
 	session_token VARCHAR(100) NOT NULL UNIQUE,

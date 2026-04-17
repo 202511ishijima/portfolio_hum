@@ -47,4 +47,8 @@ public interface CafeOrderService {
 	void updateMenu(String menuId, CafeMenuUpdateForm form);
 
 	List<Map<String, Object>> findRecentDailySales(int limit);
+
+	Map<String, Object> findSalesTarget();
+
+	void updateSalesTarget(Integer dailyTarget, Integer monthlyTarget);
 }

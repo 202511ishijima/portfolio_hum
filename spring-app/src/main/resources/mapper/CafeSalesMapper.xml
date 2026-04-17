@@ -36,5 +36,27 @@
 		ORDER BY sales_date DESC
 		LIMIT #{limit}
 	</select>
-</mapper>
 
+	<select id="findSalesTarget" resultType="map">
+		SELECT
+			daily_target AS dailyTarget,
+			monthly_target AS monthlyTarget
+		FROM cafe_sales_targets
+		WHERE id = 1
+	</select>
+
+	<update id="upsertSalesTarget">
+		MERGE INTO cafe_sales_targets (
+			id,
+			daily_target,
+			monthly_target,
+			updated_at
+		) KEY(id)
+		VALUES (
+			1,
+			#{dailyTarget},
+			#{monthlyTarget},
+			CURRENT_TIMESTAMP()
+		)
+	</update>
+</mapper>

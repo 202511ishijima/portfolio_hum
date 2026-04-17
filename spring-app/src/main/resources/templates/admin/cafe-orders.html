@@ -232,24 +232,37 @@
 				</table>
 			</div>
 
-			<div class="admin-summary-grid admin-summary-grid--compact" style="margin-top: 12px;">
-				<article class="admin-summary-card">
-					<h2>日次目標</h2>
-					<p class="admin-summary-number" th:text="${dailySalesTarget} + ' 円'">50000 円</p>
-				</article>
-				<article class="admin-summary-card">
-					<h2>日次平均（過去1か月）</h2>
-					<p class="admin-summary-number" th:text="${pastMonthAverageDaily} + ' 円'">0 円</p>
-				</article>
-				<article class="admin-summary-card">
-					<h2>月次目標</h2>
-					<p class="admin-summary-number" th:text="${monthlySalesTarget} + ' 円'">1500000 円</p>
-				</article>
-				<article class="admin-summary-card">
-					<h2>月次実績（過去1か月）</h2>
-					<p class="admin-summary-number" th:text="${pastMonthTotal} + ' 円'">0 円</p>
-				</article>
-			</div>
+			<form th:action="@{/admin/cafe/orders/sales-target}" method="post">
+				<div class="admin-summary-grid admin-summary-grid--compact" style="margin-top: 12px;">
+					<article class="admin-summary-card">
+						<h2>日次目標</h2>
+						<div th:if="${canManageCafe}">
+							<input type="number" name="dailyTarget" min="0" step="100" th:value="${dailySalesTarget}" style="width:100%;max-width:180px;">
+							<p class="admin-help-text">円</p>
+						</div>
+						<p th:if="${!canManageCafe}" class="admin-summary-number" th:text="${dailySalesTarget} + ' 円'">50000 円</p>
+					</article>
+					<article class="admin-summary-card">
+						<h2>日次平均（過去1か月）</h2>
+						<p class="admin-summary-number" th:text="${pastMonthAverageDaily} + ' 円'">0 円</p>
+					</article>
+					<article class="admin-summary-card">
+						<h2>月次目標</h2>
+						<div th:if="${canManageCafe}">
+							<input type="number" name="monthlyTarget" min="0" step="1000" th:value="${monthlySalesTarget}" style="width:100%;max-width:180px;">
+							<p class="admin-help-text">円</p>
+						</div>
+						<p th:if="${!canManageCafe}" class="admin-summary-number" th:text="${monthlySalesTarget} + ' 円'">1500000 円</p>
+					</article>
+					<article class="admin-summary-card">
+						<h2>月次実績（過去1か月）</h2>
+						<p class="admin-summary-number" th:text="${pastMonthTotal} + ' 円'">0 円</p>
+					</article>
+				</div>
+				<div class="admin-header-actions" style="margin-top:8px;" th:if="${canManageCafe}">
+					<button class="admin-button" type="submit">目標値を保存</button>
+				</div>
+			</form>
 
 			<div style="margin-top: 16px;">
 				<canvas id="sales-mixed-chart" height="120"></canvas>
