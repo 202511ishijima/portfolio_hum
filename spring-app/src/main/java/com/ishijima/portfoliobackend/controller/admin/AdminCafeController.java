@@ -253,12 +253,8 @@ public class AdminCafeController {
 		List<Map<String, Object>> salesDaily = salesDailyRaw.stream().limit(31).toList();
 		List<Map<String, Object>> salesMonthly = buildMonthlySales(salesDailyRaw, 12);
 		Map<String, Object> salesTarget = cafeOrderService.findSalesTarget();
-		int dailySalesTarget = salesTarget == null
-			? DEFAULT_DAILY_SALES_TARGET
-			: toInt(salesTarget.getOrDefault("dailyTarget", DEFAULT_DAILY_SALES_TARGET));
-		int monthlySalesTarget = salesTarget == null
-			? DEFAULT_MONTHLY_SALES_TARGET
-			: toInt(salesTarget.getOrDefault("monthlyTarget", DEFAULT_MONTHLY_SALES_TARGET));
+		int dailySalesTarget = readMapInt(salesTarget, DEFAULT_DAILY_SALES_TARGET, "dailyTarget", "daily_target", "DAILYTARGET", "DAILY_TARGET");
+		int monthlySalesTarget = readMapInt(salesTarget, DEFAULT_MONTHLY_SALES_TARGET, "monthlyTarget", "monthly_target", "MONTHLYTARGET", "MONTHLY_TARGET");
 
 		int todayTotal = sumSalesByDate(salesDailyRaw, LocalDate.now());
 		int todayOrders = countOrdersByDate(salesDailyRaw, LocalDate.now());
@@ -431,6 +427,29 @@ public class AdminCafeController {
 		} catch (NumberFormatException ex) {
 			return 0;
 		}
+	}
+
+	private int readMapInt(Map<String, Object> source, int defaultValue, String... keys) {
+		if (source == null || source.isEmpty()) {
+			return defaultValue;
+		}
+		for (String key : keys) {
+			if (source.containsKey(key)) {
+				return toInt(source.get(key));
+			}
+		}
+		for (Map.Entry<String, Object> entry : source.entrySet()) {
+			if (entry.getKey() == null) {
+				continue;
+			}
+			String normalized = entry.getKey().replace("_", "").toLowerCase();
+			for (String key : keys) {
+				if (key != null && normalized.equals(key.replace("_", "").toLowerCase())) {
+					return toInt(entry.getValue());
+				}
+			}
+		}
+		return defaultValue;
 	}
 
 	@PostMapping("/orders/sessions/{token}/checkout")
