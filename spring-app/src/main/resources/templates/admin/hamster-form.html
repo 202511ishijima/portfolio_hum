@@ -70,7 +70,14 @@
 					<small class="admin-field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">登録匹数エラー</small>
 				</label>
 
-				<input th:if="${!createMode}" th:field="*{quantity}" type="hidden">
+				<label class="admin-field" th:if="${!createMode}">
+					<span>更新匹数</span>
+					<input th:field="*{quantity}" type="number" min="1" th:attr="max=${editableGroupCount}" step="1">
+					<small class="admin-help-text" th:text="'この条件の ' + ${editableGroupCount} + ' 匹のうち、指定した匹数だけ更新します。'">
+						この条件の 1 匹のうち、指定した匹数だけ更新します。
+					</small>
+					<small class="admin-field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">更新匹数エラー</small>
+				</label>
 
 				<label class="admin-field">
 					<span>在籍状況</span>

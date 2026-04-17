@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -69,6 +70,47 @@ public class HamsterServiceImpl implements HamsterService {
 
 		hamsterMapper.update(hamster);
 		return hamster;
+	}
+
+	@Override
+	@Transactional
+	public int updatePartialByRepresentative(Long representativeId, HamsterForm form, int updateCount) {
+		if (updateCount < 1) {
+			throw new IllegalArgumentException("更新匹数は1以上で指定してください。");
+		}
+
+		Hamster representative = findById(representativeId);
+		List<Hamster> sameGroup = hamsterMapper.findAll(
+				normalize(representative.getSpecies()),
+				representative.getSex(),
+				representative.getStatus())
+			.stream()
+			.filter(hamster -> java.util.Objects.equals(hamster.getBirthDate(), representative.getBirthDate()))
+			.filter(hamster -> java.util.Objects.equals(hamster.getArrivalDate(), representative.getArrivalDate()))
+			.sorted(Comparator.comparing(Hamster::getId, Comparator.nullsLast(Long::compareTo)))
+			.toList();
+
+		if (sameGroup.isEmpty()) {
+			throw new IllegalArgumentException("更新対象のハムスターが見つかりません。");
+		}
+		if (updateCount > sameGroup.size()) {
+			throw new IllegalArgumentException("更新匹数が対象グループ数を超えています。");
+		}
+
+		List<Hamster> targets = sameGroup.subList(0, updateCount);
+		LocalDateTime now = LocalDateTime.now();
+		for (Hamster hamster : targets) {
+			hamster.setSpecies(form.getSpecies().trim());
+			hamster.setSex(form.getSex());
+			hamster.setBirthDate(form.getBirthDate());
+			hamster.setHealthCondition(DEFAULT_HEALTH_CONDITION);
+			hamster.setArrivalDate(form.getArrivalDate());
+			hamster.setStatus(form.getStatus());
+			hamster.setNotes(normalizeNullable(form.getNotes()));
+			hamster.setUpdatedAt(now);
+			hamsterMapper.update(hamster);
+		}
+		return targets.size();
 	}
 
 	@Override

@@ -21,5 +21,7 @@ public interface HamsterService {
 
 	Hamster update(Long id, HamsterForm form);
 
+	int updatePartialByRepresentative(Long representativeId, HamsterForm form, int updateCount);
+
 	void deleteById(Long id);
 }

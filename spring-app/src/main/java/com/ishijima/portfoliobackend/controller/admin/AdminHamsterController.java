@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/admin/hamsters")
@@ -144,6 +145,7 @@ public class AdminHamsterController {
 	@GetMapping("/{id}/edit")
 	public String editForm(@PathVariable Long id, Model model) {
 		Hamster hamster = hamsterService.findById(id);
+		int editableGroupCount = countSameGroup(hamster);
 		if (!model.containsAttribute("hamsterForm")) {
 			HamsterForm form = new HamsterForm();
 			form.setSpecies(hamster.getSpecies());
@@ -155,6 +157,7 @@ public class AdminHamsterController {
 			form.setNotes(hamster.getNotes());
 			model.addAttribute("hamsterForm", form);
 		}
+		model.addAttribute("editableGroupCount", editableGroupCount);
 
 		populateFormScreen(model, "ハムスター情報の編集", "/admin/hamsters/" + id, false, hamster);
 		return "admin/hamster-form";
@@ -169,14 +172,19 @@ public class AdminHamsterController {
 		RedirectAttributes redirectAttributes
 	) {
 		Hamster hamster = hamsterService.findById(id);
+		int editableGroupCount = countSameGroup(hamster);
+		if (form.getQuantity() == null || form.getQuantity() < 1 || form.getQuantity() > editableGroupCount) {
+			bindingResult.rejectValue("quantity", "quantity.invalid", "更新匹数は1〜" + editableGroupCount + "の範囲で入力してください。");
+		}
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("editableGroupCount", editableGroupCount);
 			populateFormScreen(model, "ハムスター情報の編集", "/admin/hamsters/" + id, false, hamster);
 			return "admin/hamster-form";
 		}
 
-		hamsterService.update(id, form);
-		redirectAttributes.addFlashAttribute("hamsterMessage", "ハムスター情報を更新しました。");
-		return "redirect:/admin/hamsters/" + id;
+		int updated = hamsterService.updatePartialByRepresentative(id, form, form.getQuantity());
+		redirectAttributes.addFlashAttribute("hamsterMessage", updated + "匹のハムスター情報を更新しました。");
+		return "redirect:/admin/hamsters";
 	}
 
 	@PostMapping("/{id}/delete")
@@ -220,6 +228,17 @@ public class AdminHamsterController {
 			return null;
 		}
 		return value.trim();
+	}
+
+	private int countSameGroup(Hamster representative) {
+		return (int) hamsterService.findAll(
+				normalize(representative.getSpecies()),
+				representative.getSex(),
+				representative.getStatus()
+			).stream()
+			.filter(hamster -> Objects.equals(hamster.getBirthDate(), representative.getBirthDate()))
+			.filter(hamster -> Objects.equals(hamster.getArrivalDate(), representative.getArrivalDate()))
+			.count();
 	}
 
 	private List<HamsterGroupedRow> buildGroupedRows(List<Hamster> hamsters) {
@@ -277,3 +296,4 @@ public class AdminHamsterController {
 	) {
 	}
 }
+
