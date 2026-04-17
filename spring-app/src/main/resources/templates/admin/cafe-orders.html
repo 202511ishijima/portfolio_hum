@@ -160,10 +160,41 @@
 		<section class="admin-card">
 			<div class="admin-card-header">
 				<div>
-					<h2>売上（日次・直近14日）</h2>
+					<h2>売上（日次・月次）</h2>
+					<p>目標値と過去1か月平均（実績）をあわせて確認できます。</p>
 				</div>
 			</div>
-			<div class="admin-table-wrap" th:if="${!#lists.isEmpty(salesDaily)}">
+
+			<div class="admin-table-wrap">
+				<table class="admin-table">
+					<thead>
+						<tr>
+							<th>区分</th>
+							<th>注文数</th>
+							<th>売上</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>本日</td>
+							<td th:text="${salesTodayOrders}">0</td>
+							<td th:text="${salesTodayTotal} + ' 円'">0 円</td>
+						</tr>
+						<tr>
+							<td>今月</td>
+							<td th:text="${salesThisMonthOrders}">0</td>
+							<td th:text="${salesThisMonthTotal} + ' 円'">0 円</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="admin-header-actions" style="margin-top: 12px;">
+				<button class="admin-button admin-button--ghost js-sales-mode is-active" type="button" data-mode="daily">日次</button>
+				<button class="admin-button admin-button--ghost js-sales-mode" type="button" data-mode="monthly">月次</button>
+			</div>
+
+			<div class="admin-table-wrap js-sales-table" data-mode="daily" th:if="${!#lists.isEmpty(salesDaily)}" style="margin-top: 12px;">
 				<table class="admin-table">
 					<thead>
 						<tr>
@@ -181,7 +212,48 @@
 					</tbody>
 				</table>
 			</div>
-			<p th:if="${#lists.isEmpty(salesDaily)}">売上データはまだありません。</p>
+
+			<div class="admin-table-wrap js-sales-table" data-mode="monthly" th:if="${!#lists.isEmpty(salesMonthly)}" style="display:none; margin-top: 12px;">
+				<table class="admin-table">
+					<thead>
+						<tr>
+							<th>月</th>
+							<th>注文数</th>
+							<th>売上合計</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="month : ${salesMonthly}">
+							<td th:text="${month.salesMonth}">2026-04</td>
+							<td th:text="${month.orderCount}">24</td>
+							<td th:text="${month.totalAmount} + ' 円'">220000 円</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="admin-summary-grid admin-summary-grid--compact" style="margin-top: 12px;">
+				<article class="admin-summary-card">
+					<h2>日次目標</h2>
+					<p class="admin-summary-number" th:text="${dailySalesTarget} + ' 円'">50000 円</p>
+				</article>
+				<article class="admin-summary-card">
+					<h2>日次平均（過去1か月）</h2>
+					<p class="admin-summary-number" th:text="${pastMonthAverageDaily} + ' 円'">0 円</p>
+				</article>
+				<article class="admin-summary-card">
+					<h2>月次目標</h2>
+					<p class="admin-summary-number" th:text="${monthlySalesTarget} + ' 円'">1500000 円</p>
+				</article>
+				<article class="admin-summary-card">
+					<h2>月次実績（過去1か月）</h2>
+					<p class="admin-summary-number" th:text="${pastMonthTotal} + ' 円'">0 円</p>
+				</article>
+			</div>
+
+			<div style="margin-top: 16px;">
+				<canvas id="sales-mixed-chart" height="120"></canvas>
+			</div>
 		</section>
 	</div>
 	<div id="checkout-confirm-modal" class="admin-modal" hidden>
@@ -195,6 +267,101 @@
 			</div>
 		</div>
 	</div>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script th:inline="javascript">
+		(() => {
+			if (window.location.pathname !== "/admin/cafe/orders") {
+				return;
+			}
+			const dailyLabels = /*[[${salesDailyLabels}]]*/ [];
+			const dailyTotals = /*[[${salesDailyTotals}]]*/ [];
+			const dailyTargets = /*[[${salesDailyTargetLine}]]*/ [];
+			const dailyAverages = /*[[${salesDailyAverageLine}]]*/ [];
+			const monthlyLabels = /*[[${salesMonthlyLabels}]]*/ [];
+			const monthlyTotals = /*[[${salesMonthlyTotals}]]*/ [];
+			const monthlyTargets = /*[[${salesMonthlyTargetLine}]]*/ [];
+			const monthlyAverages = /*[[${salesMonthlyAverageLine}]]*/ [];
+
+			const modeButtons = Array.from(document.querySelectorAll(".js-sales-mode"));
+			const modeTables = Array.from(document.querySelectorAll(".js-sales-table"));
+			const canvas = document.getElementById("sales-mixed-chart");
+			if (!canvas || typeof Chart === "undefined") {
+				return;
+			}
+
+			const chart = new Chart(canvas, {
+				type: "bar",
+				data: {
+					labels: dailyLabels,
+					datasets: [
+						{
+							type: "bar",
+							label: "売上実績",
+							data: dailyTotals,
+							backgroundColor: "rgba(83, 109, 254, 0.55)",
+							borderColor: "rgba(83, 109, 254, 1)",
+							borderWidth: 1
+						},
+						{
+							type: "line",
+							label: "目標値",
+							data: dailyTargets,
+							borderColor: "rgba(239, 83, 80, 1)",
+							borderWidth: 2,
+							pointRadius: 0,
+							tension: 0
+						},
+						{
+							type: "line",
+							label: "過去1か月平均",
+							data: dailyAverages,
+							borderColor: "rgba(38, 166, 154, 1)",
+							borderWidth: 2,
+							pointRadius: 0,
+							tension: 0
+						}
+					]
+				},
+				options: {
+					responsive: true,
+					plugins: {
+						legend: { position: "bottom" }
+					},
+					scales: {
+						y: {
+							beginAtZero: true
+						}
+					}
+				}
+			});
+
+			const applyMode = (mode) => {
+				modeButtons.forEach((button) => {
+					button.classList.toggle("is-active", button.dataset.mode === mode);
+				});
+				modeTables.forEach((table) => {
+					table.style.display = table.dataset.mode === mode ? "" : "none";
+				});
+				if (mode === "monthly") {
+					chart.data.labels = monthlyLabels;
+					chart.data.datasets[0].data = monthlyTotals;
+					chart.data.datasets[1].data = monthlyTargets;
+					chart.data.datasets[2].data = monthlyAverages;
+				} else {
+					chart.data.labels = dailyLabels;
+					chart.data.datasets[0].data = dailyTotals;
+					chart.data.datasets[1].data = dailyTargets;
+					chart.data.datasets[2].data = dailyAverages;
+				}
+				chart.update();
+			};
+
+			modeButtons.forEach((button) => {
+				button.addEventListener("click", () => applyMode(button.dataset.mode || "daily"));
+			});
+			applyMode("daily");
+		})();
+	</script>
 	<script>
 		(function () {
 			if (window.location.pathname !== "/admin/cafe/orders") {

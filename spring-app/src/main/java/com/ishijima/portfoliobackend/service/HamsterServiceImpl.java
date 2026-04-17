@@ -87,6 +87,7 @@ public class HamsterServiceImpl implements HamsterService {
 			.stream()
 			.filter(hamster -> java.util.Objects.equals(hamster.getBirthDate(), representative.getBirthDate()))
 			.filter(hamster -> java.util.Objects.equals(hamster.getArrivalDate(), representative.getArrivalDate()))
+			.filter(hamster -> java.util.Objects.equals(normalizeNullable(hamster.getNotes()), normalizeNullable(representative.getNotes())))
 			.sorted(Comparator.comparing(Hamster::getId, Comparator.nullsLast(Long::compareTo)))
 			.toList();
 

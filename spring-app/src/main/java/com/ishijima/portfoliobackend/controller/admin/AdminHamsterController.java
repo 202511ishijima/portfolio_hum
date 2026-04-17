@@ -238,6 +238,7 @@ public class AdminHamsterController {
 			).stream()
 			.filter(hamster -> Objects.equals(hamster.getBirthDate(), representative.getBirthDate()))
 			.filter(hamster -> Objects.equals(hamster.getArrivalDate(), representative.getArrivalDate()))
+			.filter(hamster -> Objects.equals(normalize(hamster.getNotes()), normalize(representative.getNotes())))
 			.count();
 	}
 
@@ -249,7 +250,8 @@ public class AdminHamsterController {
 				hamster.getSex(),
 				hamster.getBirthDate(),
 				hamster.getArrivalDate(),
-				hamster.getStatus()
+				hamster.getStatus(),
+				normalize(hamster.getNotes())
 			);
 			grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(hamster);
 		}
@@ -281,7 +283,8 @@ public class AdminHamsterController {
 		HamsterSex sex,
 		java.time.LocalDate birthDate,
 		java.time.LocalDate arrivalDate,
-		HamsterStatus status
+		HamsterStatus status,
+		String notes
 	) {
 	}
 
@@ -296,4 +299,3 @@ public class AdminHamsterController {
 	) {
 	}
 }
-

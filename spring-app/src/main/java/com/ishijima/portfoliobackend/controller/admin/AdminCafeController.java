@@ -28,10 +28,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +52,10 @@ public class AdminCafeController {
 	private String frontendBaseUrl;
 	@Value("${app.backend-base-url:}")
 	private String backendBaseUrlProperty;
+	@Value("${app.cafe.sales.target.daily:50000}")
+	private int dailySalesTarget;
+	@Value("${app.cafe.sales.target.monthly:1500000}")
+	private int monthlySalesTarget;
 
 	@GetMapping("/reception")
 	public String reception(Model model) {
@@ -241,9 +250,161 @@ public class AdminCafeController {
 		model.addAttribute("orderItemsMap", cafeOrderService.findOrderItemsMap(allOrders));
 		model.addAttribute("elapsedMap", elapsedMap);
 		model.addAttribute("checkoutSessionRows", checkoutSessionRows);
-		model.addAttribute("salesDaily", cafeOrderService.findRecentDailySales(14));
+		List<Map<String, Object>> salesDailyRaw = cafeOrderService.findRecentDailySales(400);
+		List<Map<String, Object>> salesDaily = salesDailyRaw.stream().limit(31).toList();
+		List<Map<String, Object>> salesMonthly = buildMonthlySales(salesDailyRaw, 12);
+
+		int todayTotal = sumSalesByDate(salesDailyRaw, LocalDate.now());
+		int todayOrders = countOrdersByDate(salesDailyRaw, LocalDate.now());
+		YearMonth thisMonth = YearMonth.now();
+		int monthTotal = sumSalesByMonth(salesDailyRaw, thisMonth);
+		int monthOrders = countOrdersByMonth(salesDailyRaw, thisMonth);
+
+		int pastMonthTotal = salesDailyRaw.stream()
+			.filter(day -> {
+				LocalDate date = parseDate(day.get("salesDate"));
+				return date != null && !date.isBefore(LocalDate.now().minusDays(30));
+			})
+			.mapToInt(day -> toInt(day.get("totalAmount")))
+			.sum();
+		int pastMonthAverageDaily = Math.round(pastMonthTotal / 30f);
+
+		List<String> dailyLabels = new ArrayList<>();
+		List<Integer> dailyTotals = new ArrayList<>();
+		List<Integer> dailyTargetLine = new ArrayList<>();
+		List<Integer> dailyAverageLine = new ArrayList<>();
+		List<Map<String, Object>> dailyForChart = new ArrayList<>(salesDaily);
+		Collections.reverse(dailyForChart);
+		for (Map<String, Object> day : dailyForChart) {
+			dailyLabels.add(String.valueOf(day.get("salesDate")));
+			int total = toInt(day.get("totalAmount"));
+			dailyTotals.add(total);
+			dailyTargetLine.add(dailySalesTarget);
+			dailyAverageLine.add(pastMonthAverageDaily);
+		}
+
+		List<String> monthlyLabels = new ArrayList<>();
+		List<Integer> monthlyTotals = new ArrayList<>();
+		List<Integer> monthlyTargetLine = new ArrayList<>();
+		List<Integer> monthlyAverageLine = new ArrayList<>();
+		List<Map<String, Object>> monthlyForChart = new ArrayList<>(salesMonthly);
+		Collections.reverse(monthlyForChart);
+		for (Map<String, Object> month : monthlyForChart) {
+			monthlyLabels.add(String.valueOf(month.get("salesMonth")));
+			int total = toInt(month.get("totalAmount"));
+			monthlyTotals.add(total);
+			monthlyTargetLine.add(monthlySalesTarget);
+			monthlyAverageLine.add(pastMonthTotal);
+		}
+
+		model.addAttribute("salesDaily", salesDaily);
+		model.addAttribute("salesMonthly", salesMonthly);
+		model.addAttribute("salesTodayTotal", todayTotal);
+		model.addAttribute("salesTodayOrders", todayOrders);
+		model.addAttribute("salesThisMonthTotal", monthTotal);
+		model.addAttribute("salesThisMonthOrders", monthOrders);
+		model.addAttribute("dailySalesTarget", dailySalesTarget);
+		model.addAttribute("monthlySalesTarget", monthlySalesTarget);
+		model.addAttribute("pastMonthAverageDaily", pastMonthAverageDaily);
+		model.addAttribute("pastMonthTotal", pastMonthTotal);
+		model.addAttribute("salesDailyLabels", dailyLabels);
+		model.addAttribute("salesDailyTotals", dailyTotals);
+		model.addAttribute("salesDailyTargetLine", dailyTargetLine);
+		model.addAttribute("salesDailyAverageLine", dailyAverageLine);
+		model.addAttribute("salesMonthlyLabels", monthlyLabels);
+		model.addAttribute("salesMonthlyTotals", monthlyTotals);
+		model.addAttribute("salesMonthlyTargetLine", monthlyTargetLine);
+		model.addAttribute("salesMonthlyAverageLine", monthlyAverageLine);
 		model.addAttribute("adminSection", "cafe-orders");
 		return "admin/cafe-orders";
+	}
+
+	private List<Map<String, Object>> buildMonthlySales(List<Map<String, Object>> dailyRows, int limit) {
+		Map<YearMonth, int[]> monthlyMap = new LinkedHashMap<>();
+		for (Map<String, Object> row : dailyRows) {
+			LocalDate date = parseDate(row.get("salesDate"));
+			if (date == null) {
+				continue;
+			}
+			YearMonth ym = YearMonth.from(date);
+			int[] values = monthlyMap.computeIfAbsent(ym, key -> new int[]{0, 0});
+			values[0] += toInt(row.get("orderCount"));
+			values[1] += toInt(row.get("totalAmount"));
+		}
+
+		return monthlyMap.entrySet().stream()
+			.sorted((a, b) -> b.getKey().compareTo(a.getKey()))
+			.limit(limit)
+			.map(entry -> {
+				Map<String, Object> month = new LinkedHashMap<>();
+				month.put("salesMonth", entry.getKey().format(DateTimeFormatter.ofPattern("yyyy-MM")));
+				month.put("orderCount", entry.getValue()[0]);
+				month.put("totalAmount", entry.getValue()[1]);
+				return month;
+			})
+			.toList();
+	}
+
+	private int sumSalesByDate(List<Map<String, Object>> rows, LocalDate targetDate) {
+		return rows.stream()
+			.filter(row -> targetDate.equals(parseDate(row.get("salesDate"))))
+			.mapToInt(row -> toInt(row.get("totalAmount")))
+			.sum();
+	}
+
+	private int countOrdersByDate(List<Map<String, Object>> rows, LocalDate targetDate) {
+		return rows.stream()
+			.filter(row -> targetDate.equals(parseDate(row.get("salesDate"))))
+			.mapToInt(row -> toInt(row.get("orderCount")))
+			.sum();
+	}
+
+	private int sumSalesByMonth(List<Map<String, Object>> rows, YearMonth targetMonth) {
+		return rows.stream()
+			.filter(row -> {
+				LocalDate date = parseDate(row.get("salesDate"));
+				return date != null && targetMonth.equals(YearMonth.from(date));
+			})
+			.mapToInt(row -> toInt(row.get("totalAmount")))
+			.sum();
+	}
+
+	private int countOrdersByMonth(List<Map<String, Object>> rows, YearMonth targetMonth) {
+		return rows.stream()
+			.filter(row -> {
+				LocalDate date = parseDate(row.get("salesDate"));
+				return date != null && targetMonth.equals(YearMonth.from(date));
+			})
+			.mapToInt(row -> toInt(row.get("orderCount")))
+			.sum();
+	}
+
+	private LocalDate parseDate(Object value) {
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof LocalDate localDate) {
+			return localDate;
+		}
+		try {
+			return LocalDate.parse(value.toString());
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+
+	private int toInt(Object value) {
+		if (value == null) {
+			return 0;
+		}
+		if (value instanceof Number number) {
+			return number.intValue();
+		}
+		try {
+			return Integer.parseInt(value.toString());
+		} catch (NumberFormatException ex) {
+			return 0;
+		}
 	}
 
 	@PostMapping("/orders/sessions/{token}/checkout")
